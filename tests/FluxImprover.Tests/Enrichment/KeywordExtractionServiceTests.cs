@@ -57,7 +57,7 @@ public sealed class KeywordExtractionServiceTests
         var result = await _sut.ExtractKeywordsAsync(text, options);
 
         // Assert
-        result.Should().HaveCountLessOrEqualTo(3);
+        result.Should().HaveCountLessThanOrEqualTo(3);
     }
 
     [Fact]

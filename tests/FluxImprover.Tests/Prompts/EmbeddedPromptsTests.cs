@@ -93,7 +93,7 @@ public sealed class EmbeddedPromptsTests
 
         // Assert
         all.Should().NotBeEmpty();
-        all.Should().HaveCountGreaterOrEqualTo(5);
+        all.Should().HaveCountGreaterThanOrEqualTo(5);
     }
 
     [Fact]
