@@ -16,7 +16,7 @@ public sealed class EvaluationOptionsTests
         options.EnableFaithfulness.Should().BeTrue();
         options.EnableRelevancy.Should().BeTrue();
         options.EnableAnswerability.Should().BeTrue();
-        options.Temperature.Should().Be(0.0f);
+        options.Temperature.Should().BeNull();
         options.MaxTokens.Should().Be(1024);
         options.PassThreshold.Should().Be(0.7f);
         options.IncludeDetails.Should().BeTrue();

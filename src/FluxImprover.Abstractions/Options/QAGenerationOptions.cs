@@ -8,7 +8,7 @@ using FluxImprover.Abstractions.Models;
 public sealed class QAGenerationOptions
 {
     private int _pairsPerChunk = 3;
-    private float _temperature = 0.7f;
+    private float? _temperature;
     private int _maxTokens = 2048;
     private int _minAnswerLength = 10;
     private int _maxAnswerLength = 500;
@@ -27,15 +27,19 @@ public sealed class QAGenerationOptions
     }
 
     /// <summary>
-    /// LLM 온도 (0.0 ~ 2.0, 기본값: 0.7)
+    /// LLM 온도 (0.0 ~ 2.0).
+    /// null이면 모델 기본값 사용 (일부 모델은 기본값 외 temperature를 지원하지 않음).
     /// </summary>
-    public float Temperature
+    public float? Temperature
     {
         get => _temperature;
         init
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan(value, 0.0f);
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, 2.0f);
+            if (value.HasValue)
+            {
+                ArgumentOutOfRangeException.ThrowIfLessThan(value.Value, 0.0f);
+                ArgumentOutOfRangeException.ThrowIfGreaterThan(value.Value, 2.0f);
+            }
             _temperature = value;
         }
     }

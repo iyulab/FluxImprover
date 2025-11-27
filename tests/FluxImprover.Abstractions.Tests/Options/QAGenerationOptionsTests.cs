@@ -15,7 +15,7 @@ public sealed class QAGenerationOptionsTests
 
         // Assert
         options.PairsPerChunk.Should().Be(3);
-        options.Temperature.Should().Be(0.7f);
+        options.Temperature.Should().BeNull();
         options.MaxTokens.Should().Be(2048);
         options.IncludeMultiHop.Should().BeFalse();
         options.IncludeReasoning.Should().BeTrue();

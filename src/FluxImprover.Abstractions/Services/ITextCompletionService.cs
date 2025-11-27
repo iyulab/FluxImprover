@@ -38,8 +38,9 @@ public sealed record CompletionOptions
 {
     /// <summary>
     /// 생성 온도 (0.0 ~ 2.0). 높을수록 창의적, 낮을수록 결정적.
+    /// null이면 모델 기본값 사용 (일부 모델은 기본값 외 temperature를 지원하지 않음).
     /// </summary>
-    public float Temperature { get; init; } = 0.7f;
+    public float? Temperature { get; init; }
 
     /// <summary>
     /// 최대 생성 토큰 수. null이면 모델 기본값 사용.

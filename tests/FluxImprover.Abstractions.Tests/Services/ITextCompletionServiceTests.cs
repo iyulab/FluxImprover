@@ -94,7 +94,7 @@ public class CompletionOptionsTests
         var options = new CompletionOptions();
 
         // Assert
-        options.Temperature.Should().Be(0.7f);
+        options.Temperature.Should().BeNull();
         options.MaxTokens.Should().BeNull();
         options.SystemPrompt.Should().BeNull();
         options.Messages.Should().BeNull();

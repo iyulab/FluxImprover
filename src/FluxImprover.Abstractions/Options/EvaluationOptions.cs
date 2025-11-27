@@ -5,7 +5,7 @@ namespace FluxImprover.Abstractions.Options;
 /// </summary>
 public sealed class EvaluationOptions
 {
-    private float _temperature = 0.0f;
+    private float? _temperature;
     private int _maxTokens = 1024;
     private float _passThreshold = 0.7f;
     private int _maxRetries = 3;
@@ -26,15 +26,20 @@ public sealed class EvaluationOptions
     public bool EnableAnswerability { get; init; } = true;
 
     /// <summary>
-    /// LLM 온도 (0.0 ~ 2.0, 기본값: 0.0 - 평가는 결정적이어야 함)
+    /// LLM 온도 (0.0 ~ 2.0).
+    /// null이면 모델 기본값 사용 (일부 모델은 기본값 외 temperature를 지원하지 않음).
+    /// 평가 작업에는 낮은 temperature가 권장됩니다.
     /// </summary>
-    public float Temperature
+    public float? Temperature
     {
         get => _temperature;
         init
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan(value, 0.0f);
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, 2.0f);
+            if (value.HasValue)
+            {
+                ArgumentOutOfRangeException.ThrowIfLessThan(value.Value, 0.0f);
+                ArgumentOutOfRangeException.ThrowIfGreaterThan(value.Value, 2.0f);
+            }
             _temperature = value;
         }
     }

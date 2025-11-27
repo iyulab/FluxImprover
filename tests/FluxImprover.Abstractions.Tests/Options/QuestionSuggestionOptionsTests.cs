@@ -15,7 +15,7 @@ public sealed class QuestionSuggestionOptionsTests
 
         // Assert
         options.MaxSuggestions.Should().Be(5);
-        options.Temperature.Should().Be(0.8f);
+        options.Temperature.Should().BeNull();
         options.MaxTokens.Should().Be(1024);
         options.IncludeReasoning.Should().BeFalse();
         options.MinRelevanceScore.Should().Be(0.5f);

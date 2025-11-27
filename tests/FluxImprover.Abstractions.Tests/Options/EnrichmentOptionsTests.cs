@@ -16,7 +16,7 @@ public sealed class EnrichmentOptionsTests
         options.EnableSummarization.Should().BeTrue();
         options.EnableKeywordExtraction.Should().BeTrue();
         options.EnableEntityExtraction.Should().BeFalse();
-        options.Temperature.Should().Be(0.3f);
+        options.Temperature.Should().BeNull();
         options.MaxTokens.Should().Be(512);
         options.MaxKeywords.Should().Be(10);
         options.MaxSummaryLength.Should().Be(200);

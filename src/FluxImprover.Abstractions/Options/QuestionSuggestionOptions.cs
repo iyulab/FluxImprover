@@ -8,7 +8,7 @@ using FluxImprover.Abstractions.Models;
 public sealed class QuestionSuggestionOptions
 {
     private int _maxSuggestions = 5;
-    private float _temperature = 0.8f;
+    private float? _temperature;
     private int _maxTokens = 1024;
     private float _minRelevanceScore = 0.5f;
     private int _contextWindowSize = 5;
@@ -27,15 +27,19 @@ public sealed class QuestionSuggestionOptions
     }
 
     /// <summary>
-    /// LLM 온도 (0.0 ~ 2.0, 기본값: 0.8 - 다양성 확보)
+    /// LLM 온도 (0.0 ~ 2.0).
+    /// null이면 모델 기본값 사용 (일부 모델은 기본값 외 temperature를 지원하지 않음).
     /// </summary>
-    public float Temperature
+    public float? Temperature
     {
         get => _temperature;
         init
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan(value, 0.0f);
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, 2.0f);
+            if (value.HasValue)
+            {
+                ArgumentOutOfRangeException.ThrowIfLessThan(value.Value, 0.0f);
+                ArgumentOutOfRangeException.ThrowIfGreaterThan(value.Value, 2.0f);
+            }
             _temperature = value;
         }
     }

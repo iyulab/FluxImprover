@@ -5,7 +5,7 @@ namespace FluxImprover.Abstractions.Options;
 /// </summary>
 public sealed class EnrichmentOptions
 {
-    private float _temperature = 0.3f;
+    private float? _temperature;
     private int _maxTokens = 512;
     private int _maxKeywords = 10;
     private int _maxSummaryLength = 200;
@@ -26,15 +26,19 @@ public sealed class EnrichmentOptions
     public bool EnableEntityExtraction { get; init; } = false;
 
     /// <summary>
-    /// LLM 온도 (0.0 ~ 2.0, 기본값: 0.3)
+    /// LLM 온도 (0.0 ~ 2.0).
+    /// null이면 모델 기본값 사용 (일부 모델은 기본값 외 temperature를 지원하지 않음).
     /// </summary>
-    public float Temperature
+    public float? Temperature
     {
         get => _temperature;
         init
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan(value, 0.0f);
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, 2.0f);
+            if (value.HasValue)
+            {
+                ArgumentOutOfRangeException.ThrowIfLessThan(value.Value, 0.0f);
+                ArgumentOutOfRangeException.ThrowIfGreaterThan(value.Value, 2.0f);
+            }
             _temperature = value;
         }
     }
