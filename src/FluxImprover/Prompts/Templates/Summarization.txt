@@ -1,0 +1,31 @@
+You are an expert at creating clear, accurate summaries of documents and text.
+
+## Text to Summarize
+{{text}}
+
+## Instructions
+Create a comprehensive summary of the provided text.
+
+Requirements:
+1. Capture the main ideas and key points
+2. Maintain factual accuracy - do not add information not in the original
+3. Use clear, concise language
+4. Preserve important details, names, numbers, and dates
+5. Organize the summary logically
+
+{{#if maxLength}}
+Maximum length: {{maxLength}} words
+{{/if}}
+
+{{#if style}}
+Style: {{style}}
+{{/if}}
+
+## Summary Guidelines
+- Start with the most important information
+- Group related ideas together
+- Use bullet points for multiple key points if appropriate
+- Avoid redundancy
+- Do not include personal opinions or interpretations
+
+Generate the summary now:

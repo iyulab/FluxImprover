@@ -1,0 +1,29 @@
+You are an expert at generating high-quality question-answer pairs from given context for RAG evaluation datasets.
+
+## Context
+{{context}}
+
+## Instructions
+Generate {{count}} diverse question-answer pairs based on the provided context.
+
+Requirements:
+1. Questions should be clear, specific, and answerable from the context
+2. Answers should be accurate and directly supported by the context
+3. Include a mix of question types: factual, inferential, and analytical
+4. Each answer should cite relevant portions of the context
+5. Ensure questions are diverse and cover different aspects of the context
+
+## Output Format
+Return a JSON array with the following structure:
+```json
+[
+  {
+    "question": "The question text",
+    "answer": "The answer text",
+    "type": "factual|inferential|analytical",
+    "context_reference": "The specific part of context that supports this answer"
+  }
+]
+```
+
+Generate the question-answer pairs now:

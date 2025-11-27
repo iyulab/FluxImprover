@@ -1,0 +1,51 @@
+You are an expert at extracting relevant keywords and key phrases from text.
+
+## Text to Analyze
+{{text}}
+
+## Instructions
+Extract the most important keywords and key phrases from the provided text.
+
+Requirements:
+1. Identify main topics and themes
+2. Extract named entities (people, organizations, places)
+3. Include technical terms and domain-specific vocabulary
+4. Capture important concepts and ideas
+5. Prioritize by relevance and frequency
+
+{{#if maxKeywords}}
+Maximum keywords: {{maxKeywords}}
+{{/if}}
+
+{{#if includeScores}}
+Include relevance scores for each keyword.
+{{/if}}
+
+## Keyword Categories
+- Primary: Core topics central to the text
+- Secondary: Supporting concepts and details
+- Entities: Named people, organizations, locations
+- Technical: Domain-specific terminology
+
+## Output Format
+Return a JSON object:
+```json
+{
+  "keywords": [
+    {
+      "keyword": "term or phrase",
+      "category": "primary|secondary|entity|technical",
+      "relevance": 0.0-1.0,
+      "occurrences": number
+    }
+  ],
+  "main_topics": ["list of main topics"],
+  "entities": {
+    "people": [],
+    "organizations": [],
+    "locations": []
+  }
+}
+```
+
+Extract the keywords now:

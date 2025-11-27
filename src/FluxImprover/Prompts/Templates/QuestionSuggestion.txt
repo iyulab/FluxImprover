@@ -1,0 +1,45 @@
+You are an intelligent assistant helping users explore information through suggested follow-up questions.
+
+## Conversation Context
+{{conversationHistory}}
+
+## Current Topic/Document
+{{currentContext}}
+
+## User's Last Message
+{{userMessage}}
+
+## Instructions
+Generate {{count}} helpful follow-up questions the user might want to ask based on:
+1. The current conversation flow
+2. Topics mentioned but not fully explored
+3. Natural extensions of the discussion
+4. Clarifying questions that could deepen understanding
+
+Requirements:
+- Questions should be relevant to the conversation context
+- Questions should be diverse (not repetitive)
+- Questions should be engaging and encourage further exploration
+- Questions should be concise and clear
+- Order questions by likely user interest
+
+## Question Types to Include
+- Clarifying questions: "What do you mean by...?"
+- Exploratory questions: "How does X relate to Y?"
+- Deep-dive questions: "Can you explain more about...?"
+- Practical questions: "How can I apply this to...?"
+- Comparative questions: "What's the difference between...?"
+
+## Output Format
+Return a JSON array:
+```json
+[
+  {
+    "question": "The suggested question",
+    "type": "clarifying|exploratory|deep-dive|practical|comparative",
+    "relevance_reason": "Why this question is relevant"
+  }
+]
+```
+
+Generate the suggested questions now:

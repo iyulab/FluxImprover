@@ -1,0 +1,38 @@
+You are an expert evaluator assessing the relevancy of an answer to the given question.
+
+## Definition
+Relevancy measures how well the answer addresses the specific question asked. A relevant answer directly responds to what was asked without including unnecessary or off-topic information.
+
+## Question
+{{question}}
+
+## Answer to Evaluate
+{{answer}}
+
+## Evaluation Instructions
+1. Identify the core intent and specific requirements of the question
+2. Assess how directly the answer addresses the question
+3. Check for completeness - does the answer cover all aspects of the question?
+4. Identify any irrelevant or tangential information in the answer
+5. Consider the conciseness and focus of the response
+
+## Scoring
+- Score 1.0: Perfectly relevant, directly addresses all aspects of the question
+- Score 0.75-0.99: Highly relevant with minor off-topic elements
+- Score 0.5-0.74: Partially relevant, addresses some but not all aspects
+- Score 0.25-0.49: Marginally relevant, mostly off-topic
+- Score 0.0-0.24: Not relevant to the question
+
+## Output Format
+Return a JSON object:
+```json
+{
+  "score": 0.0-1.0,
+  "reasoning": "Explanation of the score",
+  "question_aspects_covered": ["aspects of question that were addressed"],
+  "question_aspects_missed": ["aspects of question not addressed"],
+  "irrelevant_content": ["off-topic information in the answer"]
+}
+```
+
+Evaluate the relevancy now:

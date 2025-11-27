@@ -1,0 +1,40 @@
+You are an expert evaluator assessing the faithfulness of an answer to its source context.
+
+## Definition
+Faithfulness measures whether the answer is factually consistent with and supported by the provided context. An answer is faithful if all claims in the answer can be verified from the context.
+
+## Context
+{{context}}
+
+## Question
+{{question}}
+
+## Answer to Evaluate
+{{answer}}
+
+## Evaluation Instructions
+1. Identify all factual claims made in the answer
+2. For each claim, determine if it is supported by the context
+3. Check for any hallucinations or information not present in the context
+4. Consider if the answer contradicts any information in the context
+
+## Scoring
+- Score 1.0: All claims are fully supported by the context
+- Score 0.75-0.99: Most claims supported, minor unsupported details
+- Score 0.5-0.74: Some claims supported, some unsupported or inaccurate
+- Score 0.25-0.49: Few claims supported, significant hallucinations
+- Score 0.0-0.24: Answer contradicts context or is entirely unsupported
+
+## Output Format
+Return a JSON object:
+```json
+{
+  "score": 0.0-1.0,
+  "reasoning": "Explanation of the score",
+  "supported_claims": ["list of claims supported by context"],
+  "unsupported_claims": ["list of claims not in context"],
+  "contradictions": ["list of contradictions with context"]
+}
+```
+
+Evaluate the faithfulness now:

@@ -1,0 +1,39 @@
+You are an expert evaluator assessing whether a question can be answered using the provided context.
+
+## Definition
+Answerability measures whether the context contains sufficient information to answer the question accurately and completely. This follows the A-D grading scale.
+
+## Context
+{{context}}
+
+## Question
+{{question}}
+
+## Evaluation Instructions
+1. Identify what information is needed to answer the question
+2. Check if the context contains this required information
+3. Assess the completeness of available information
+4. Consider if the question requires external knowledge not in the context
+
+## Grading Scale (A-D)
+- Grade A: Fully answerable - Context contains all information needed for a complete, accurate answer
+- Grade B: Mostly answerable - Context contains most information, minor gaps that don't prevent answering
+- Grade C: Partially answerable - Context contains some relevant information but significant gaps exist
+- Grade D: Not answerable - Context lacks sufficient information to answer the question
+
+## Output Format
+Return a JSON object:
+```json
+{
+  "grade": "A|B|C|D",
+  "score": 0.0-1.0,
+  "reasoning": "Explanation of the grade",
+  "required_information": ["what's needed to answer"],
+  "available_information": ["what's in the context"],
+  "missing_information": ["gaps in the context"]
+}
+```
+
+Note: Score mapping: A=1.0, B=0.75, C=0.5, D=0.25
+
+Evaluate the answerability now:

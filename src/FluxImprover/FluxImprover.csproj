@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>FluxImprover</PackageId>
+    <Description>The Quality Layer for RAG Data Pipelines - LLM-powered enrichment and quality assessment</Description>
+    <PackageTags>RAG;LLM;QA;Evaluation;Enrichment;Benchmark</PackageTags>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FluxImprover.Abstractions\FluxImprover.Abstractions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Polly.Core" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Prompts\Templates\*.txt" />
+  </ItemGroup>
+
+</Project>
