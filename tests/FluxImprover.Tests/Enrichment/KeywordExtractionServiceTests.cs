@@ -133,4 +133,93 @@ public sealed class KeywordExtractionServiceTests
         // Assert
         results.Should().HaveCount(2);
     }
+
+    [Theory]
+    [InlineData(@"{""keywords"": [{""term"": ""machine learning"", ""score"": 0.9}]}", "machine learning")]
+    [InlineData(@"{""keywords"": [{""name"": ""AI"", ""relevance"": 0.8}]}", "AI")]
+    [InlineData(@"{""keywords"": [{""text"": ""neural network"", ""weight"": 0.7}]}", "neural network")]
+    [InlineData(@"{""keywords"": [{""value"": ""deep learning"", ""confidence"": 0.95}]}", "deep learning")]
+    [InlineData(@"{""keywords"": [{""word"": ""NLP"", ""importance"": 0.85}]}", "NLP")]
+    public async Task ExtractKeywordsAsync_WithVariousPropertyNames_ReturnsKeywords(string response, string expectedKeyword)
+    {
+        // Arrange
+        var text = "Sample text for keyword extraction.";
+        _completionService.CompleteAsync(
+            Arg.Any<string>(),
+            Arg.Any<CompletionOptions>(),
+            Arg.Any<CancellationToken>())
+            .Returns(response);
+
+        // Act
+        var result = await _sut.ExtractKeywordsAsync(text);
+
+        // Assert
+        result.Should().Contain(expectedKeyword);
+    }
+
+    [Fact]
+    public async Task ExtractKeywordsAsync_WithPlainStringArray_ReturnsKeywords()
+    {
+        // Arrange
+        var text = "Sample text for keyword extraction.";
+        var response = @"{""keywords"": [""machine learning"", ""AI"", ""data science""]}";
+        _completionService.CompleteAsync(
+            Arg.Any<string>(),
+            Arg.Any<CompletionOptions>(),
+            Arg.Any<CancellationToken>())
+            .Returns(response);
+
+        // Act
+        var result = await _sut.ExtractKeywordsAsync(text);
+
+        // Assert
+        result.Should().HaveCount(3);
+        result.Should().Contain("machine learning");
+        result.Should().Contain("AI");
+        result.Should().Contain("data science");
+    }
+
+    [Theory]
+    [InlineData(@"{""keywords"": [{""term"": ""ML"", ""score"": 0.9}]}", "ML", 0.9)]
+    [InlineData(@"{""keywords"": [{""name"": ""AI"", ""weight"": 0.85}]}", "AI", 0.85)]
+    [InlineData(@"{""keywords"": [{""keyword"": ""NLP"", ""confidence"": 0.75}]}", "NLP", 0.75)]
+    public async Task ExtractKeywordsWithScoresAsync_WithVariousPropertyNames_ReturnsCorrectScores(
+        string response, string expectedKeyword, double expectedScore)
+    {
+        // Arrange
+        var text = "Sample text for keyword extraction.";
+        _completionService.CompleteAsync(
+            Arg.Any<string>(),
+            Arg.Any<CompletionOptions>(),
+            Arg.Any<CancellationToken>())
+            .Returns(response);
+
+        // Act
+        var result = await _sut.ExtractKeywordsWithScoresAsync(text);
+
+        // Assert
+        result.Should().ContainKey(expectedKeyword);
+        result[expectedKeyword].Should().BeApproximately(expectedScore, 0.01);
+    }
+
+    [Fact]
+    public async Task ExtractKeywordsAsync_WithDirectArray_ReturnsKeywords()
+    {
+        // Arrange - Some LLMs return array directly without "keywords" wrapper
+        var text = "Sample text for keyword extraction.";
+        var response = @"[{""keyword"": ""AI"", ""relevance"": 0.9}, {""keyword"": ""ML"", ""relevance"": 0.8}]";
+        _completionService.CompleteAsync(
+            Arg.Any<string>(),
+            Arg.Any<CompletionOptions>(),
+            Arg.Any<CancellationToken>())
+            .Returns(response);
+
+        // Act
+        var result = await _sut.ExtractKeywordsAsync(text);
+
+        // Assert
+        result.Should().HaveCount(2);
+        result.Should().Contain("AI");
+        result.Should().Contain("ML");
+    }
 }

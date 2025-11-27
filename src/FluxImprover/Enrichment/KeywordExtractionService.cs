@@ -124,9 +124,10 @@ public sealed class KeywordExtractionService : IKeywordExtractionService
             {
                 foreach (var item in keywordsArray.EnumerateArray())
                 {
-                    if (item.TryGetProperty("keyword", out var keyword))
+                    var keyword = ExtractKeywordFromElement(item);
+                    if (!string.IsNullOrEmpty(keyword))
                     {
-                        keywords.Add(keyword.GetString() ?? string.Empty);
+                        keywords.Add(keyword);
                     }
                 }
             }
@@ -137,6 +138,55 @@ public sealed class KeywordExtractionService : IKeywordExtractionService
         {
             return [];
         }
+    }
+
+    /// <summary>
+    /// Extracts keyword string from a JSON element, handling various LLM response formats.
+    /// Supports: {"keyword": "term"}, {"term": "word"}, {"name": "word"}, {"text": "word"},
+    /// {"value": "word"}, {"word": "term"}, or plain string "term"
+    /// </summary>
+    private static string? ExtractKeywordFromElement(JsonElement item)
+    {
+        // Handle plain string array: ["keyword1", "keyword2"]
+        if (item.ValueKind == JsonValueKind.String)
+        {
+            return item.GetString();
+        }
+
+        // Handle object with various property names (in order of likelihood)
+        if (item.ValueKind == JsonValueKind.Object)
+        {
+            // Common property names for keyword values
+            string[] keywordPropertyNames = ["keyword", "term", "name", "text", "value", "word", "key"];
+
+            foreach (var propName in keywordPropertyNames)
+            {
+                if (item.TryGetProperty(propName, out var prop) && prop.ValueKind == JsonValueKind.String)
+                {
+                    return prop.GetString();
+                }
+            }
+
+            // Fallback: try to get the first string property
+            foreach (var property in item.EnumerateObject())
+            {
+                if (property.Value.ValueKind == JsonValueKind.String)
+                {
+                    var value = property.Value.GetString();
+                    // Skip score/relevance-like properties
+                    if (!string.IsNullOrEmpty(value) &&
+                        !property.Name.Contains("score", StringComparison.OrdinalIgnoreCase) &&
+                        !property.Name.Contains("relevance", StringComparison.OrdinalIgnoreCase) &&
+                        !property.Name.Contains("weight", StringComparison.OrdinalIgnoreCase) &&
+                        !property.Name.Contains("confidence", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return value;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     private static IReadOnlyDictionary<string, double> ParseKeywordsWithScores(string response)
@@ -159,8 +209,8 @@ public sealed class KeywordExtractionService : IKeywordExtractionService
             {
                 foreach (var item in keywordsArray.EnumerateArray())
                 {
-                    var keyword = item.TryGetProperty("keyword", out var k) ? k.GetString() : null;
-                    var relevance = item.TryGetProperty("relevance", out var r) ? r.GetDouble() : 0.0;
+                    var keyword = ExtractKeywordFromElement(item);
+                    var relevance = ExtractScoreFromElement(item);
 
                     if (!string.IsNullOrEmpty(keyword))
                     {
@@ -175,5 +225,37 @@ public sealed class KeywordExtractionService : IKeywordExtractionService
         {
             return new Dictionary<string, double>();
         }
+    }
+
+    /// <summary>
+    /// Extracts score/relevance value from a JSON element, handling various LLM response formats.
+    /// Supports: {"relevance": 0.9}, {"score": 0.9}, {"weight": 0.9}, {"confidence": 0.9}
+    /// </summary>
+    private static double ExtractScoreFromElement(JsonElement item)
+    {
+        if (item.ValueKind != JsonValueKind.Object)
+            return 0.0;
+
+        // Common property names for score values
+        string[] scorePropertyNames = ["relevance", "score", "weight", "confidence", "importance", "rank"];
+
+        foreach (var propName in scorePropertyNames)
+        {
+            if (item.TryGetProperty(propName, out var prop))
+            {
+                if (prop.ValueKind == JsonValueKind.Number)
+                {
+                    return prop.GetDouble();
+                }
+                // Handle string numbers like "0.9"
+                if (prop.ValueKind == JsonValueKind.String &&
+                    double.TryParse(prop.GetString(), out var score))
+                {
+                    return score;
+                }
+            }
+        }
+
+        return 0.0;
     }
 }
