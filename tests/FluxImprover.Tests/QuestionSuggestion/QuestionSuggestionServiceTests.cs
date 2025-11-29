@@ -1,9 +1,9 @@
-namespace FluxImprover.Tests.QuestionSuggestion;
+﻿namespace FluxImprover.Tests.QuestionSuggestion;
 
 using FluentAssertions;
-using FluxImprover.Abstractions.Models;
-using FluxImprover.Abstractions.Options;
-using FluxImprover.Abstractions.Services;
+using FluxImprover.Models;
+using FluxImprover.Options;
+using FluxImprover.Services;
 using FluxImprover.QuestionSuggestion;
 using NSubstitute;
 using Xunit;

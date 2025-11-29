@@ -1,6 +1,6 @@
 using FluxImprover;
-using FluxImprover.Abstractions.Models;
-using FluxImprover.Abstractions.Options;
+using FluxImprover.Models;
+using FluxImprover.Options;
 using FluxImprover.ConsoleDemo;
 using FluxImprover.QAGeneration;
 using FluxImprover.QuestionSuggestion;

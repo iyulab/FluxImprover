@@ -1,4 +1,4 @@
-namespace FluxImprover.Tests.Prompts;
+﻿namespace FluxImprover.Tests.Prompts;
 
 using FluentAssertions;
 using FluxImprover.Prompts;

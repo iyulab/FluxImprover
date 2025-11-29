@@ -1,4 +1,4 @@
-namespace FluxImprover.Abstractions.Options;
+﻿namespace FluxImprover.Options;
 
 /// <summary>
 /// 문서 강화 옵션

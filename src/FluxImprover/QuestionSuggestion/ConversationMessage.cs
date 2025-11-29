@@ -1,4 +1,4 @@
-namespace FluxImprover.QuestionSuggestion;
+﻿namespace FluxImprover.QuestionSuggestion;
 
 /// <summary>
 /// 대화 메시지

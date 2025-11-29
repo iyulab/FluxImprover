@@ -1,4 +1,4 @@
-namespace FluxImprover.Abstractions.Models;
+﻿namespace FluxImprover.Models;
 
 using System.Text.Json.Serialization;
 

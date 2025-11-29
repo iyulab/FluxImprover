@@ -1,6 +1,6 @@
-namespace FluxImprover.Abstractions.Options;
+﻿namespace FluxImprover.Options;
 
-using FluxImprover.Abstractions.Models;
+using FluxImprover.Models;
 
 /// <summary>
 /// QA 생성 옵션

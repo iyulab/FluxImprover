@@ -1,9 +1,9 @@
-namespace FluxImprover.Evaluation;
+﻿namespace FluxImprover.Evaluation;
 
 using System.Text.Json;
-using FluxImprover.Abstractions.Options;
-using FluxImprover.Abstractions.Services;
-using FluxImprover.Abstractions.Utilities;
+using FluxImprover.Options;
+using FluxImprover.Services;
+using FluxImprover.Utilities;
 
 /// <summary>
 /// LLM 기반 관련성(Relevancy) 평가기.

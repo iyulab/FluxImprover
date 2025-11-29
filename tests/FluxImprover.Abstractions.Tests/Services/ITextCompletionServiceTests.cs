@@ -1,7 +1,7 @@
-namespace FluxImprover.Abstractions.Tests.Services;
+﻿namespace FluxImprover.Abstractions.Tests.Services;
 
 using FluentAssertions;
-using FluxImprover.Abstractions.Services;
+using FluxImprover.Services;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 

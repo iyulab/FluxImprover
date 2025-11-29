@@ -1,4 +1,4 @@
-namespace FluxImprover.Abstractions.Services;
+﻿namespace FluxImprover.Services;
 
 /// <summary>
 /// 문서 재순위 서비스 인터페이스.

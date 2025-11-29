@@ -1,7 +1,7 @@
-namespace FluxImprover.Enrichment;
+﻿namespace FluxImprover.Enrichment;
 
-using FluxImprover.Abstractions.Models;
-using FluxImprover.Abstractions.Options;
+using FluxImprover.Models;
+using FluxImprover.Options;
 
 /// <summary>
 /// 청크 강화 서비스 - 요약과 키워드 추출을 통해 청크를 강화합니다.

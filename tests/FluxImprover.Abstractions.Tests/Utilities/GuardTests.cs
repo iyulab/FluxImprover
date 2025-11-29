@@ -1,6 +1,6 @@
-namespace FluxImprover.Abstractions.Tests.Utilities;
+﻿namespace FluxImprover.Abstractions.Tests.Utilities;
 
-using FluxImprover.Abstractions.Utilities;
+using FluxImprover.Utilities;
 
 public sealed class GuardTests
 {

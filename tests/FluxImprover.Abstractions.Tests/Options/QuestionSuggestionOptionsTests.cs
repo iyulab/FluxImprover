@@ -1,8 +1,8 @@
-namespace FluxImprover.Abstractions.Tests.Options;
+﻿namespace FluxImprover.Abstractions.Tests.Options;
 
 using FluentAssertions;
-using FluxImprover.Abstractions.Models;
-using FluxImprover.Abstractions.Options;
+using FluxImprover.Models;
+using FluxImprover.Options;
 using Xunit;
 
 public sealed class QuestionSuggestionOptionsTests

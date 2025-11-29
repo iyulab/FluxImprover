@@ -1,4 +1,4 @@
-namespace FluxImprover.Abstractions.Utilities;
+﻿namespace FluxImprover.Utilities;
 
 /// <summary>
 /// 컬렉션 확장 메서드
@@ -53,29 +53,6 @@ public static class CollectionExtensions
         }
 
         return list;
-    }
-
-    /// <summary>
-    /// 지정된 키 선택기로 중복을 제거합니다.
-    /// </summary>
-    /// <typeparam name="TSource">요소 타입</typeparam>
-    /// <typeparam name="TKey">키 타입</typeparam>
-    /// <param name="source">원본 컬렉션</param>
-    /// <param name="keySelector">키 선택 함수</param>
-    /// <returns>중복이 제거된 컬렉션</returns>
-    public static IEnumerable<TSource> DistinctBy<TSource, TKey>(
-        this IEnumerable<TSource> source,
-        Func<TSource, TKey> keySelector)
-    {
-        var seen = new HashSet<TKey>();
-
-        foreach (var item in source)
-        {
-            if (seen.Add(keySelector(item)))
-            {
-                yield return item;
-            }
-        }
     }
 
     /// <summary>

@@ -1,4 +1,4 @@
-namespace FluxImprover.Evaluation;
+﻿namespace FluxImprover.Evaluation;
 
 /// <summary>
 /// 개별 메트릭 평가 결과

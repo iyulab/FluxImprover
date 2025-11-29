@@ -1,8 +1,8 @@
-namespace FluxImprover.Abstractions.Tests.Models;
+﻿namespace FluxImprover.Abstractions.Tests.Models;
 
 using System.Text.Json;
 using FluentAssertions;
-using FluxImprover.Abstractions.Models;
+using FluxImprover.Models;
 
 public class EvaluationResultTests
 {

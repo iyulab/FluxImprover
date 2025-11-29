@@ -1,7 +1,7 @@
-namespace FluxImprover.Enrichment;
+﻿namespace FluxImprover.Enrichment;
 
-using FluxImprover.Abstractions.Options;
-using FluxImprover.Abstractions.Services;
+using FluxImprover.Options;
+using FluxImprover.Services;
 
 /// <summary>
 /// LLM 기반 텍스트 요약 서비스

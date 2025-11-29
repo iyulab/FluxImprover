@@ -1,8 +1,8 @@
-namespace FluxImprover.Tests.QAGeneration;
+﻿namespace FluxImprover.Tests.QAGeneration;
 
 using FluentAssertions;
-using FluxImprover.Abstractions.Options;
-using FluxImprover.Abstractions.Services;
+using FluxImprover.Options;
+using FluxImprover.Services;
 using FluxImprover.Evaluation;
 using FluxImprover.QAGeneration;
 using NSubstitute;

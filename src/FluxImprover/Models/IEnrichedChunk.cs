@@ -1,4 +1,4 @@
-namespace FluxImprover.Abstractions.Models;
+﻿namespace FluxImprover.Models;
 
 /// <summary>
 /// 강화된 청크 인터페이스.

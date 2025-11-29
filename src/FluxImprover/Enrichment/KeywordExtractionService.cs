@@ -1,9 +1,9 @@
-namespace FluxImprover.Enrichment;
+﻿namespace FluxImprover.Enrichment;
 
 using System.Text.Json;
-using FluxImprover.Abstractions.Options;
-using FluxImprover.Abstractions.Services;
-using FluxImprover.Abstractions.Utilities;
+using FluxImprover.Options;
+using FluxImprover.Services;
+using FluxImprover.Utilities;
 
 /// <summary>
 /// LLM 기반 키워드 추출 서비스

@@ -1,10 +1,10 @@
-namespace FluxImprover.QuestionSuggestion;
+﻿namespace FluxImprover.QuestionSuggestion;
 
 using System.Text.Json;
-using FluxImprover.Abstractions.Models;
-using FluxImprover.Abstractions.Options;
-using FluxImprover.Abstractions.Services;
-using FluxImprover.Abstractions.Utilities;
+using FluxImprover.Models;
+using FluxImprover.Options;
+using FluxImprover.Services;
+using FluxImprover.Utilities;
 
 /// <summary>
 /// LLM 기반 질문 추천 서비스

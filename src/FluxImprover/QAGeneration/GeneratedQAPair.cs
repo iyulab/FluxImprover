@@ -1,6 +1,6 @@
-namespace FluxImprover.QAGeneration;
+﻿namespace FluxImprover.QAGeneration;
 
-using FluxImprover.Abstractions.Models;
+using FluxImprover.Models;
 
 /// <summary>
 /// 생성된 QA 쌍 (평가 결과 포함)

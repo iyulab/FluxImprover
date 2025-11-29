@@ -1,4 +1,4 @@
-namespace FluxImprover.Abstractions.Services;
+﻿namespace FluxImprover.Services;
 
 /// <summary>
 /// 토크나이저 인터페이스.

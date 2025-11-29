@@ -1,6 +1,6 @@
-namespace FluxImprover.Enrichment;
+﻿namespace FluxImprover.Enrichment;
 
-using FluxImprover.Abstractions.Options;
+using FluxImprover.Options;
 
 /// <summary>
 /// 키워드 추출 서비스 인터페이스

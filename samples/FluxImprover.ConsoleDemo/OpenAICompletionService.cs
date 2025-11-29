@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using FluxImprover.Abstractions.Services;
+using FluxImprover.Services;
 
 /// <summary>
 /// OpenAI API 기반 ITextCompletionService 구현

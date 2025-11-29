@@ -1,6 +1,6 @@
-namespace FluxImprover.Abstractions.Options;
+﻿namespace FluxImprover.Options;
 
-using FluxImprover.Abstractions.Models;
+using FluxImprover.Models;
 
 /// <summary>
 /// 질문 추천 옵션

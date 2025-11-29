@@ -1,9 +1,9 @@
-namespace FluxImprover.Evaluation;
+﻿namespace FluxImprover.Evaluation;
 
 using System.Text.Json;
-using FluxImprover.Abstractions.Options;
-using FluxImprover.Abstractions.Services;
-using FluxImprover.Abstractions.Utilities;
+using FluxImprover.Options;
+using FluxImprover.Services;
+using FluxImprover.Utilities;
 
 /// <summary>
 /// LLM 기반 답변 가능성(Answerability) 평가기.

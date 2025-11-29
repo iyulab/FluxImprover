@@ -1,4 +1,4 @@
-namespace FluxImprover.Abstractions.Models;
+﻿namespace FluxImprover.Models;
 
 /// <summary>
 /// QA 데이터셋 (RAGAS EvaluationDataset 호환)

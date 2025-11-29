@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\FluxImprover.Abstractions\FluxImprover.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\FluxImprover\FluxImprover.csproj" />
   </ItemGroup>
 
   <ItemGroup>

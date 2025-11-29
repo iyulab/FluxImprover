@@ -1,6 +1,6 @@
-namespace FluxImprover.QAGeneration;
+﻿namespace FluxImprover.QAGeneration;
 
-using FluxImprover.Abstractions.Options;
+using FluxImprover.Options;
 
 /// <summary>
 /// QA 파이프라인 옵션

@@ -1,4 +1,4 @@
-namespace FluxImprover.Prompts;
+﻿namespace FluxImprover.Prompts;
 
 using System.Reflection;
 

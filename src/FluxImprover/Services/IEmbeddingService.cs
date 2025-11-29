@@ -1,4 +1,4 @@
-namespace FluxImprover.Abstractions.Services;
+﻿namespace FluxImprover.Services;
 
 /// <summary>
 /// 텍스트 임베딩 생성 서비스 인터페이스.

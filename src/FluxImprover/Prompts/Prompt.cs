@@ -1,4 +1,4 @@
-namespace FluxImprover.Prompts;
+﻿namespace FluxImprover.Prompts;
 
 /// <summary>
 /// 빌드된 프롬프트 결과

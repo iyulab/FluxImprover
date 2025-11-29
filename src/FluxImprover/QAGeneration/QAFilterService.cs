@@ -1,4 +1,4 @@
-namespace FluxImprover.QAGeneration;
+﻿namespace FluxImprover.QAGeneration;
 
 using FluxImprover.Evaluation;
 

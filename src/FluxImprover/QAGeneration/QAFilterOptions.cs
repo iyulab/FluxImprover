@@ -1,4 +1,4 @@
-namespace FluxImprover.QAGeneration;
+﻿namespace FluxImprover.QAGeneration;
 
 /// <summary>
 /// QA 필터링 옵션

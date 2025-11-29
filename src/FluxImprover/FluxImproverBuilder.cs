@@ -1,6 +1,7 @@
-namespace FluxImprover;
+﻿namespace FluxImprover;
 
-using FluxImprover.Abstractions.Services;
+using FluxImprover.Services;
+using FluxImprover.ChunkFiltering;
 using FluxImprover.Enrichment;
 using FluxImprover.Evaluation;
 using FluxImprover.QAGeneration;
@@ -48,6 +49,9 @@ public sealed class FluxImproverBuilder
         // Question Suggestion
         var questionSuggestion = new QuestionSuggestionService(_completionService);
 
+        // Chunk Filtering
+        var chunkFiltering = new ChunkFilteringService(_completionService);
+
         return new FluxImproverServices(
             Summarization: summarizationService,
             KeywordExtraction: keywordExtractionService,
@@ -58,7 +62,8 @@ public sealed class FluxImproverBuilder
             QAGenerator: qaGenerator,
             QAFilter: qaFilter,
             QAPipeline: qaPipeline,
-            QuestionSuggestion: questionSuggestion
+            QuestionSuggestion: questionSuggestion,
+            ChunkFiltering: chunkFiltering
         );
     }
 }
@@ -76,6 +81,7 @@ public sealed class FluxImproverBuilder
 /// <param name="QAFilter">QA 필터</param>
 /// <param name="QAPipeline">QA 파이프라인</param>
 /// <param name="QuestionSuggestion">질문 추천 서비스</param>
+/// <param name="ChunkFiltering">청크 필터링 서비스</param>
 public sealed record FluxImproverServices(
     SummarizationService Summarization,
     KeywordExtractionService KeywordExtraction,
@@ -86,5 +92,6 @@ public sealed record FluxImproverServices(
     QAGeneratorService QAGenerator,
     QAFilterService QAFilter,
     QAPipeline QAPipeline,
-    QuestionSuggestionService QuestionSuggestion
+    QuestionSuggestionService QuestionSuggestion,
+    IChunkFilteringService ChunkFiltering
 );

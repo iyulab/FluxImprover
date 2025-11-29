@@ -1,4 +1,4 @@
-namespace FluxImprover.Abstractions.Options;
+﻿namespace FluxImprover.Options;
 
 /// <summary>
 /// 품질 평가 옵션

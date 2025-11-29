@@ -1,4 +1,4 @@
-namespace FluxImprover.Prompts;
+﻿namespace FluxImprover.Prompts;
 
 /// <summary>
 /// 프롬프트를 구성하기 위한 Fluent Builder

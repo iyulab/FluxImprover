@@ -1,6 +1,6 @@
-namespace FluxImprover.QAGeneration;
+﻿namespace FluxImprover.QAGeneration;
 
-using FluxImprover.Abstractions.Models;
+using FluxImprover.Models;
 
 /// <summary>
 /// QA 생성 및 필터링 파이프라인

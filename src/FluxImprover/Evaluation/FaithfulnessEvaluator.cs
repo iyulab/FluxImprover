@@ -1,9 +1,9 @@
-namespace FluxImprover.Evaluation;
+﻿namespace FluxImprover.Evaluation;
 
 using System.Text.Json;
-using FluxImprover.Abstractions.Options;
-using FluxImprover.Abstractions.Services;
-using FluxImprover.Abstractions.Utilities;
+using FluxImprover.Options;
+using FluxImprover.Services;
+using FluxImprover.Utilities;
 
 /// <summary>
 /// LLM 기반 충실도(Faithfulness) 평가기.

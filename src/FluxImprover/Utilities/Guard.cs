@@ -1,4 +1,4 @@
-namespace FluxImprover.Abstractions.Utilities;
+﻿namespace FluxImprover.Utilities;
 
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;

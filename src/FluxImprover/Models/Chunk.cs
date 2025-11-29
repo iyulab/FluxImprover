@@ -1,4 +1,4 @@
-namespace FluxImprover.Abstractions.Models;
+﻿namespace FluxImprover.Models;
 
 /// <summary>
 /// 원본 문서 청크

@@ -1,7 +1,7 @@
-namespace FluxImprover.Abstractions.Tests.Utilities;
+﻿namespace FluxImprover.Abstractions.Tests.Utilities;
 
 using System.Text.Json;
-using FluxImprover.Abstractions.Utilities;
+using FluxImprover.Utilities;
 
 public sealed class JsonHelpersTests
 {
