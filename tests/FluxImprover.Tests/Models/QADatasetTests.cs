@@ -1,4 +1,5 @@
-﻿namespace FluxImprover.Abstractions.Tests.Models;
+﻿using Xunit;
+namespace FluxImprover.Tests.Models;
 
 using System.Text.Json;
 using FluentAssertions;

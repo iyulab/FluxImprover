@@ -1,4 +1,5 @@
-﻿namespace FluxImprover.Abstractions.Tests.Services;
+﻿using Xunit;
+namespace FluxImprover.Tests.Services;
 
 using FluentAssertions;
 using FluxImprover.Services;

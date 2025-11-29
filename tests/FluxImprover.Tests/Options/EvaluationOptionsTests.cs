@@ -1,4 +1,4 @@
-﻿namespace FluxImprover.Abstractions.Tests.Options;
+﻿namespace FluxImprover.Tests.Options;
 
 using FluentAssertions;
 using FluxImprover.Options;

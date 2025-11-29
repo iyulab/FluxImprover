@@ -18,6 +18,7 @@ It acts as the **quality assurance and value-add layer**, leveraging Large Langu
 ### Key Capabilities
 
 * **Chunk Enrichment**: Uses LLMs to create concise **summaries** and relevant **keywords** for each chunk
+* **Chunk Filtering**: 3-stage LLM-based assessment with **self-reflection** and **critic validation** for intelligent retrieval filtering
 * **QA Pair Generation**: Automatically generates **Golden QA datasets** from document chunks for RAG benchmarking
 * **Quality Assessment**: Provides **Faithfulness**, **Relevancy**, and **Answerability** evaluators
 * **Question Suggestion**: Generates contextual follow-up questions from content or conversations
@@ -81,7 +82,7 @@ Use the `FluxImproverBuilder` to create all services with a single LLM provider:
 
 ```csharp
 using FluxImprover;
-using FluxImprover.Abstractions.Services;
+using FluxImprover.Services;
 
 // Your ITextCompletionService implementation
 ITextCompletionService completionService = new OpenAICompletionService(apiKey);
@@ -97,7 +98,7 @@ var services = new FluxImproverBuilder()
 Add summaries and keywords to your document chunks:
 
 ```csharp
-using FluxImprover.Abstractions.Models;
+using FluxImprover.Models;
 
 var chunk = new Chunk
 {
@@ -117,7 +118,7 @@ Console.WriteLine($"Keywords: {string.Join(", ", enrichedChunk.Keywords ?? [])}"
 Create question-answer pairs for RAG testing:
 
 ```csharp
-using FluxImprover.Abstractions.Options;
+using FluxImprover.Options;
 
 var context = "The solar system has eight planets. Earth is the third planet from the sun.";
 
@@ -198,13 +199,49 @@ var allQAPairs = results.SelectMany(r => r.QAPairs).ToList();
 Console.WriteLine($"Generated: {totalGenerated}, Passed Filter: {totalFiltered}");
 ```
 
-### 7. Suggest Follow-up Questions
+### 7. Filter Chunks with 3-Stage Assessment
+
+Use intelligent chunk filtering with self-reflection and critic validation:
+
+```csharp
+using FluxImprover.ChunkFiltering;
+using FluxImprover.Options;
+
+var chunk = new Chunk
+{
+    Id = "chunk-1",
+    Content = "This is a detailed technical document about machine learning algorithms..."
+};
+
+var filterOptions = new ChunkFilteringOptions
+{
+    MinimumScore = 0.6,
+    EnableSelfReflection = true,
+    EnableCriticValidation = true
+};
+
+// Assess chunk quality with 3-stage evaluation
+var assessment = await services.ChunkFiltering.AssessAsync(chunk, filterOptions);
+
+Console.WriteLine($"Initial Score: {assessment.InitialScore:P0}");
+Console.WriteLine($"Reflected Score: {assessment.ReflectedScore:P0}");
+Console.WriteLine($"Final Score: {assessment.FinalScore:P0}");
+Console.WriteLine($"Should Include: {assessment.ShouldInclude}");
+Console.WriteLine($"Reasoning: {assessment.Reasoning}");
+```
+
+The 3-stage assessment process:
+1. **Initial Assessment**: LLM evaluates chunk quality and relevance
+2. **Self-Reflection**: LLM reviews its initial assessment for consistency
+3. **Critic Validation**: Independent LLM evaluation validates the assessment
+
+### 8. Suggest Follow-up Questions
 
 Generate contextual questions from content or conversations:
 
 ```csharp
 using FluxImprover.QuestionSuggestion;
-using FluxImprover.Abstractions.Options;
+using FluxImprover.Options;
 
 // From a conversation
 var history = new[]
@@ -236,6 +273,7 @@ foreach (var suggestion in suggestions)
 | `Summarization` | Generates concise summaries from text |
 | `KeywordExtraction` | Extracts relevant keywords |
 | `ChunkEnrichment` | Combines summarization and keyword extraction |
+| `ChunkFiltering` | 3-stage LLM-based chunk assessment with self-reflection and critic validation |
 | `Faithfulness` | Evaluates if answers are grounded in context |
 | `Relevancy` | Evaluates if answers address the question |
 | `Answerability` | Evaluates if questions can be answered from context |
@@ -294,9 +332,10 @@ public record CompletionOptions
 │  │  Services   │     │  Metrics    │     │ Generation  │       │
 │  └─────────────┘     └─────────────┘     └─────────────┘       │
 │                                                                 │
-│  ┌─────────────────────────────────────────────────────────────┐│
-│  │              Question Suggestion Service                    ││
-│  └─────────────────────────────────────────────────────────────┘│
+│  ┌──────────────────────────┐  ┌───────────────────────────────┐│
+│  │     Chunk Filtering      │  │   Question Suggestion Service ││
+│  │  (3-Stage Assessment)    │  │                               ││
+│  └──────────────────────────┘  └───────────────────────────────┘│
 └─────────────────────────────────────────────────────────────────┘
 ```
 

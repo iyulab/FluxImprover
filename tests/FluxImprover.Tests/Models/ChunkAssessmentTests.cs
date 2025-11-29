@@ -1,4 +1,4 @@
-namespace FluxImprover.Abstractions.Tests.Models;
+﻿namespace FluxImprover.Tests.Models;
 
 using FluentAssertions;
 using FluxImprover.Models;
