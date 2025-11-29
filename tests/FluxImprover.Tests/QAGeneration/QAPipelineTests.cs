@@ -1,11 +1,11 @@
 ﻿namespace FluxImprover.Tests.QAGeneration;
 
 using FluentAssertions;
+using FluxImprover.Evaluation;
 using FluxImprover.Models;
 using FluxImprover.Options;
-using FluxImprover.Services;
-using FluxImprover.Evaluation;
 using FluxImprover.QAGeneration;
+using FluxImprover.Services;
 using NSubstitute;
 using Xunit;
 

@@ -1,4 +1,4 @@
-namespace FluxImprover.Tests.ChunkFiltering;
+﻿namespace FluxImprover.Tests.ChunkFiltering;
 
 using FluentAssertions;
 using FluxImprover.ChunkFiltering;

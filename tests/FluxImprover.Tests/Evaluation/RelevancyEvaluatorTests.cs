@@ -1,10 +1,10 @@
 ﻿namespace FluxImprover.Tests.Evaluation;
 
 using FluentAssertions;
+using FluxImprover.Evaluation;
 using FluxImprover.Models;
 using FluxImprover.Options;
 using FluxImprover.Services;
-using FluxImprover.Evaluation;
 using NSubstitute;
 using Xunit;
 

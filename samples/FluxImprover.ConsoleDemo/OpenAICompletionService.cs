@@ -1,4 +1,4 @@
-namespace FluxImprover.ConsoleDemo;
+﻿namespace FluxImprover.ConsoleDemo;
 
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;

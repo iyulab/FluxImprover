@@ -1,9 +1,9 @@
 ﻿namespace FluxImprover.Tests.Enrichment;
 
 using FluentAssertions;
+using FluxImprover.Enrichment;
 using FluxImprover.Models;
 using FluxImprover.Options;
-using FluxImprover.Enrichment;
 using NSubstitute;
 using Xunit;
 

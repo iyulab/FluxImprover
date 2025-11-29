@@ -1,11 +1,12 @@
 ﻿namespace FluxImprover;
 
-using FluxImprover.Services;
 using FluxImprover.ChunkFiltering;
 using FluxImprover.Enrichment;
 using FluxImprover.Evaluation;
 using FluxImprover.QAGeneration;
+using FluxImprover.QueryPreprocessing;
 using FluxImprover.QuestionSuggestion;
+using FluxImprover.Services;
 
 /// <summary>
 /// FluxImprover 서비스 빌더 - 모든 서비스의 중앙 구성 및 생성 지점
@@ -52,6 +53,9 @@ public sealed class FluxImproverBuilder
         // Chunk Filtering
         var chunkFiltering = new ChunkFilteringService(_completionService);
 
+        // Query Preprocessing
+        var queryPreprocessing = new QueryPreprocessingService(_completionService);
+
         return new FluxImproverServices(
             Summarization: summarizationService,
             KeywordExtraction: keywordExtractionService,
@@ -63,7 +67,8 @@ public sealed class FluxImproverBuilder
             QAFilter: qaFilter,
             QAPipeline: qaPipeline,
             QuestionSuggestion: questionSuggestion,
-            ChunkFiltering: chunkFiltering
+            ChunkFiltering: chunkFiltering,
+            QueryPreprocessing: queryPreprocessing
         );
     }
 }
@@ -82,6 +87,7 @@ public sealed class FluxImproverBuilder
 /// <param name="QAPipeline">QA 파이프라인</param>
 /// <param name="QuestionSuggestion">질문 추천 서비스</param>
 /// <param name="ChunkFiltering">청크 필터링 서비스</param>
+/// <param name="QueryPreprocessing">쿼리 전처리 서비스</param>
 public sealed record FluxImproverServices(
     SummarizationService Summarization,
     KeywordExtractionService KeywordExtraction,
@@ -93,5 +99,6 @@ public sealed record FluxImproverServices(
     QAFilterService QAFilter,
     QAPipeline QAPipeline,
     QuestionSuggestionService QuestionSuggestion,
-    IChunkFilteringService ChunkFiltering
+    IChunkFilteringService ChunkFiltering,
+    IQueryPreprocessingService QueryPreprocessing
 );

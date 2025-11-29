@@ -19,6 +19,7 @@ It acts as the **quality assurance and value-add layer**, leveraging Large Langu
 
 * **Chunk Enrichment**: Uses LLMs to create concise **summaries** and relevant **keywords** for each chunk
 * **Chunk Filtering**: 3-stage LLM-based assessment with **self-reflection** and **critic validation** for intelligent retrieval filtering
+* **Query Preprocessing**: Normalizes, expands, and classifies queries with **synonym expansion** and **intent classification** for optimal retrieval
 * **QA Pair Generation**: Automatically generates **Golden QA datasets** from document chunks for RAG benchmarking
 * **Quality Assessment**: Provides **Faithfulness**, **Relevancy**, and **Answerability** evaluators
 * **Question Suggestion**: Generates contextual follow-up questions from content or conversations
@@ -235,7 +236,42 @@ The 3-stage assessment process:
 2. **Self-Reflection**: LLM reviews its initial assessment for consistency
 3. **Critic Validation**: Independent LLM evaluation validates the assessment
 
-### 8. Suggest Follow-up Questions
+### 8. Preprocess Queries for Better Retrieval
+
+Optimize queries before RAG retrieval with normalization, synonym expansion, and intent classification:
+
+```csharp
+using FluxImprover.QueryPreprocessing;
+using FluxImprover.Options;
+
+var query = "How do I implement auth config?";
+
+var options = new QueryPreprocessingOptions
+{
+    UseLlmExpansion = true,
+    ExpandTechnicalTerms = true,
+    MaxSynonymsPerKeyword = 3
+};
+
+var result = await services.QueryPreprocessing.PreprocessAsync(query, options);
+
+Console.WriteLine($"Original: {result.OriginalQuery}");
+Console.WriteLine($"Normalized: {result.NormalizedQuery}");
+Console.WriteLine($"Expanded: {result.ExpandedQuery}");
+Console.WriteLine($"Intent: {result.Intent} (confidence: {result.IntentConfidence:P0})");
+Console.WriteLine($"Strategy: {result.SuggestedStrategy}");
+Console.WriteLine($"Keywords: {string.Join(", ", result.Keywords)}");
+Console.WriteLine($"Expanded Keywords: {string.Join(", ", result.ExpandedKeywords)}");
+```
+
+Features:
+- **Query Normalization**: Lowercase, trim, remove extra whitespace
+- **Synonym Expansion**: LLM-based and built-in technical term expansion (e.g., "auth" → "authentication")
+- **Intent Classification**: Classifies queries into types (HowTo, Definition, Code, Search, etc.)
+- **Entity Extraction**: Identifies file names, class names, method names in queries
+- **Search Strategy**: Recommends optimal search strategy (Semantic, Keyword, Hybrid, MultiQuery)
+
+### 9. Suggest Follow-up Questions
 
 Generate contextual questions from content or conversations:
 
@@ -274,6 +310,7 @@ foreach (var suggestion in suggestions)
 | `KeywordExtraction` | Extracts relevant keywords |
 | `ChunkEnrichment` | Combines summarization and keyword extraction |
 | `ChunkFiltering` | 3-stage LLM-based chunk assessment with self-reflection and critic validation |
+| `QueryPreprocessing` | Normalizes, expands, and classifies queries for optimal retrieval |
 | `Faithfulness` | Evaluates if answers are grounded in context |
 | `Relevancy` | Evaluates if answers address the question |
 | `Answerability` | Evaluates if questions can be answered from context |
@@ -321,22 +358,22 @@ public record CompletionOptions
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                     FluxImproverBuilder                         │
-│  ┌─────────────────────────────────────────────────────────────┐│
-│  │                 ITextCompletionService                      ││
-│  └─────────────────────────────────────────────────────────────┘│
-│         │                    │                    │             │
-│  ┌──────▼──────┐     ┌──────▼──────┐     ┌──────▼──────┐       │
-│  │ Enrichment  │     │ Evaluation  │     │    QA       │       │
-│  │  Services   │     │  Metrics    │     │ Generation  │       │
-│  └─────────────┘     └─────────────┘     └─────────────┘       │
-│                                                                 │
-│  ┌──────────────────────────┐  ┌───────────────────────────────┐│
-│  │     Chunk Filtering      │  │   Question Suggestion Service ││
-│  │  (3-Stage Assessment)    │  │                               ││
-│  └──────────────────────────┘  └───────────────────────────────┘│
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│                       FluxImproverBuilder                           │
+│  ┌─────────────────────────────────────────────────────────────────┐│
+│  │                   ITextCompletionService                        ││
+│  └─────────────────────────────────────────────────────────────────┘│
+│         │                    │                    │                 │
+│  ┌──────▼──────┐     ┌──────▼──────┐     ┌──────▼──────┐           │
+│  │ Enrichment  │     │ Evaluation  │     │    QA       │           │
+│  │  Services   │     │  Metrics    │     │ Generation  │           │
+│  └─────────────┘     └─────────────┘     └─────────────┘           │
+│                                                                     │
+│  ┌────────────────────┐  ┌─────────────────┐  ┌───────────────────┐│
+│  │   Chunk Filtering  │  │ Query Preproc.  │  │ Question Suggest. ││
+│  │  (3-Stage Assess.) │  │ (Expand/Intent) │  │                   ││
+│  └────────────────────┘  └─────────────────┘  └───────────────────┘│
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
 ---

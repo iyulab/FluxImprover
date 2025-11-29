@@ -1,7 +1,7 @@
-using FluxImprover;
+﻿using FluxImprover;
+using FluxImprover.ConsoleDemo;
 using FluxImprover.Models;
 using FluxImprover.Options;
-using FluxImprover.ConsoleDemo;
 using FluxImprover.QAGeneration;
 using FluxImprover.QuestionSuggestion;
 using Microsoft.Extensions.Configuration;

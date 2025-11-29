@@ -3,8 +3,8 @@
 using FluentAssertions;
 using FluxImprover.Models;
 using FluxImprover.Options;
-using FluxImprover.Services;
 using FluxImprover.QAGeneration;
+using FluxImprover.Services;
 using NSubstitute;
 using Xunit;
 
