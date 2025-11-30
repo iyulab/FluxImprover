@@ -1,11 +1,13 @@
 ﻿namespace FluxImprover;
 
 using FluxImprover.ChunkFiltering;
+using FluxImprover.ContextualRetrieval;
 using FluxImprover.Enrichment;
 using FluxImprover.Evaluation;
 using FluxImprover.QAGeneration;
 using FluxImprover.QueryPreprocessing;
 using FluxImprover.QuestionSuggestion;
+using FluxImprover.RelationshipDiscovery;
 using FluxImprover.Services;
 
 /// <summary>
@@ -56,6 +58,12 @@ public sealed class FluxImproverBuilder
         // Query Preprocessing
         var queryPreprocessing = new QueryPreprocessingService(_completionService);
 
+        // Contextual Retrieval (Anthropic pattern)
+        var contextualEnrichment = new ContextualEnrichmentService(_completionService);
+
+        // Chunk Relationship Discovery
+        var chunkRelationship = new ChunkRelationshipService(_completionService);
+
         return new FluxImproverServices(
             Summarization: summarizationService,
             KeywordExtraction: keywordExtractionService,
@@ -68,7 +76,9 @@ public sealed class FluxImproverBuilder
             QAPipeline: qaPipeline,
             QuestionSuggestion: questionSuggestion,
             ChunkFiltering: chunkFiltering,
-            QueryPreprocessing: queryPreprocessing
+            QueryPreprocessing: queryPreprocessing,
+            ContextualEnrichment: contextualEnrichment,
+            ChunkRelationship: chunkRelationship
         );
     }
 }
@@ -88,6 +98,8 @@ public sealed class FluxImproverBuilder
 /// <param name="QuestionSuggestion">질문 추천 서비스</param>
 /// <param name="ChunkFiltering">청크 필터링 서비스</param>
 /// <param name="QueryPreprocessing">쿼리 전처리 서비스</param>
+/// <param name="ContextualEnrichment">Contextual Retrieval 서비스 (Anthropic pattern)</param>
+/// <param name="ChunkRelationship">청크 관계 발견 서비스</param>
 public sealed record FluxImproverServices(
     SummarizationService Summarization,
     KeywordExtractionService KeywordExtraction,
@@ -100,5 +112,7 @@ public sealed record FluxImproverServices(
     QAPipeline QAPipeline,
     QuestionSuggestionService QuestionSuggestion,
     IChunkFilteringService ChunkFiltering,
-    IQueryPreprocessingService QueryPreprocessing
+    IQueryPreprocessingService QueryPreprocessing,
+    IContextualEnrichmentService ContextualEnrichment,
+    IChunkRelationshipService ChunkRelationship
 );

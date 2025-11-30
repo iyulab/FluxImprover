@@ -97,4 +97,42 @@ public sealed class EnrichmentOptions
     /// 병렬 처리 시 최대 동시 작업 수 (기본값: 4)
     /// </summary>
     public int MaxDegreeOfParallelism { get; init; } = 4;
+
+    /// <summary>
+    /// Parent chunk context for hierarchical enrichment.
+    /// When provided, this context is used to inform the enrichment of child chunks.
+    /// Supports hierarchical document structures where parent context improves child understanding.
+    /// </summary>
+    public ParentChunkContext? ParentContext { get; init; }
+}
+
+/// <summary>
+/// Context information from a parent chunk for hierarchical enrichment.
+/// </summary>
+public sealed class ParentChunkContext
+{
+    /// <summary>
+    /// Parent chunk identifier.
+    /// </summary>
+    public string? ParentId { get; init; }
+
+    /// <summary>
+    /// Summary of the parent chunk.
+    /// </summary>
+    public string? ParentSummary { get; init; }
+
+    /// <summary>
+    /// Keywords from the parent chunk.
+    /// </summary>
+    public IReadOnlyList<string>? ParentKeywords { get; init; }
+
+    /// <summary>
+    /// Document structure path of the parent (e.g., "Chapter 1").
+    /// </summary>
+    public string? ParentHeadingPath { get; init; }
+
+    /// <summary>
+    /// Hierarchy level (0 = root, 1 = first child level, etc.).
+    /// </summary>
+    public int HierarchyLevel { get; init; }
 }

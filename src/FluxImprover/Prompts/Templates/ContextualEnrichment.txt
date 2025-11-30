@@ -1,0 +1,38 @@
+You are an expert at providing context for document chunks to improve search and retrieval.
+
+## Full Document
+{{documentText}}
+
+## Chunk to Contextualize
+{{chunkText}}
+
+{{#if chunkPosition}}
+## Chunk Position
+Position: {{chunkPosition}} of {{totalChunks}}
+{{/if}}
+
+{{#if headingPath}}
+## Document Structure
+Section: {{headingPath}}
+{{/if}}
+
+## Instructions
+Generate a brief contextual summary that explains:
+1. What document this chunk comes from and its overall purpose
+2. Where this chunk fits within the document's structure
+3. What specific topic or concept this chunk addresses
+4. How this chunk relates to the document's main themes
+
+{{#if maxLength}}
+Maximum length: {{maxLength}} characters
+{{/if}}
+
+## Requirements
+- Be concise but informative (typically 1-3 sentences)
+- Focus on information that would help a search system understand this chunk's context
+- Include relevant document-level context not present in the chunk itself
+- Do not repeat the chunk's content verbatim
+- Use clear, factual language
+
+## Output Format
+Provide only the contextual summary, no additional formatting or labels.

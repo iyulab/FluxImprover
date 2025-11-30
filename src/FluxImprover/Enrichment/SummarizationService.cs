@@ -66,15 +66,43 @@ public sealed class SummarizationService : ISummarizationService
 
     private static string BuildPrompt(string text, EnrichmentOptions options)
     {
-        var prompt = $"Please summarize the following text";
+        var parts = new List<string>();
 
-        if (options.MaxSummaryLength > 0)
+        // Add parent context if available (for hierarchical enrichment)
+        if (options.ParentContext is not null)
         {
-            prompt += $" in approximately {options.MaxSummaryLength} words or less";
+            parts.Add("## Parent Context");
+            if (!string.IsNullOrWhiteSpace(options.ParentContext.ParentHeadingPath))
+            {
+                parts.Add($"Section: {options.ParentContext.ParentHeadingPath}");
+            }
+            if (!string.IsNullOrWhiteSpace(options.ParentContext.ParentSummary))
+            {
+                parts.Add($"Parent Summary: {options.ParentContext.ParentSummary}");
+            }
+            if (options.ParentContext.ParentKeywords?.Count > 0)
+            {
+                parts.Add($"Parent Keywords: {string.Join(", ", options.ParentContext.ParentKeywords)}");
+            }
+            parts.Add("");
         }
 
-        prompt += ":\n\n" + text;
+        parts.Add("## Text to Summarize");
+        parts.Add(text);
+        parts.Add("");
 
-        return prompt;
+        parts.Add("## Instructions");
+        var instruction = "Please summarize the text";
+        if (options.MaxSummaryLength > 0)
+        {
+            instruction += $" in approximately {options.MaxSummaryLength} words or less";
+        }
+        if (options.ParentContext is not null)
+        {
+            instruction += ". Consider the parent context to ensure the summary is coherent within the document hierarchy";
+        }
+        parts.Add(instruction + ".");
+
+        return string.Join("\n", parts);
     }
 }

@@ -364,5 +364,6 @@ FodyWeavers.xsd
 
 # Local
 local-docs/
+claudedocs/
 .env.local
 .serena/
