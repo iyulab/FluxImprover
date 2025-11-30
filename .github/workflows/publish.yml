@@ -47,12 +47,6 @@ jobs:
 
       - name: Pack
         run: |
-          dotnet pack src/FluxImprover.Abstractions/FluxImprover.Abstractions.csproj \
-            --no-build \
-            --configuration Release \
-            --output ./nupkgs \
-            -p:PackageVersion=${{ steps.version.outputs.version }}
-
           dotnet pack src/FluxImprover/FluxImprover.csproj \
             --no-build \
             --configuration Release \
