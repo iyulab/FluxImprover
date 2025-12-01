@@ -1,4 +1,4 @@
-namespace FluxImprover.Models;
+﻿namespace FluxImprover.Models;
 
 /// <summary>
 /// Represents a semantic relationship between two chunks.

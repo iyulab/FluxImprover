@@ -1,4 +1,4 @@
-using FluxImprover.Models;
+﻿using FluxImprover.Models;
 
 namespace FluxImprover.Options;
 

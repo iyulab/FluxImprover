@@ -1,4 +1,4 @@
-namespace FluxImprover.Tests.RelationshipDiscovery;
+﻿namespace FluxImprover.Tests.RelationshipDiscovery;
 
 using FluentAssertions;
 using FluxImprover.Models;

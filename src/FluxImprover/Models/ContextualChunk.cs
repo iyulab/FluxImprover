@@ -1,4 +1,4 @@
-namespace FluxImprover.Models;
+﻿namespace FluxImprover.Models;
 
 /// <summary>
 /// A chunk enriched with document-level context.

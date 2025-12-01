@@ -1,4 +1,4 @@
-namespace FluxImprover.Options;
+﻿namespace FluxImprover.Options;
 
 /// <summary>
 /// Options for contextual enrichment of chunks.

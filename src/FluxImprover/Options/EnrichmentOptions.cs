@@ -104,6 +104,12 @@ public sealed class EnrichmentOptions
     /// Supports hierarchical document structures where parent context improves child understanding.
     /// </summary>
     public ParentChunkContext? ParentContext { get; init; }
+
+    /// <summary>
+    /// Conditional enrichment options for cost optimization.
+    /// When configured, chunks are pre-assessed and may skip unnecessary enrichment operations.
+    /// </summary>
+    public ConditionalEnrichmentOptions? ConditionalOptions { get; init; }
 }
 
 /// <summary>
@@ -135,4 +141,104 @@ public sealed class ParentChunkContext
     /// Hierarchy level (0 = root, 1 = first child level, etc.).
     /// </summary>
     public int HierarchyLevel { get; init; }
+}
+
+
+/// <summary>
+/// Options for conditional enrichment based on chunk quality assessment.
+/// Enables cost optimization by skipping enrichment for high-quality chunks.
+/// </summary>
+public sealed class ConditionalEnrichmentOptions
+{
+    private float _skipEnrichmentThreshold = 0.8f;
+    private int _minSummarizationLength = 500;
+    private float _minKeywordDensity = 0.3f;
+
+    /// <summary>
+    /// Enable conditional enrichment based on quality assessment.
+    /// When enabled, chunks are analyzed before enrichment and may skip
+    /// unnecessary operations. Default: false (all chunks are enriched).
+    /// </summary>
+    public bool EnableConditionalEnrichment { get; init; }
+
+    /// <summary>
+    /// Quality score threshold above which enrichment is skipped (0.0 - 1.0).
+    /// Chunks with OverallScore >= this value skip enrichment.
+    /// Default: 0.8
+    /// </summary>
+    public float SkipEnrichmentThreshold
+    {
+        get => _skipEnrichmentThreshold;
+        init
+        {
+            ArgumentOutOfRangeException.ThrowIfLessThan(value, 0f);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, 1f);
+            _skipEnrichmentThreshold = value;
+        }
+    }
+
+    /// <summary>
+    /// Minimum content length (characters) to enable summarization.
+    /// Chunks shorter than this skip summarization even if otherwise recommended.
+    /// Default: 500
+    /// </summary>
+    public int MinSummarizationLength
+    {
+        get => _minSummarizationLength;
+        init
+        {
+            ArgumentOutOfRangeException.ThrowIfLessThan(value, 0);
+            _minSummarizationLength = value;
+        }
+    }
+
+    /// <summary>
+    /// Minimum information density score to enable keyword extraction.
+    /// Chunks with lower density skip keyword extraction.
+    /// Default: 0.3
+    /// </summary>
+    public float MinKeywordDensity
+    {
+        get => _minKeywordDensity;
+        init
+        {
+            ArgumentOutOfRangeException.ThrowIfLessThan(value, 0f);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, 1f);
+            _minKeywordDensity = value;
+        }
+    }
+
+    /// <summary>
+    /// Include quality assessment results in enriched chunk metadata.
+    /// Default: true
+    /// </summary>
+    public bool IncludeQualityMetrics { get; init; } = true;
+
+    /// <summary>
+    /// Optional domain glossary for term expansion.
+    /// When provided, acronyms and technical terms are expanded using domain knowledge.
+    /// Implementation is provided by the consumer.
+    /// </summary>
+    public IDomainGlossary? DomainGlossary { get; init; }
+}
+
+/// <summary>
+/// Interface for domain-specific glossary that expands acronyms and technical terms.
+/// Consumers implement this interface to provide domain knowledge for their use case.
+/// </summary>
+public interface IDomainGlossary
+{
+    /// <summary>
+    /// Expands known acronyms and technical terms in the text.
+    /// </summary>
+    /// <param name="text">The text containing terms to expand.</param>
+    /// <returns>Text with expanded terms, or original text if no expansions apply.</returns>
+    string ExpandTerms(string text);
+
+    /// <summary>
+    /// Gets expanded form of a specific term if known.
+    /// </summary>
+    /// <param name="term">The term or acronym to expand.</param>
+    /// <returns>The expanded form, or null if not in glossary.</returns>
+    string? GetExpansion(string term);
 }

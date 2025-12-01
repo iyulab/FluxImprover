@@ -1,4 +1,4 @@
-namespace FluxImprover.Tests.ContextualRetrieval;
+﻿namespace FluxImprover.Tests.ContextualRetrieval;
 
 using FluentAssertions;
 using FluxImprover.ContextualRetrieval;
