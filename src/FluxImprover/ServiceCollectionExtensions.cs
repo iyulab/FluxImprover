@@ -4,6 +4,7 @@ using FluxImprover.ChunkFiltering;
 using FluxImprover.ContextualRetrieval;
 using FluxImprover.Enrichment;
 using FluxImprover.Evaluation;
+using FluxImprover.LocalAI;
 using FluxImprover.QAGeneration;
 using FluxImprover.QueryPreprocessing;
 using FluxImprover.QuestionSuggestion;
@@ -83,6 +84,111 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddFluxImprover(this IServiceCollection services)
     {
         return services.AddFluxImprover(sp => sp.GetRequiredService<ITextCompletionService>());
+    }
+
+    /// <summary>
+    /// Adds all FluxImprover services with LocalAI.Generator as the default LLM backend.
+    /// Uses the default model preset.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <returns>The service collection for chaining.</returns>
+    /// <remarks>
+    /// LocalAI requires async initialization. The services will be initialized on first use.
+    /// Consider calling <see cref="InitializeLocalAIAsync"/> during application startup
+    /// to ensure the model is loaded before first use.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// services.AddFluxImproverWithLocalAI();
+    ///
+    /// // Optional: Initialize during startup
+    /// await app.Services.InitializeLocalAIAsync();
+    /// </code>
+    /// </example>
+    public static IServiceCollection AddFluxImproverWithLocalAI(this IServiceCollection services)
+    {
+        return services.AddFluxImproverWithLocalAI(_ => { });
+    }
+
+    /// <summary>
+    /// Adds all FluxImprover services with LocalAI.Generator as the default LLM backend.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="configure">Configuration action for LocalAI options.</param>
+    /// <returns>The service collection for chaining.</returns>
+    /// <remarks>
+    /// LocalAI requires async initialization. The services will be initialized on first use.
+    /// Consider calling <see cref="InitializeLocalAIAsync"/> during application startup
+    /// to ensure the model is loaded before first use.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// services.AddFluxImproverWithLocalAI(options =>
+    /// {
+    ///     options.ModelPreset = GeneratorModelPreset.Quality;
+    ///     options.GenerationDefaults = new LocalAIGenerationDefaults
+    ///     {
+    ///         Temperature = 0.7f,
+    ///         MaxTokens = 1024
+    ///     };
+    /// });
+    /// </code>
+    /// </example>
+    public static IServiceCollection AddFluxImproverWithLocalAI(
+        this IServiceCollection services,
+        Action<LocalAICompletionOptions> configure)
+    {
+        ArgumentNullException.ThrowIfNull(configure);
+
+        // Register LocalAI options
+        var options = new LocalAICompletionOptions();
+        configure(options);
+
+        // Register the lazy initialization wrapper
+        services.TryAddSingleton(_ => new LocalAIInitializer(options));
+
+        // Register ITextCompletionService backed by LocalAI
+        services.TryAddSingleton<ITextCompletionService>(sp =>
+        {
+            var initializer = sp.GetRequiredService<LocalAIInitializer>();
+            return initializer.GetServiceAsync().GetAwaiter().GetResult();
+        });
+
+        // Register LocalAICompletionService for direct access
+        services.TryAddSingleton(sp =>
+            (LocalAICompletionService)sp.GetRequiredService<ITextCompletionService>());
+
+        // Register FluxImproverServices
+        services.TryAddSingleton(sp =>
+        {
+            var completionService = sp.GetRequiredService<ITextCompletionService>();
+            return new FluxImproverBuilder()
+                .WithCompletionService(completionService)
+                .Build();
+        });
+
+        // Register individual services as facades for convenience
+        RegisterEnrichmentServices(services);
+        RegisterEvaluationServices(services);
+        RegisterQAServices(services);
+        RegisterOtherServices(services);
+
+        return services;
+    }
+
+    /// <summary>
+    /// Initializes the LocalAI service asynchronously.
+    /// Call this during application startup to ensure the model is loaded before first use.
+    /// </summary>
+    /// <param name="serviceProvider">The service provider.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The initialized LocalAICompletionService.</returns>
+    public static async Task<LocalAICompletionService> InitializeLocalAIAsync(
+        this IServiceProvider serviceProvider,
+        CancellationToken cancellationToken = default)
+    {
+        var initializer = serviceProvider.GetRequiredService<LocalAIInitializer>();
+        return await initializer.GetServiceAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private static void RegisterEnrichmentServices(IServiceCollection services)

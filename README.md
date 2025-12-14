@@ -39,9 +39,40 @@ dotnet add package FluxImprover
 
 ## Quick Start
 
-### 1. Implement ITextCompletionService
+### Option A: Use Built-in LocalAI (Recommended)
 
-FluxImprover requires you to provide an LLM implementation:
+FluxImprover includes built-in support for [LocalAI.Generator](https://github.com/iyulab/local-ai), enabling local LLM inference without external API dependencies:
+
+```csharp
+using FluxImprover;
+using LocalAI.Generator;
+
+// Use default model preset
+var services = await new FluxImproverBuilder()
+    .WithLocalAI()
+    .BuildAsync();
+
+// Or customize the model
+var services = await new FluxImproverBuilder()
+    .WithLocalAI(options =>
+    {
+        options.ModelPreset = GeneratorModelPreset.Quality;
+        options.GenerationDefaults = new LocalAIGenerationDefaults
+        {
+            Temperature = 0.7f,
+            MaxTokens = 1024
+        };
+    })
+    .BuildAsync();
+
+// Or with DI
+services.AddFluxImproverWithLocalAI();
+services.AddFluxImproverWithLocalAI(opt => opt.ModelPreset = GeneratorModelPreset.Fast);
+```
+
+### Option B: Custom ITextCompletionService
+
+For cloud-based LLMs (OpenAI, Azure, etc.), implement the `ITextCompletionService` interface:
 
 ```csharp
 public class OpenAICompletionService : ITextCompletionService
@@ -79,16 +110,19 @@ public class OpenAICompletionService : ITextCompletionService
 
 ### 2. Configure and Build Services
 
-Use the `FluxImproverBuilder` to create all services with a single LLM provider:
+Use the `FluxImproverBuilder` to create all services:
 
 ```csharp
 using FluxImprover;
 using FluxImprover.Services;
 
-// Your ITextCompletionService implementation
-ITextCompletionService completionService = new OpenAICompletionService(apiKey);
+// Option A: With LocalAI (async initialization required)
+var services = await new FluxImproverBuilder()
+    .WithLocalAI()
+    .BuildAsync();
 
-// Build all FluxImprover services
+// Option B: With custom ITextCompletionService
+ITextCompletionService completionService = new OpenAICompletionService(apiKey);
 var services = new FluxImproverBuilder()
     .WithCompletionService(completionService)
     .Build();
@@ -361,7 +395,11 @@ public record CompletionOptions
 ┌─────────────────────────────────────────────────────────────────────┐
 │                       FluxImproverBuilder                           │
 │  ┌─────────────────────────────────────────────────────────────────┐│
-│  │                   ITextCompletionService                        ││
+│  │        ITextCompletionService (Built-in or Custom)              ││
+│  │   ┌─────────────────────┐  ┌────────────────────────────────┐  ││
+│  │   │  LocalAI.Generator  │  │  Custom Implementation         │  ││
+│  │   │  (Built-in)         │  │  (OpenAI, Azure, Claude, etc.) │  ││
+│  │   └─────────────────────┘  └────────────────────────────────┘  ││
 │  └─────────────────────────────────────────────────────────────────┘│
 │         │                    │                    │                 │
 │  ┌──────▼──────┐     ┌──────▼──────┐     ┌──────▼──────┐           │

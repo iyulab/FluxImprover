@@ -363,6 +363,7 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # Local
+CLAUDE.md
 local-docs/
 claudedocs/
 .env.local
