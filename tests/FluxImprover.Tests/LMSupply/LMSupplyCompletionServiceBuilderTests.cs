@@ -1,17 +1,17 @@
-namespace FluxImprover.Tests.LocalAI;
+namespace FluxImprover.Tests.LMSupply;
 
-using FluxImprover.LocalAI;
-using global::LocalAI.Generator;
+using FluxImprover.LMSupply;
+using global::LMSupply.Generator;
 using FluentAssertions;
 using Xunit;
 
-public class LocalAICompletionServiceBuilderTests
+public class LMSupplyCompletionServiceBuilderTests
 {
     [Fact]
     public void Create_ReturnsNewBuilderInstance()
     {
         // Act
-        var builder = LocalAICompletionServiceBuilder.Create();
+        var builder = LMSupplyCompletionServiceBuilder.Create();
 
         // Assert
         builder.Should().NotBeNull();
@@ -21,7 +21,7 @@ public class LocalAICompletionServiceBuilderTests
     public void WithModelPreset_SetsPreset_ReturnsSameBuilder()
     {
         // Arrange
-        var builder = LocalAICompletionServiceBuilder.Create();
+        var builder = LMSupplyCompletionServiceBuilder.Create();
 
         // Act
         var result = builder.WithModelPreset(GeneratorModelPreset.Fast);
@@ -34,7 +34,7 @@ public class LocalAICompletionServiceBuilderTests
     public void WithModelPath_SetsPath_ReturnsSameBuilder()
     {
         // Arrange
-        var builder = LocalAICompletionServiceBuilder.Create();
+        var builder = LMSupplyCompletionServiceBuilder.Create();
 
         // Act
         var result = builder.WithModelPath("/path/to/model");
@@ -47,7 +47,7 @@ public class LocalAICompletionServiceBuilderTests
     public void WithHuggingFaceModel_SetsModelId_ReturnsSameBuilder()
     {
         // Arrange
-        var builder = LocalAICompletionServiceBuilder.Create();
+        var builder = LMSupplyCompletionServiceBuilder.Create();
 
         // Act
         var result = builder.WithHuggingFaceModel("microsoft/phi-4-onnx");
@@ -60,7 +60,7 @@ public class LocalAICompletionServiceBuilderTests
     public void WithCacheDirectory_SetsDirectory_ReturnsSameBuilder()
     {
         // Arrange
-        var builder = LocalAICompletionServiceBuilder.Create();
+        var builder = LMSupplyCompletionServiceBuilder.Create();
 
         // Act
         var result = builder.WithCacheDirectory("/cache");
@@ -73,7 +73,7 @@ public class LocalAICompletionServiceBuilderTests
     public void WithMaxContextLength_SetsLength_ReturnsSameBuilder()
     {
         // Arrange
-        var builder = LocalAICompletionServiceBuilder.Create();
+        var builder = LMSupplyCompletionServiceBuilder.Create();
 
         // Act
         var result = builder.WithMaxContextLength(4096);
@@ -86,7 +86,7 @@ public class LocalAICompletionServiceBuilderTests
     public void WithVerboseLogging_EnablesLogging_ReturnsSameBuilder()
     {
         // Arrange
-        var builder = LocalAICompletionServiceBuilder.Create();
+        var builder = LMSupplyCompletionServiceBuilder.Create();
 
         // Act
         var result = builder.WithVerboseLogging();
@@ -99,7 +99,7 @@ public class LocalAICompletionServiceBuilderTests
     public void WithGenerationDefaults_ConfiguresDefaults_ReturnsSameBuilder()
     {
         // Arrange
-        var builder = LocalAICompletionServiceBuilder.Create();
+        var builder = LMSupplyCompletionServiceBuilder.Create();
 
         // Act
         var result = builder.WithGenerationDefaults(defaults =>
@@ -116,7 +116,7 @@ public class LocalAICompletionServiceBuilderTests
     public void WithTemperature_SetsTemperature_ReturnsSameBuilder()
     {
         // Arrange
-        var builder = LocalAICompletionServiceBuilder.Create();
+        var builder = LMSupplyCompletionServiceBuilder.Create();
 
         // Act
         var result = builder.WithTemperature(0.8f);
@@ -129,7 +129,7 @@ public class LocalAICompletionServiceBuilderTests
     public void WithMaxTokens_SetsMaxTokens_ReturnsSameBuilder()
     {
         // Arrange
-        var builder = LocalAICompletionServiceBuilder.Create();
+        var builder = LMSupplyCompletionServiceBuilder.Create();
 
         // Act
         var result = builder.WithMaxTokens(2048);
@@ -142,7 +142,7 @@ public class LocalAICompletionServiceBuilderTests
     public void FluentChaining_AllMethods_ReturnsSameBuilder()
     {
         // Arrange & Act
-        var builder = LocalAICompletionServiceBuilder.Create()
+        var builder = LMSupplyCompletionServiceBuilder.Create()
             .WithModelPreset(GeneratorModelPreset.Default)
             .WithCacheDirectory("/cache")
             .WithMaxContextLength(4096)

@@ -1,6 +1,6 @@
-namespace FluxImprover.Tests.LocalAI;
+namespace FluxImprover.Tests.LMSupply;
 
-using FluxImprover.LocalAI;
+using FluxImprover.LMSupply;
 using FluxImprover.Services;
 using FluentAssertions;
 using Xunit;
@@ -23,7 +23,7 @@ public class OptionsMapperTests
     public void ToGenerationOptions_WithDefaults_AppliesDefaultValues()
     {
         // Arrange
-        var defaults = new LocalAIGenerationDefaults
+        var defaults = new LMSupplyGenerationDefaults
         {
             Temperature = 0.5f,
             MaxTokens = 1024,
@@ -47,7 +47,7 @@ public class OptionsMapperTests
     public void ToGenerationOptions_WithOptions_OverridesDefaults()
     {
         // Arrange
-        var defaults = new LocalAIGenerationDefaults
+        var defaults = new LMSupplyGenerationDefaults
         {
             Temperature = 0.5f,
             MaxTokens = 1024
@@ -70,7 +70,7 @@ public class OptionsMapperTests
     public void ToGenerationOptions_PartialDefaults_AppliesOnlySpecifiedValues()
     {
         // Arrange
-        var defaults = new LocalAIGenerationDefaults
+        var defaults = new LMSupplyGenerationDefaults
         {
             Temperature = 0.3f
             // MaxTokens not set
@@ -88,16 +88,16 @@ public class OptionsMapperTests
     [InlineData("system")]
     [InlineData("System")]
     [InlineData("SYSTEM")]
-    public void ToLocalAIChatMessage_SystemRole_CreatesSystemMessage(string role)
+    public void ToLMSupplyChatMessage_SystemRole_CreatesSystemMessage(string role)
     {
         // Arrange
         var message = new ChatMessage(role, "System prompt content");
 
         // Act
-        var result = OptionsMapper.ToLocalAIChatMessage(message);
+        var result = OptionsMapper.ToLMSupplyChatMessage(message);
 
         // Assert
-        result.Role.Should().Be(global::LocalAI.Generator.Models.ChatRole.System);
+        result.Role.Should().Be(global::LMSupply.Generator.Models.ChatRole.System);
         result.Content.Should().Be("System prompt content");
     }
 
@@ -105,16 +105,16 @@ public class OptionsMapperTests
     [InlineData("user")]
     [InlineData("User")]
     [InlineData("USER")]
-    public void ToLocalAIChatMessage_UserRole_CreatesUserMessage(string role)
+    public void ToLMSupplyChatMessage_UserRole_CreatesUserMessage(string role)
     {
         // Arrange
         var message = new ChatMessage(role, "User message");
 
         // Act
-        var result = OptionsMapper.ToLocalAIChatMessage(message);
+        var result = OptionsMapper.ToLMSupplyChatMessage(message);
 
         // Assert
-        result.Role.Should().Be(global::LocalAI.Generator.Models.ChatRole.User);
+        result.Role.Should().Be(global::LMSupply.Generator.Models.ChatRole.User);
         result.Content.Should().Be("User message");
     }
 
@@ -122,30 +122,30 @@ public class OptionsMapperTests
     [InlineData("assistant")]
     [InlineData("Assistant")]
     [InlineData("ASSISTANT")]
-    public void ToLocalAIChatMessage_AssistantRole_CreatesAssistantMessage(string role)
+    public void ToLMSupplyChatMessage_AssistantRole_CreatesAssistantMessage(string role)
     {
         // Arrange
         var message = new ChatMessage(role, "Assistant response");
 
         // Act
-        var result = OptionsMapper.ToLocalAIChatMessage(message);
+        var result = OptionsMapper.ToLMSupplyChatMessage(message);
 
         // Assert
-        result.Role.Should().Be(global::LocalAI.Generator.Models.ChatRole.Assistant);
+        result.Role.Should().Be(global::LMSupply.Generator.Models.ChatRole.Assistant);
         result.Content.Should().Be("Assistant response");
     }
 
     [Fact]
-    public void ToLocalAIChatMessage_UnknownRole_DefaultsToUser()
+    public void ToLMSupplyChatMessage_UnknownRole_DefaultsToUser()
     {
         // Arrange
         var message = new ChatMessage("unknown", "Some content");
 
         // Act
-        var result = OptionsMapper.ToLocalAIChatMessage(message);
+        var result = OptionsMapper.ToLMSupplyChatMessage(message);
 
         // Assert
-        result.Role.Should().Be(global::LocalAI.Generator.Models.ChatRole.User);
+        result.Role.Should().Be(global::LMSupply.Generator.Models.ChatRole.User);
     }
 
     [Fact]
@@ -162,9 +162,9 @@ public class OptionsMapperTests
 
         // Assert
         result.Should().HaveCount(2);
-        result[0].Role.Should().Be(global::LocalAI.Generator.Models.ChatRole.System);
+        result[0].Role.Should().Be(global::LMSupply.Generator.Models.ChatRole.System);
         result[0].Content.Should().Be("You are a helpful assistant");
-        result[1].Role.Should().Be(global::LocalAI.Generator.Models.ChatRole.User);
+        result[1].Role.Should().Be(global::LMSupply.Generator.Models.ChatRole.User);
         result[1].Content.Should().Be("Hello");
     }
 

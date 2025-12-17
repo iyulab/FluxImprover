@@ -9,8 +9,8 @@
     <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.0" />
     <!-- Optional Dependencies -->
     <PackageVersion Include="Polly.Core" Version="8.6.5" />
-    <!-- LocalAI Integration -->
-    <PackageVersion Include="LocalAI.Generator" Version="0.7.0" />
+    <!-- LMSupply Integration -->
+    <PackageVersion Include="LMSupply.Generator" Version="0.7.2" />
     <!-- Sample/Demo Dependencies -->
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.1" />

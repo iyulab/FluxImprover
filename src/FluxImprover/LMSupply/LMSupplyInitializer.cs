@@ -1,25 +1,25 @@
-namespace FluxImprover.LocalAI;
+namespace FluxImprover.LMSupply;
 
 /// <summary>
-/// Lazy initialization wrapper for LocalAICompletionService.
+/// Lazy initialization wrapper for LMSupplyCompletionService.
 /// Ensures thread-safe, single initialization of the service.
 /// </summary>
-internal sealed class LocalAIInitializer : IAsyncDisposable
+internal sealed class LMSupplyInitializer : IAsyncDisposable
 {
-    private readonly LocalAICompletionOptions _options;
+    private readonly LMSupplyCompletionOptions _options;
     private readonly SemaphoreSlim _lock = new(1, 1);
-    private LocalAICompletionService? _service;
+    private LMSupplyCompletionService? _service;
     private bool _disposed;
 
-    public LocalAIInitializer(LocalAICompletionOptions options)
+    public LMSupplyInitializer(LMSupplyCompletionOptions options)
     {
         _options = options ?? throw new ArgumentNullException(nameof(options));
     }
 
     /// <summary>
-    /// Gets or initializes the LocalAICompletionService.
+    /// Gets or initializes the LMSupplyCompletionService.
     /// </summary>
-    public async Task<LocalAICompletionService> GetServiceAsync(CancellationToken cancellationToken = default)
+    public async Task<LMSupplyCompletionService> GetServiceAsync(CancellationToken cancellationToken = default)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
 
@@ -32,7 +32,7 @@ internal sealed class LocalAIInitializer : IAsyncDisposable
             if (_service is not null)
                 return _service;
 
-            _service = await LocalAICompletionServiceBuilder
+            _service = await LMSupplyCompletionServiceBuilder
                 .BuildAsync(_options, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 

@@ -1,21 +1,21 @@
-namespace FluxImprover.LocalAI;
+namespace FluxImprover.LMSupply;
 
 using FluxImprover.Services;
-using global::LocalAI.Generator.Models;
-using LocalAIChatMessage = global::LocalAI.Generator.Models.ChatMessage;
+using global::LMSupply.Generator.Models;
+using LMSupplyChatMessage = global::LMSupply.Generator.Models.ChatMessage;
 using FluxChatMessage = FluxImprover.Services.ChatMessage;
 
 /// <summary>
-/// FluxImprover와 LocalAI.Generator 간의 옵션 매핑 유틸리티
+/// FluxImprover와 LMSupply.Generator 간의 옵션 매핑 유틸리티
 /// </summary>
 internal static class OptionsMapper
 {
     /// <summary>
-    /// FluxImprover CompletionOptions를 LocalAI GenerationOptions로 변환
+    /// FluxImprover CompletionOptions를 LMSupply GenerationOptions로 변환
     /// </summary>
     public static GenerationOptions ToGenerationOptions(
         CompletionOptions? options,
-        LocalAIGenerationDefaults? defaults = null)
+        LMSupplyGenerationDefaults? defaults = null)
     {
         var result = new GenerationOptions();
 
@@ -47,32 +47,32 @@ internal static class OptionsMapper
     }
 
     /// <summary>
-    /// FluxImprover ChatMessage를 LocalAI ChatMessage로 변환
+    /// FluxImprover ChatMessage를 LMSupply ChatMessage로 변환
     /// </summary>
-    public static LocalAIChatMessage ToLocalAIChatMessage(FluxChatMessage message)
+    public static LMSupplyChatMessage ToLMSupplyChatMessage(FluxChatMessage message)
     {
         return message.Role.ToLowerInvariant() switch
         {
-            "system" => LocalAIChatMessage.System(message.Content),
-            "user" => LocalAIChatMessage.User(message.Content),
-            "assistant" => LocalAIChatMessage.Assistant(message.Content),
-            _ => LocalAIChatMessage.User(message.Content)
+            "system" => LMSupplyChatMessage.System(message.Content),
+            "user" => LMSupplyChatMessage.User(message.Content),
+            "assistant" => LMSupplyChatMessage.Assistant(message.Content),
+            _ => LMSupplyChatMessage.User(message.Content)
         };
     }
 
     /// <summary>
     /// 대화 메시지 목록 빌드
     /// </summary>
-    public static IEnumerable<LocalAIChatMessage> BuildChatMessages(
+    public static IEnumerable<LMSupplyChatMessage> BuildChatMessages(
         string prompt,
         CompletionOptions? options)
     {
-        var messages = new List<LocalAIChatMessage>();
+        var messages = new List<LMSupplyChatMessage>();
 
         // System prompt
         if (!string.IsNullOrEmpty(options?.SystemPrompt))
         {
-            messages.Add(LocalAIChatMessage.System(options.SystemPrompt));
+            messages.Add(LMSupplyChatMessage.System(options.SystemPrompt));
         }
 
         // Previous messages
@@ -80,13 +80,13 @@ internal static class OptionsMapper
         {
             foreach (var msg in options.Messages)
             {
-                messages.Add(ToLocalAIChatMessage(msg));
+                messages.Add(ToLMSupplyChatMessage(msg));
             }
         }
 
         // Current user prompt (with JSON mode instruction if needed)
         var finalPrompt = ApplyJsonModeIfNeeded(prompt, options);
-        messages.Add(LocalAIChatMessage.User(finalPrompt));
+        messages.Add(LMSupplyChatMessage.User(finalPrompt));
 
         return messages;
     }

@@ -1,11 +1,11 @@
-namespace FluxImprover.LocalAI;
+namespace FluxImprover.LMSupply;
 
-using global::LocalAI.Generator;
+using global::LMSupply.Generator;
 
 /// <summary>
-/// LocalAI.Generator 기반 ITextCompletionService의 설정 옵션
+/// LMSupply.Generator 기반 ITextCompletionService의 설정 옵션
 /// </summary>
-public sealed class LocalAICompletionOptions
+public sealed class LMSupplyCompletionOptions
 {
     /// <summary>
     /// 사용할 모델 프리셋 (Default, Fast, Quality 등)
@@ -43,13 +43,13 @@ public sealed class LocalAICompletionOptions
     /// <summary>
     /// 기본 생성 옵션 (Temperature, MaxTokens 등)
     /// </summary>
-    public LocalAIGenerationDefaults? GenerationDefaults { get; set; }
+    public LMSupplyGenerationDefaults? GenerationDefaults { get; set; }
 }
 
 /// <summary>
 /// 기본 생성 옵션
 /// </summary>
-public sealed class LocalAIGenerationDefaults
+public sealed class LMSupplyGenerationDefaults
 {
     /// <summary>
     /// 생성 온도 (0.0 ~ 2.0). 높을수록 창의적, 낮을수록 결정적.

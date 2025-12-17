@@ -39,25 +39,25 @@ dotnet add package FluxImprover
 
 ## Quick Start
 
-### Option A: Use Built-in LocalAI (Recommended)
+### Option A: Use Built-in LMSupply (Recommended)
 
-FluxImprover includes built-in support for [LocalAI.Generator](https://github.com/iyulab/local-ai), enabling local LLM inference without external API dependencies:
+FluxImprover includes built-in support for [LMSupply.Generator](https://github.com/iyulab/lm-supply), enabling local LLM inference without external API dependencies:
 
 ```csharp
 using FluxImprover;
-using LocalAI.Generator;
+using LMSupply.Generator;
 
 // Use default model preset
 var services = await new FluxImproverBuilder()
-    .WithLocalAI()
+    .WithLMSupply()
     .BuildAsync();
 
 // Or customize the model
 var services = await new FluxImproverBuilder()
-    .WithLocalAI(options =>
+    .WithLMSupply(options =>
     {
         options.ModelPreset = GeneratorModelPreset.Quality;
-        options.GenerationDefaults = new LocalAIGenerationDefaults
+        options.GenerationDefaults = new LMSupplyGenerationDefaults
         {
             Temperature = 0.7f,
             MaxTokens = 1024
@@ -66,8 +66,8 @@ var services = await new FluxImproverBuilder()
     .BuildAsync();
 
 // Or with DI
-services.AddFluxImproverWithLocalAI();
-services.AddFluxImproverWithLocalAI(opt => opt.ModelPreset = GeneratorModelPreset.Fast);
+services.AddFluxImproverWithLMSupply();
+services.AddFluxImproverWithLMSupply(opt => opt.ModelPreset = GeneratorModelPreset.Fast);
 ```
 
 ### Option B: Custom ITextCompletionService
@@ -116,9 +116,9 @@ Use the `FluxImproverBuilder` to create all services:
 using FluxImprover;
 using FluxImprover.Services;
 
-// Option A: With LocalAI (async initialization required)
+// Option A: With LMSupply (async initialization required)
 var services = await new FluxImproverBuilder()
-    .WithLocalAI()
+    .WithLMSupply()
     .BuildAsync();
 
 // Option B: With custom ITextCompletionService
@@ -397,7 +397,7 @@ public record CompletionOptions
 │  ┌─────────────────────────────────────────────────────────────────┐│
 │  │        ITextCompletionService (Built-in or Custom)              ││
 │  │   ┌─────────────────────┐  ┌────────────────────────────────┐  ││
-│  │   │  LocalAI.Generator  │  │  Custom Implementation         │  ││
+│  │   │  LMSupply.Generator  │  │  Custom Implementation         │  ││
 │  │   │  (Built-in)         │  │  (OpenAI, Azure, Claude, etc.) │  ││
 │  │   └─────────────────────┘  └────────────────────────────────┘  ││
 │  └─────────────────────────────────────────────────────────────────┘│

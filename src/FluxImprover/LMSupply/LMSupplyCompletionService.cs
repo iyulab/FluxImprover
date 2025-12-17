@@ -1,25 +1,25 @@
-namespace FluxImprover.LocalAI;
+namespace FluxImprover.LMSupply;
 
 using System.Runtime.CompilerServices;
 using FluxImprover.Services;
-using global::LocalAI.Generator.Abstractions;
-using global::LocalAI.Generator.Models;
+using global::LMSupply.Generator.Abstractions;
+using global::LMSupply.Generator.Models;
 
 /// <summary>
-/// LocalAI.Generator 기반 ITextCompletionService 구현
+/// LMSupply.Generator 기반 ITextCompletionService 구현
 /// </summary>
-public sealed class LocalAICompletionService : ITextCompletionService, IAsyncDisposable
+public sealed class LMSupplyCompletionService : ITextCompletionService, IAsyncDisposable
 {
     private readonly IGeneratorModel _generator;
-    private readonly LocalAIGenerationDefaults? _defaults;
+    private readonly LMSupplyGenerationDefaults? _defaults;
     private bool _disposed;
 
     /// <summary>
-    /// LocalAICompletionService 생성자
+    /// LMSupplyCompletionService 생성자
     /// </summary>
     /// <param name="generator">텍스트 생성기 모델</param>
     /// <param name="defaults">기본 생성 옵션</param>
-    internal LocalAICompletionService(IGeneratorModel generator, LocalAIGenerationDefaults? defaults = null)
+    internal LMSupplyCompletionService(IGeneratorModel generator, LMSupplyGenerationDefaults? defaults = null)
     {
         _generator = generator ?? throw new ArgumentNullException(nameof(generator));
         _defaults = defaults;

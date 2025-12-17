@@ -3,7 +3,7 @@
   <PropertyGroup>
     <PackageId>FluxImprover</PackageId>
     <Description>The Quality Layer for RAG Data Pipelines - LLM-powered enrichment and quality assessment</Description>
-    <PackageTags>RAG;LLM;QA;Evaluation;Enrichment;Benchmark;LocalAI</PackageTags>
+    <PackageTags>RAG;LLM;QA;Evaluation;Enrichment;Benchmark;LMSupply</PackageTags>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
@@ -15,7 +15,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Options" />
     <PackageReference Include="Polly.Core" />
-    <PackageReference Include="LocalAI.Generator" />
+    <PackageReference Include="LMSupply.Generator" />
   </ItemGroup>
 
   <ItemGroup>

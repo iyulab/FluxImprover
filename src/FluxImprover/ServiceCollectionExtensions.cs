@@ -4,7 +4,7 @@ using FluxImprover.ChunkFiltering;
 using FluxImprover.ContextualRetrieval;
 using FluxImprover.Enrichment;
 using FluxImprover.Evaluation;
-using FluxImprover.LocalAI;
+using FluxImprover.LMSupply;
 using FluxImprover.QAGeneration;
 using FluxImprover.QueryPreprocessing;
 using FluxImprover.QuestionSuggestion;
@@ -87,46 +87,46 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Adds all FluxImprover services with LocalAI.Generator as the default LLM backend.
+    /// Adds all FluxImprover services with LMSupply.Generator as the default LLM backend.
     /// Uses the default model preset.
     /// </summary>
     /// <param name="services">The service collection.</param>
     /// <returns>The service collection for chaining.</returns>
     /// <remarks>
-    /// LocalAI requires async initialization. The services will be initialized on first use.
-    /// Consider calling <see cref="InitializeLocalAIAsync"/> during application startup
+    /// LMSupply requires async initialization. The services will be initialized on first use.
+    /// Consider calling <see cref="InitializeLMSupplyAsync"/> during application startup
     /// to ensure the model is loaded before first use.
     /// </remarks>
     /// <example>
     /// <code>
-    /// services.AddFluxImproverWithLocalAI();
+    /// services.AddFluxImproverWithLMSupply();
     ///
     /// // Optional: Initialize during startup
-    /// await app.Services.InitializeLocalAIAsync();
+    /// await app.Services.InitializeLMSupplyAsync();
     /// </code>
     /// </example>
-    public static IServiceCollection AddFluxImproverWithLocalAI(this IServiceCollection services)
+    public static IServiceCollection AddFluxImproverWithLMSupply(this IServiceCollection services)
     {
-        return services.AddFluxImproverWithLocalAI(_ => { });
+        return services.AddFluxImproverWithLMSupply(_ => { });
     }
 
     /// <summary>
-    /// Adds all FluxImprover services with LocalAI.Generator as the default LLM backend.
+    /// Adds all FluxImprover services with LMSupply.Generator as the default LLM backend.
     /// </summary>
     /// <param name="services">The service collection.</param>
-    /// <param name="configure">Configuration action for LocalAI options.</param>
+    /// <param name="configure">Configuration action for LMSupply options.</param>
     /// <returns>The service collection for chaining.</returns>
     /// <remarks>
-    /// LocalAI requires async initialization. The services will be initialized on first use.
-    /// Consider calling <see cref="InitializeLocalAIAsync"/> during application startup
+    /// LMSupply requires async initialization. The services will be initialized on first use.
+    /// Consider calling <see cref="InitializeLMSupplyAsync"/> during application startup
     /// to ensure the model is loaded before first use.
     /// </remarks>
     /// <example>
     /// <code>
-    /// services.AddFluxImproverWithLocalAI(options =>
+    /// services.AddFluxImproverWithLMSupply(options =>
     /// {
     ///     options.ModelPreset = GeneratorModelPreset.Quality;
-    ///     options.GenerationDefaults = new LocalAIGenerationDefaults
+    ///     options.GenerationDefaults = new LMSupplyGenerationDefaults
     ///     {
     ///         Temperature = 0.7f,
     ///         MaxTokens = 1024
@@ -134,29 +134,29 @@ public static class ServiceCollectionExtensions
     /// });
     /// </code>
     /// </example>
-    public static IServiceCollection AddFluxImproverWithLocalAI(
+    public static IServiceCollection AddFluxImproverWithLMSupply(
         this IServiceCollection services,
-        Action<LocalAICompletionOptions> configure)
+        Action<LMSupplyCompletionOptions> configure)
     {
         ArgumentNullException.ThrowIfNull(configure);
 
-        // Register LocalAI options
-        var options = new LocalAICompletionOptions();
+        // Register LMSupply options
+        var options = new LMSupplyCompletionOptions();
         configure(options);
 
         // Register the lazy initialization wrapper
-        services.TryAddSingleton(_ => new LocalAIInitializer(options));
+        services.TryAddSingleton(_ => new LMSupplyInitializer(options));
 
-        // Register ITextCompletionService backed by LocalAI
+        // Register ITextCompletionService backed by LMSupply
         services.TryAddSingleton<ITextCompletionService>(sp =>
         {
-            var initializer = sp.GetRequiredService<LocalAIInitializer>();
+            var initializer = sp.GetRequiredService<LMSupplyInitializer>();
             return initializer.GetServiceAsync().GetAwaiter().GetResult();
         });
 
-        // Register LocalAICompletionService for direct access
+        // Register LMSupplyCompletionService for direct access
         services.TryAddSingleton(sp =>
-            (LocalAICompletionService)sp.GetRequiredService<ITextCompletionService>());
+            (LMSupplyCompletionService)sp.GetRequiredService<ITextCompletionService>());
 
         // Register FluxImproverServices
         services.TryAddSingleton(sp =>
@@ -177,17 +177,17 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Initializes the LocalAI service asynchronously.
+    /// Initializes the LMSupply service asynchronously.
     /// Call this during application startup to ensure the model is loaded before first use.
     /// </summary>
     /// <param name="serviceProvider">The service provider.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    /// <returns>The initialized LocalAICompletionService.</returns>
-    public static async Task<LocalAICompletionService> InitializeLocalAIAsync(
+    /// <returns>The initialized LMSupplyCompletionService.</returns>
+    public static async Task<LMSupplyCompletionService> InitializeLMSupplyAsync(
         this IServiceProvider serviceProvider,
         CancellationToken cancellationToken = default)
     {
-        var initializer = serviceProvider.GetRequiredService<LocalAIInitializer>();
+        var initializer = serviceProvider.GetRequiredService<LMSupplyInitializer>();
         return await initializer.GetServiceAsync(cancellationToken).ConfigureAwait(false);
     }
 

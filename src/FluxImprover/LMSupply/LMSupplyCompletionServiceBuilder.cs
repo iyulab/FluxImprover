@@ -1,27 +1,27 @@
-namespace FluxImprover.LocalAI;
+namespace FluxImprover.LMSupply;
 
-using global::LocalAI.Generator;
+using global::LMSupply.Generator;
 
 /// <summary>
-/// LocalAICompletionService 빌더
+/// LMSupplyCompletionService 빌더
 /// </summary>
-public sealed class LocalAICompletionServiceBuilder
+public sealed class LMSupplyCompletionServiceBuilder
 {
-    private readonly LocalAICompletionOptions _options = new();
+    private readonly LMSupplyCompletionOptions _options = new();
 
-    private LocalAICompletionServiceBuilder()
+    private LMSupplyCompletionServiceBuilder()
     {
     }
 
     /// <summary>
     /// 새 빌더 인스턴스 생성
     /// </summary>
-    public static LocalAICompletionServiceBuilder Create() => new();
+    public static LMSupplyCompletionServiceBuilder Create() => new();
 
     /// <summary>
     /// 모델 프리셋 지정 (Default, Fast, Quality)
     /// </summary>
-    public LocalAICompletionServiceBuilder WithModelPreset(GeneratorModelPreset preset)
+    public LMSupplyCompletionServiceBuilder WithModelPreset(GeneratorModelPreset preset)
     {
         _options.ModelPreset = preset;
         return this;
@@ -30,7 +30,7 @@ public sealed class LocalAICompletionServiceBuilder
     /// <summary>
     /// 로컬 모델 경로 지정
     /// </summary>
-    public LocalAICompletionServiceBuilder WithModelPath(string modelPath)
+    public LMSupplyCompletionServiceBuilder WithModelPath(string modelPath)
     {
         _options.ModelPath = modelPath;
         return this;
@@ -39,7 +39,7 @@ public sealed class LocalAICompletionServiceBuilder
     /// <summary>
     /// HuggingFace 모델 ID 지정
     /// </summary>
-    public LocalAICompletionServiceBuilder WithHuggingFaceModel(string modelId)
+    public LMSupplyCompletionServiceBuilder WithHuggingFaceModel(string modelId)
     {
         _options.HuggingFaceModelId = modelId;
         return this;
@@ -48,7 +48,7 @@ public sealed class LocalAICompletionServiceBuilder
     /// <summary>
     /// 모델 캐시 디렉토리 지정
     /// </summary>
-    public LocalAICompletionServiceBuilder WithCacheDirectory(string cacheDirectory)
+    public LMSupplyCompletionServiceBuilder WithCacheDirectory(string cacheDirectory)
     {
         _options.CacheDirectory = cacheDirectory;
         return this;
@@ -57,7 +57,7 @@ public sealed class LocalAICompletionServiceBuilder
     /// <summary>
     /// 최대 컨텍스트 길이 지정
     /// </summary>
-    public LocalAICompletionServiceBuilder WithMaxContextLength(int maxContextLength)
+    public LMSupplyCompletionServiceBuilder WithMaxContextLength(int maxContextLength)
     {
         _options.MaxContextLength = maxContextLength;
         return this;
@@ -66,7 +66,7 @@ public sealed class LocalAICompletionServiceBuilder
     /// <summary>
     /// 상세 로깅 활성화
     /// </summary>
-    public LocalAICompletionServiceBuilder WithVerboseLogging(bool enabled = true)
+    public LMSupplyCompletionServiceBuilder WithVerboseLogging(bool enabled = true)
     {
         _options.VerboseLogging = enabled;
         return this;
@@ -75,9 +75,9 @@ public sealed class LocalAICompletionServiceBuilder
     /// <summary>
     /// 기본 생성 옵션 지정
     /// </summary>
-    public LocalAICompletionServiceBuilder WithGenerationDefaults(Action<LocalAIGenerationDefaults> configure)
+    public LMSupplyCompletionServiceBuilder WithGenerationDefaults(Action<LMSupplyGenerationDefaults> configure)
     {
-        _options.GenerationDefaults ??= new LocalAIGenerationDefaults();
+        _options.GenerationDefaults ??= new LMSupplyGenerationDefaults();
         configure(_options.GenerationDefaults);
         return this;
     }
@@ -85,9 +85,9 @@ public sealed class LocalAICompletionServiceBuilder
     /// <summary>
     /// 기본 생성 온도 지정
     /// </summary>
-    public LocalAICompletionServiceBuilder WithTemperature(float temperature)
+    public LMSupplyCompletionServiceBuilder WithTemperature(float temperature)
     {
-        _options.GenerationDefaults ??= new LocalAIGenerationDefaults();
+        _options.GenerationDefaults ??= new LMSupplyGenerationDefaults();
         _options.GenerationDefaults.Temperature = temperature;
         return this;
     }
@@ -95,27 +95,27 @@ public sealed class LocalAICompletionServiceBuilder
     /// <summary>
     /// 기본 최대 토큰 수 지정
     /// </summary>
-    public LocalAICompletionServiceBuilder WithMaxTokens(int maxTokens)
+    public LMSupplyCompletionServiceBuilder WithMaxTokens(int maxTokens)
     {
-        _options.GenerationDefaults ??= new LocalAIGenerationDefaults();
+        _options.GenerationDefaults ??= new LMSupplyGenerationDefaults();
         _options.GenerationDefaults.MaxTokens = maxTokens;
         return this;
     }
 
     /// <summary>
-    /// LocalAICompletionService 빌드 (비동기)
+    /// LMSupplyCompletionService 빌드 (비동기)
     /// </summary>
-    public Task<LocalAICompletionService> BuildAsync(CancellationToken cancellationToken = default)
+    public Task<LMSupplyCompletionService> BuildAsync(CancellationToken cancellationToken = default)
         => BuildAsync(_options, cancellationToken);
 
     /// <summary>
-    /// 옵션을 사용하여 LocalAICompletionService 빌드 (정적)
+    /// 옵션을 사용하여 LMSupplyCompletionService 빌드 (정적)
     /// </summary>
-    public static async Task<LocalAICompletionService> BuildAsync(
-        LocalAICompletionOptions? options,
+    public static async Task<LMSupplyCompletionService> BuildAsync(
+        LMSupplyCompletionOptions? options,
         CancellationToken cancellationToken = default)
     {
-        options ??= new LocalAICompletionOptions();
+        options ??= new LMSupplyCompletionOptions();
 
         var builder = TextGeneratorBuilder.Create();
 
@@ -157,6 +157,6 @@ public sealed class LocalAICompletionServiceBuilder
         var generator = await builder.BuildAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        return new LocalAICompletionService(generator, options.GenerationDefaults);
+        return new LMSupplyCompletionService(generator, options.GenerationDefaults);
     }
 }
