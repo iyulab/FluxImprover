@@ -27,5 +27,6 @@ Style: {{style}}
 - Use bullet points for multiple key points if appropriate
 - Avoid redundancy
 - Do not include personal opinions or interpretations
+- Respond in the same language as the input text
 
 Generate the summary now:

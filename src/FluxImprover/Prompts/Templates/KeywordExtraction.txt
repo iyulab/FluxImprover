@@ -25,7 +25,7 @@ Include relevance scores for each keyword.
 - Primary: Core topics central to the text
 - Secondary: Supporting concepts and details
 - Entities: Named people, organizations, locations
-- Technical: Domain-specific terminology
+- Technical: Domain-specific terminology (preserve original language for technical terms)
 
 ## Output Format
 Return a JSON object:

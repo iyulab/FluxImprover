@@ -33,6 +33,7 @@ Maximum length: {{maxLength}} characters
 - Include relevant document-level context not present in the chunk itself
 - Do not repeat the chunk's content verbatim
 - Use clear, factual language
+- Respond in the same language as the document
 
 ## Output Format
 Provide only the contextual summary, no additional formatting or labels.

@@ -212,4 +212,140 @@ public sealed class ContextualEnrichmentServiceTests
         // Assert
         result.Should().Be("Original text content");
     }
+
+    #region Multilingual Support Tests
+
+    [Fact]
+    public async Task EnrichAsync_WithKoreanDocument_ReturnsContextualChunk()
+    {
+        // Arrange - Korean technical document (ClusterPlex HA solution)
+        var chunk = new Chunk
+        {
+            Id = "korean-chunk-1",
+            Content = "DRBD를 통한 실시간 데이터 복제와 Splitbrain 방지 기능을 포함합니다.",
+            Metadata = new Dictionary<string, object>
+            {
+                ["sourceId"] = "clusterplex-manual",
+                ["headingPath"] = "아키텍처 > 데이터 복제"
+            }
+        };
+
+        var fullDocument = """
+            # ClusterPlex 사용자 매뉴얼
+
+            ## 개요
+            ClusterPlex는 고가용성(HA) 솔루션입니다.
+
+            ## 아키텍처
+            ### 데이터 복제
+            DRBD를 통한 실시간 데이터 복제와 Splitbrain 방지 기능을 포함합니다.
+
+            ### 페일오버
+            핫빗 기반의 페일오버 메커니즘을 제공합니다.
+            """;
+
+        var expectedContext = "이 청크는 ClusterPlex HA 솔루션 매뉴얼의 '데이터 복제' 섹션에서 DRBD 복제 기능을 설명합니다.";
+
+        _completionService.CompleteAsync(
+            Arg.Any<string>(),
+            Arg.Any<CompletionOptions>(),
+            Arg.Any<CancellationToken>())
+            .Returns(expectedContext);
+
+        // Act
+        var result = await _sut.EnrichAsync(chunk, fullDocument);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Id.Should().Be("korean-chunk-1");
+        result.ContextSummary.Should().Be(expectedContext);
+        result.HeadingPath.Should().Be("아키텍처 > 데이터 복제");
+    }
+
+    [Fact]
+    public async Task EnrichAsync_WithKoreanContent_PassesCorrectPromptToLLM()
+    {
+        // Arrange
+        var chunk = new Chunk
+        {
+            Id = "korean-chunk-1",
+            Content = "핫빗 기반의 페일오버 메커니즘을 제공합니다."
+        };
+        var fullDocument = "ClusterPlex 매뉴얼. 핫빗 기반의 페일오버 메커니즘을 제공합니다.";
+
+        string? capturedPrompt = null;
+        _completionService.CompleteAsync(
+            Arg.Do<string>(p => capturedPrompt = p),
+            Arg.Any<CompletionOptions>(),
+            Arg.Any<CancellationToken>())
+            .Returns("Context summary");
+
+        // Act
+        await _sut.EnrichAsync(chunk, fullDocument);
+
+        // Assert
+        capturedPrompt.Should().NotBeNull();
+        capturedPrompt.Should().Contain("핫빗");
+        capturedPrompt.Should().Contain("페일오버");
+        capturedPrompt.Should().Contain("ClusterPlex");
+    }
+
+    [Fact]
+    public async Task EnrichBatchAsync_WithKoreanChunks_ProcessesAllCorrectly()
+    {
+        // Arrange - Korean document chunks
+        var chunks = new[]
+        {
+            new Chunk { Id = "k1", Content = "클러스터 구성 방법을 설명합니다." },
+            new Chunk { Id = "k2", Content = "페일오버 설정 가이드입니다." },
+            new Chunk { Id = "k3", Content = "모니터링 대시보드 사용법입니다." }
+        };
+        var document = "ClusterPlex 매뉴얼: 클러스터 구성, 페일오버 설정, 모니터링 대시보드";
+
+        _completionService.CompleteAsync(
+            Arg.Any<string>(),
+            Arg.Any<CompletionOptions>(),
+            Arg.Any<CancellationToken>())
+            .Returns("한국어 컨텍스트 요약");
+
+        // Act
+        var results = await _sut.EnrichBatchAsync(chunks, document);
+
+        // Assert
+        results.Should().HaveCount(3);
+        results.All(r => r.ContextSummary == "한국어 컨텍스트 요약").Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task EnrichAsync_WithMixedLanguageDocument_ProcessesCorrectly()
+    {
+        // Arrange - Mixed Korean/English technical document
+        var chunk = new Chunk
+        {
+            Id = "mixed-1",
+            Content = "kubectl apply -f deployment.yaml 명령으로 배포합니다."
+        };
+        var fullDocument = """
+            # Kubernetes 배포 가이드
+
+            kubectl apply -f deployment.yaml 명령으로 배포합니다.
+
+            Pod 상태 확인: kubectl get pods
+            """;
+
+        _completionService.CompleteAsync(
+            Arg.Any<string>(),
+            Arg.Any<CompletionOptions>(),
+            Arg.Any<CancellationToken>())
+            .Returns("Kubernetes 배포 가이드에서 kubectl 배포 명령어를 설명하는 섹션");
+
+        // Act
+        var result = await _sut.EnrichAsync(chunk, fullDocument);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.ContextSummary.Should().Contain("Kubernetes");
+    }
+
+    #endregion
 }

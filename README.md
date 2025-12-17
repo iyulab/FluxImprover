@@ -336,6 +336,38 @@ foreach (var suggestion in suggestions)
 
 ---
 
+## Language Support
+
+FluxImprover is designed to be **language-agnostic**. The underlying LLM automatically detects the input language and responds accordingly.
+
+### Supported Languages
+
+Any language supported by your LLM provider works with FluxImprover:
+- **English** - Primary development and testing language
+- **Korean** - Tested with technical documentation (e.g., ClusterPlex HA solution manuals)
+- **Other languages** - Japanese, Chinese, German, French, etc. (depends on LLM capability)
+
+### Best Practices for Non-English Documents
+
+1. **Use a capable LLM**: Modern LLMs (GPT-4, Claude, Phi-4) have excellent multilingual support
+2. **Domain terminology**: The LLM will recognize domain-specific terms in any language
+3. **Mixed content**: Documents with mixed languages (e.g., Korean text with English technical terms) are handled naturally
+
+### Example: Korean Document Enrichment
+
+```csharp
+var chunk = new Chunk
+{
+    Id = "korean-1",
+    Content = "ClusterPlex는 고가용성(HA) 솔루션으로, 핫빗 기반의 페일오버 메커니즘을 제공합니다."
+};
+
+var enriched = await services.ChunkEnrichment.EnrichAsync(chunk);
+// Summary and keywords will be generated in Korean
+```
+
+---
+
 ## Available Services
 
 | Service | Description |

@@ -375,4 +375,117 @@ public sealed class ChunkEnrichmentServiceTests
         // Assert
         result.SourceId.Should().Be("chunk-123");
     }
+
+    #region Multilingual Support Tests
+
+    [Fact]
+    public async Task EnrichAsync_WithKoreanContent_ReturnsEnrichedChunk()
+    {
+        // Arrange - Korean technical document (ClusterPlex HA solution)
+        var chunk = new Chunk
+        {
+            Id = "korean-chunk-1",
+            Content = "ClusterPlex는 고가용성(HA) 솔루션으로, 핫빗(Heartbeat) 기반의 페일오버 메커니즘을 제공합니다. " +
+                      "DRBD를 통한 실시간 데이터 복제와 Splitbrain 방지 기능을 포함합니다.",
+            Metadata = new Dictionary<string, object> { ["source"] = "clusterplex-manual.md" }
+        };
+
+        var expectedSummary = "ClusterPlex HA 솔루션의 핵심 기능 설명";
+        var expectedKeywords = new List<string> { "ClusterPlex", "고가용성", "핫빗", "페일오버", "DRBD", "Splitbrain" };
+
+        _summarizationService.SummarizeAsync(
+            Arg.Any<string>(),
+            Arg.Any<EnrichmentOptions>(),
+            Arg.Any<CancellationToken>())
+            .Returns(expectedSummary);
+
+        _keywordService.ExtractKeywordsAsync(
+            Arg.Any<string>(),
+            Arg.Any<EnrichmentOptions>(),
+            Arg.Any<CancellationToken>())
+            .Returns(expectedKeywords);
+
+        // Act
+        var result = await _sut.EnrichAsync(chunk);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Id.Should().Be("korean-chunk-1");
+        result.Text.Should().Contain("ClusterPlex");
+        result.Summary.Should().Be(expectedSummary);
+        result.Keywords.Should().Contain("ClusterPlex");
+        result.Keywords.Should().Contain("고가용성");
+    }
+
+    [Fact]
+    public async Task EnrichAsync_WithKoreanTableContent_ProcessesCorrectly()
+    {
+        // Arrange - Korean table content
+        var chunk = new Chunk
+        {
+            Id = "korean-table-1",
+            Content = """
+                | 항목 | 설명 | 기본값 |
+                |------|------|--------|
+                | 핫빗 주기 | 노드 간 상태 확인 주기 | 1초 |
+                | 페일오버 시간 | 장애 감지 후 전환 시간 | 3초 |
+                | DRBD 동기화 | 데이터 복제 방식 | 동기식 |
+                """,
+            Metadata = new Dictionary<string, object> { ["contentType"] = "table" }
+        };
+
+        _summarizationService.SummarizeAsync(
+            Arg.Any<string>(),
+            Arg.Any<EnrichmentOptions>(),
+            Arg.Any<CancellationToken>())
+            .Returns("ClusterPlex 설정 항목 테이블");
+
+        _keywordService.ExtractKeywordsAsync(
+            Arg.Any<string>(),
+            Arg.Any<EnrichmentOptions>(),
+            Arg.Any<CancellationToken>())
+            .Returns(new List<string> { "핫빗", "페일오버", "DRBD" });
+
+        // Act
+        var result = await _sut.EnrichAsync(chunk);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Summary.Should().NotBeNullOrEmpty();
+        result.Keywords.Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public async Task EnrichAsync_WithMixedLanguageContent_ProcessesCorrectly()
+    {
+        // Arrange - Mixed Korean and English technical terms
+        var chunk = new Chunk
+        {
+            Id = "mixed-lang-1",
+            Content = "Kubernetes 클러스터에서 Pod의 상태를 모니터링합니다. " +
+                      "liveness probe와 readiness probe를 설정하여 컨테이너 헬스체크를 수행합니다."
+        };
+
+        _summarizationService.SummarizeAsync(
+            Arg.Any<string>(),
+            Arg.Any<EnrichmentOptions>(),
+            Arg.Any<CancellationToken>())
+            .Returns("Kubernetes Pod 상태 모니터링 및 헬스체크 설명");
+
+        _keywordService.ExtractKeywordsAsync(
+            Arg.Any<string>(),
+            Arg.Any<EnrichmentOptions>(),
+            Arg.Any<CancellationToken>())
+            .Returns(new List<string> { "Kubernetes", "Pod", "liveness probe", "readiness probe", "헬스체크" });
+
+        // Act
+        var result = await _sut.EnrichAsync(chunk);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Keywords.Should().Contain("Kubernetes");
+        result.Keywords.Should().Contain("헬스체크");
+    }
+
+    #endregion
 }
