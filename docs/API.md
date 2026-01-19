@@ -1,6 +1,6 @@
 # FluxImprover API Reference
 
-> Complete API documentation for FluxImprover v0.1.0
+> Complete API documentation for FluxImprover v0.6.0
 
 ---
 
@@ -10,11 +10,15 @@
 2. [Services](#services)
    - [Summarization](#isummarizationservice)
    - [Keyword Extraction](#ikeywordextractionservice)
-   - [Chunk Enrichment](#ichunkenrichmentservice)
-   - [QA Generation](#iqageneratorservice)
+   - [Chunk Enrichment](#chunkenrichmentservice)
+   - [Chunk Filtering](#ichunkfilteringservice)
+   - [Query Preprocessing](#iquerypreprocessingservice)
+   - [QA Generation](#qageneratorservice)
    - [Evaluators](#evaluators)
-   - [Question Suggestion](#iquestionsuggestservice)
-   - [QA Pipeline](#iqapipelineservice)
+   - [Question Suggestion](#questionsuggestionservice)
+   - [QA Pipeline](#qapipeline)
+   - [Contextual Enrichment](#icontextualenrichmentservice)
+   - [Chunk Relationship](#ichunkrelationshipservice)
 3. [Models](#models)
 4. [Options](#options)
 5. [Interfaces](#interfaces)
@@ -44,18 +48,22 @@ var services = new FluxImproverBuilder()
 ### FluxImproverServices
 
 ```csharp
-public class FluxImproverServices
-{
-    public ISummarizationService Summarization { get; }
-    public IKeywordExtractionService KeywordExtraction { get; }
-    public IChunkEnrichmentService ChunkEnrichment { get; }
-    public IQAGeneratorService QAGenerator { get; }
-    public IFaithfulnessEvaluator Faithfulness { get; }
-    public IRelevancyEvaluator Relevancy { get; }
-    public IAnswerabilityEvaluator Answerability { get; }
-    public IQuestionSuggestService QuestionSuggestion { get; }
-    public IQAPipelineService QAPipeline { get; }
-}
+public sealed record FluxImproverServices(
+    SummarizationService Summarization,
+    KeywordExtractionService KeywordExtraction,
+    ChunkEnrichmentService ChunkEnrichment,
+    FaithfulnessEvaluator Faithfulness,
+    RelevancyEvaluator Relevancy,
+    AnswerabilityEvaluator Answerability,
+    QAGeneratorService QAGenerator,
+    QAFilterService QAFilter,
+    QAPipeline QAPipeline,
+    QuestionSuggestionService QuestionSuggestion,
+    IChunkFilteringService ChunkFiltering,
+    IQueryPreprocessingService QueryPreprocessing,
+    IContextualEnrichmentService ContextualEnrichment,
+    IChunkRelationshipService ChunkRelationship
+);
 ```
 
 ---
@@ -71,7 +79,7 @@ public interface ISummarizationService
 {
     Task<string> SummarizeAsync(
         string content,
-        SummarizationOptions? options = null,
+        EnrichmentOptions? options = null,
         CancellationToken cancellationToken = default);
 }
 ```
@@ -81,7 +89,7 @@ public interface ISummarizationService
 ```csharp
 var summary = await services.Summarization.SummarizeAsync(
     "Long text content here...",
-    new SummarizationOptions { MaxLength = 100 });
+    new EnrichmentOptions { MaxSummaryLength = 100 });
 ```
 
 ---
@@ -93,9 +101,9 @@ Extracts relevant keywords from text content.
 ```csharp
 public interface IKeywordExtractionService
 {
-    Task<IReadOnlyList<string>> ExtractAsync(
+    Task<IReadOnlyList<string>> ExtractKeywordsAsync(
         string content,
-        KeywordExtractionOptions? options = null,
+        EnrichmentOptions? options = null,
         CancellationToken cancellationToken = default);
 }
 ```
@@ -103,37 +111,30 @@ public interface IKeywordExtractionService
 #### Example
 
 ```csharp
-var keywords = await services.KeywordExtraction.ExtractAsync(
+var keywords = await services.KeywordExtraction.ExtractKeywordsAsync(
     "Machine learning is a subset of artificial intelligence...",
-    new KeywordExtractionOptions { MaxKeywords = 5 });
+    new EnrichmentOptions { MaxKeywords = 5 });
 // Returns: ["machine learning", "artificial intelligence", ...]
 ```
 
 ---
 
-### IChunkEnrichmentService
+### ChunkEnrichmentService
 
 Combines summarization and keyword extraction to enrich document chunks.
 
 ```csharp
-public interface IChunkEnrichmentService
+public class ChunkEnrichmentService
 {
-    Task<EnrichedChunk> EnrichAsync(
+    Task<IEnrichedChunk> EnrichAsync(
         Chunk chunk,
         EnrichmentOptions? options = null,
         CancellationToken cancellationToken = default);
-}
-```
 
-#### EnrichedChunk
-
-```csharp
-public class EnrichedChunk
-{
-    public string Id { get; }
-    public string Content { get; }
-    public string? Summary { get; }
-    public IReadOnlyList<string>? Keywords { get; }
+    IAsyncEnumerable<IEnrichedChunk> EnrichBatchAsync(
+        IEnumerable<Chunk> chunks,
+        EnrichmentOptions? options = null,
+        CancellationToken cancellationToken = default);
 }
 ```
 
@@ -149,29 +150,121 @@ Console.WriteLine($"Keywords: {string.Join(", ", enriched.Keywords ?? [])}");
 
 ---
 
-### IQAGeneratorService
+### IChunkFilteringService
+
+3-stage LLM-based chunk assessment with self-reflection and critic validation.
+
+```csharp
+public interface IChunkFilteringService
+{
+    Task<ChunkAssessment> AssessAsync(
+        Chunk chunk,
+        ChunkFilteringOptions? options = null,
+        CancellationToken cancellationToken = default);
+
+    IAsyncEnumerable<ChunkAssessment> AssessBatchAsync(
+        IEnumerable<Chunk> chunks,
+        ChunkFilteringOptions? options = null,
+        CancellationToken cancellationToken = default);
+}
+```
+
+#### ChunkAssessment
+
+```csharp
+public sealed record ChunkAssessment
+{
+    public required string ChunkId { get; init; }
+    public required double InitialScore { get; init; }
+    public double? ReflectedScore { get; init; }
+    public double? CriticScore { get; init; }
+    public required double FinalScore { get; init; }
+    public required bool ShouldInclude { get; init; }
+    public string? Reasoning { get; init; }
+}
+```
+
+#### Example
+
+```csharp
+var assessment = await services.ChunkFiltering.AssessAsync(chunk, new ChunkFilteringOptions
+{
+    MinimumScore = 0.6,
+    EnableSelfReflection = true,
+    EnableCriticValidation = true
+});
+
+Console.WriteLine($"Final Score: {assessment.FinalScore:P0}");
+Console.WriteLine($"Should Include: {assessment.ShouldInclude}");
+```
+
+---
+
+### IQueryPreprocessingService
+
+Normalizes, expands, and classifies queries for optimal retrieval.
+
+```csharp
+public interface IQueryPreprocessingService
+{
+    Task<PreprocessedQuery> PreprocessAsync(
+        string query,
+        QueryPreprocessingOptions? options = null,
+        CancellationToken cancellationToken = default);
+}
+```
+
+#### PreprocessedQuery
+
+```csharp
+public sealed record PreprocessedQuery
+{
+    public required string OriginalQuery { get; init; }
+    public required string NormalizedQuery { get; init; }
+    public required string ExpandedQuery { get; init; }
+    public required QueryIntent Intent { get; init; }
+    public required double IntentConfidence { get; init; }
+    public required SearchStrategy SuggestedStrategy { get; init; }
+    public required IReadOnlyList<string> Keywords { get; init; }
+    public required IReadOnlyList<string> ExpandedKeywords { get; init; }
+}
+```
+
+#### Example
+
+```csharp
+var result = await services.QueryPreprocessing.PreprocessAsync(
+    "How do I implement auth config?",
+    new QueryPreprocessingOptions { UseLlmExpansion = true });
+
+Console.WriteLine($"Expanded: {result.ExpandedQuery}");
+Console.WriteLine($"Intent: {result.Intent}");
+```
+
+---
+
+### QAGeneratorService
 
 Generates question-answer pairs from content.
 
 ```csharp
-public interface IQAGeneratorService
+public class QAGeneratorService
 {
-    Task<IReadOnlyList<QAPair>> GenerateAsync(
+    Task<IReadOnlyList<GeneratedQAPair>> GenerateAsync(
         string context,
         QAGenerationOptions? options = null,
         CancellationToken cancellationToken = default);
 }
 ```
 
-#### QAPair
+#### GeneratedQAPair
 
 ```csharp
-public class QAPair
+public sealed record GeneratedQAPair
 {
-    public string Question { get; }
-    public string Answer { get; }
-    public string? Context { get; }
-    public QuestionType? Type { get; }
+    public required string Question { get; init; }
+    public required string Answer { get; init; }
+    public QuestionType Type { get; init; }
 }
 ```
 
@@ -191,45 +284,48 @@ var qaPairs = await services.QAGenerator.GenerateAsync(
 
 ### Evaluators
 
-#### IFaithfulnessEvaluator
+#### FaithfulnessEvaluator
 
 Evaluates if an answer is grounded in the provided context.
 
 ```csharp
-public interface IFaithfulnessEvaluator
+public class FaithfulnessEvaluator
 {
     Task<MetricResult> EvaluateAsync(
         string context,
         string answer,
+        EvaluationOptions? options = null,
         CancellationToken cancellationToken = default);
 }
 ```
 
-#### IRelevancyEvaluator
+#### RelevancyEvaluator
 
 Evaluates if an answer addresses the question.
 
 ```csharp
-public interface IRelevancyEvaluator
+public class RelevancyEvaluator
 {
     Task<MetricResult> EvaluateAsync(
         string question,
         string answer,
         string? context = null,
+        EvaluationOptions? options = null,
         CancellationToken cancellationToken = default);
 }
 ```
 
-#### IAnswerabilityEvaluator
+#### AnswerabilityEvaluator
 
 Evaluates if a question can be answered from the context.
 
 ```csharp
-public interface IAnswerabilityEvaluator
+public class AnswerabilityEvaluator
 {
     Task<MetricResult> EvaluateAsync(
         string context,
         string question,
+        EvaluationOptions? options = null,
         CancellationToken cancellationToken = default);
 }
 ```
@@ -237,10 +333,10 @@ public interface IAnswerabilityEvaluator
 #### MetricResult
 
 ```csharp
-public class MetricResult
+public sealed record MetricResult
 {
-    public double Score { get; }  // 0.0 to 1.0
-    public IReadOnlyDictionary<string, string> Details { get; }
+    public required double Score { get; init; }  // 0.0 to 1.0
+    public IReadOnlyDictionary<string, string> Details { get; init; }
 }
 ```
 
@@ -258,12 +354,12 @@ Console.WriteLine($"Answerability: {answerability.Score:P0}");
 
 ---
 
-### IQuestionSuggestService
+### QuestionSuggestionService
 
 Suggests follow-up questions based on content or conversation.
 
 ```csharp
-public interface IQuestionSuggestService
+public class QuestionSuggestionService
 {
     Task<IReadOnlyList<SuggestedQuestion>> SuggestFromContentAsync(
         string content,
@@ -280,11 +376,11 @@ public interface IQuestionSuggestService
 #### SuggestedQuestion
 
 ```csharp
-public class SuggestedQuestion
+public sealed record SuggestedQuestion
 {
-    public string Text { get; }
-    public QuestionCategory Category { get; }
-    public double Relevance { get; }
+    public required string Text { get; init; }
+    public required QuestionCategory Category { get; init; }
+    public required double Relevance { get; init; }
 }
 ```
 
@@ -301,12 +397,12 @@ var suggestions = await services.QuestionSuggestion.SuggestFromConversationAsync
 
 ---
 
-### IQAPipelineService
+### QAPipeline
 
 End-to-end QA generation with quality filtering.
 
 ```csharp
-public interface IQAPipelineService
+public class QAPipeline
 {
     Task<IReadOnlyList<QAPipelineResult>> ExecuteFromChunksBatchAsync(
         IEnumerable<Chunk> chunks,
@@ -318,12 +414,12 @@ public interface IQAPipelineService
 #### QAPipelineResult
 
 ```csharp
-public class QAPipelineResult
+public sealed record QAPipelineResult
 {
-    public string ChunkId { get; }
-    public int GeneratedCount { get; }
-    public int FilteredCount { get; }
-    public IReadOnlyList<QAPair> QAPairs { get; }
+    public required string ChunkId { get; init; }
+    public required int GeneratedCount { get; init; }
+    public required int FilteredCount { get; init; }
+    public required IReadOnlyList<QAPair> QAPairs { get; init; }
 }
 ```
 
@@ -348,6 +444,45 @@ var totalPassed = results.Sum(r => r.FilteredCount);
 
 ---
 
+### IContextualEnrichmentService
+
+Document-level contextual retrieval (Anthropic pattern).
+
+```csharp
+public interface IContextualEnrichmentService
+{
+    Task<ContextualChunk> EnrichAsync(
+        Chunk chunk,
+        string fullDocument,
+        ContextualEnrichmentOptions? options = null,
+        CancellationToken cancellationToken = default);
+
+    IAsyncEnumerable<ContextualChunk> EnrichBatchAsync(
+        IEnumerable<Chunk> chunks,
+        string fullDocument,
+        ContextualEnrichmentOptions? options = null,
+        CancellationToken cancellationToken = default);
+}
+```
+
+---
+
+### IChunkRelationshipService
+
+Discovers relationships between chunks.
+
+```csharp
+public interface IChunkRelationshipService
+{
+    Task<IReadOnlyList<ChunkRelationship>> DiscoverRelationshipsAsync(
+        IEnumerable<Chunk> chunks,
+        ChunkRelationshipOptions? options = null,
+        CancellationToken cancellationToken = default);
+}
+```
+
+---
+
 ## Models
 
 ### Chunk
@@ -355,7 +490,7 @@ var totalPassed = results.Sum(r => r.FilteredCount);
 Input model for document chunks.
 
 ```csharp
-public class Chunk
+public sealed record Chunk
 {
     public required string Id { get; init; }
     public required string Content { get; init; }
@@ -369,7 +504,7 @@ public class Chunk
 Represents a message in a conversation.
 
 ```csharp
-public class ConversationMessage
+public sealed record ConversationMessage
 {
     public required string Role { get; init; }  // "user" or "assistant"
     public required string Content { get; init; }
@@ -401,14 +536,53 @@ public enum QuestionCategory
 }
 ```
 
+### QueryIntent
+
+```csharp
+public enum QueryIntent
+{
+    Unknown,
+    HowTo,
+    Definition,
+    Code,
+    Search,
+    Troubleshoot,
+    Compare
+}
+```
+
+### SearchStrategy
+
+```csharp
+public enum SearchStrategy
+{
+    Semantic,
+    Keyword,
+    Hybrid,
+    MultiQuery
+}
+```
+
 ---
 
 ## Options
 
+### EnrichmentOptions
+
+```csharp
+public sealed record EnrichmentOptions
+{
+    public bool GenerateSummary { get; init; } = true;
+    public bool ExtractKeywords { get; init; } = true;
+    public int MaxKeywords { get; init; } = 5;
+    public int MaxSummaryLength { get; init; } = 200;
+}
+```
+
 ### QAGenerationOptions
 
 ```csharp
-public class QAGenerationOptions
+public sealed record QAGenerationOptions
 {
     public int PairsPerChunk { get; init; } = 3;
     public IReadOnlyList<QuestionType>? QuestionTypes { get; init; }
@@ -419,7 +593,7 @@ public class QAGenerationOptions
 ### QAFilterOptions
 
 ```csharp
-public class QAFilterOptions
+public sealed record QAFilterOptions
 {
     public double MinFaithfulness { get; init; } = 0.7;
     public double MinRelevancy { get; init; } = 0.7;
@@ -430,7 +604,7 @@ public class QAFilterOptions
 ### QAPipelineOptions
 
 ```csharp
-public class QAPipelineOptions
+public sealed record QAPipelineOptions
 {
     public QAGenerationOptions? GenerationOptions { get; init; }
     public QAFilterOptions? FilterOptions { get; init; }
@@ -440,22 +614,32 @@ public class QAPipelineOptions
 ### QuestionSuggestionOptions
 
 ```csharp
-public class QuestionSuggestionOptions
+public sealed record QuestionSuggestionOptions
 {
     public int MaxSuggestions { get; init; } = 3;
     public IReadOnlyList<QuestionCategory>? Categories { get; init; }
 }
 ```
 
-### EnrichmentOptions
+### ChunkFilteringOptions
 
 ```csharp
-public class EnrichmentOptions
+public sealed record ChunkFilteringOptions
 {
-    public bool GenerateSummary { get; init; } = true;
-    public bool ExtractKeywords { get; init; } = true;
-    public int MaxKeywords { get; init; } = 5;
-    public int MaxSummaryLength { get; init; } = 200;
+    public double MinimumScore { get; init; } = 0.6;
+    public bool EnableSelfReflection { get; init; } = true;
+    public bool EnableCriticValidation { get; init; } = true;
+}
+```
+
+### QueryPreprocessingOptions
+
+```csharp
+public sealed record QueryPreprocessingOptions
+{
+    public bool UseLlmExpansion { get; init; } = true;
+    public bool ExpandTechnicalTerms { get; init; } = true;
+    public int MaxSynonymsPerKeyword { get; init; } = 3;
 }
 ```
 
@@ -485,24 +669,40 @@ public interface ITextCompletionService
 ### CompletionOptions
 
 ```csharp
-public record CompletionOptions
+public sealed record CompletionOptions
 {
     public string? SystemPrompt { get; init; }
-    public float Temperature { get; init; } = 0.7f;
+    public float? Temperature { get; init; }
     public int? MaxTokens { get; init; }
     public bool JsonMode { get; init; } = false;
-    public IReadOnlyList<Message>? Messages { get; init; }
+    public string? ResponseSchema { get; init; }
+    public IReadOnlyList<ChatMessage>? Messages { get; init; }
 }
 ```
 
-### Message
+### ChatMessage
 
 ```csharp
-public record Message
+public sealed record ChatMessage
 {
     public required string Role { get; init; }
     public required string Content { get; init; }
 }
+```
+
+---
+
+## Dependency Injection
+
+### Registration Methods
+
+```csharp
+// With factory
+services.AddFluxImprover(sp => new OpenAICompletionService(apiKey));
+
+// With pre-registered ITextCompletionService
+services.AddSingleton<ITextCompletionService, OpenAICompletionService>();
+services.AddFluxImprover();
 ```
 
 ---
@@ -513,10 +713,11 @@ All services may throw the following exceptions:
 
 - `ArgumentNullException` - When required parameters are null
 - `ArgumentException` - When parameters are invalid
+- `InvalidOperationException` - When service is not properly configured
 - `OperationCanceledException` - When cancellation is requested
 - `HttpRequestException` - When LLM API calls fail (from your implementation)
 
 ---
 
-*API Reference for FluxImprover v0.1.0*
-*Last updated: 2025-11-27*
+*API Reference for FluxImprover v0.6.0*
+*Last updated: 2025-01-19*

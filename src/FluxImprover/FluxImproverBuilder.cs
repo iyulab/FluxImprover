@@ -4,7 +4,6 @@ using FluxImprover.ChunkFiltering;
 using FluxImprover.ContextualRetrieval;
 using FluxImprover.Enrichment;
 using FluxImprover.Evaluation;
-using FluxImprover.LMSupply;
 using FluxImprover.QAGeneration;
 using FluxImprover.QueryPreprocessing;
 using FluxImprover.QuestionSuggestion;
@@ -17,8 +16,6 @@ using FluxImprover.Services;
 public sealed class FluxImproverBuilder
 {
     private ITextCompletionService? _completionService;
-    private bool _useLMSupply;
-    private Action<LMSupplyCompletionOptions>? _LMSupplyOptionsAction;
 
     /// <summary>
     /// LLM 완성 서비스를 설정합니다.
@@ -26,72 +23,16 @@ public sealed class FluxImproverBuilder
     public FluxImproverBuilder WithCompletionService(ITextCompletionService completionService)
     {
         _completionService = completionService ?? throw new ArgumentNullException(nameof(completionService));
-        _useLMSupply = false;
-        return this;
-    }
-
-    /// <summary>
-    /// LMSupply.Generator를 기본 LLM 서비스로 사용합니다.
-    /// 기본 모델 프리셋(Default)을 사용합니다.
-    /// </summary>
-    public FluxImproverBuilder WithLMSupply()
-    {
-        _useLMSupply = true;
-        _LMSupplyOptionsAction = null;
-        _completionService = null;
-        return this;
-    }
-
-    /// <summary>
-    /// LMSupply.Generator를 기본 LLM 서비스로 사용합니다.
-    /// </summary>
-    /// <param name="configure">LMSupply 옵션 구성 액션</param>
-    public FluxImproverBuilder WithLMSupply(Action<LMSupplyCompletionOptions> configure)
-    {
-        _useLMSupply = true;
-        _LMSupplyOptionsAction = configure ?? throw new ArgumentNullException(nameof(configure));
-        _completionService = null;
         return this;
     }
 
     /// <summary>
     /// FluxImprover 인스턴스를 빌드합니다.
-    /// LMSupply 사용 시에는 BuildAsync()를 사용하세요.
     /// </summary>
-    /// <exception cref="InvalidOperationException">LMSupply 사용 시 BuildAsync()를 호출해야 합니다.</exception>
     public FluxImproverServices Build()
     {
-        if (_useLMSupply)
-            throw new InvalidOperationException(
-                "LMSupply requires async initialization. Use BuildAsync() instead of Build().");
-
         if (_completionService is null)
-            throw new InvalidOperationException("CompletionService must be configured before building.");
-
-        return BuildServices(_completionService);
-    }
-
-    /// <summary>
-    /// FluxImprover 인스턴스를 비동기로 빌드합니다.
-    /// LMSupply 사용 시 필수입니다.
-    /// </summary>
-    /// <param name="cancellationToken">취소 토큰</param>
-    /// <returns>빌드된 서비스 컨테이너</returns>
-    public async Task<FluxImproverServices> BuildAsync(CancellationToken cancellationToken = default)
-    {
-        if (_useLMSupply)
-        {
-            var options = new LMSupplyCompletionOptions();
-            _LMSupplyOptionsAction?.Invoke(options);
-
-            _completionService = await LMSupplyCompletionServiceBuilder
-                .BuildAsync(options, cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
-        }
-
-        if (_completionService is null)
-            throw new InvalidOperationException(
-                "CompletionService must be configured. Use WithCompletionService() or WithLMSupply().");
+            throw new InvalidOperationException("CompletionService must be configured before building. Use WithCompletionService().");
 
         return BuildServices(_completionService);
     }

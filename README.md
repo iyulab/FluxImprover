@@ -39,40 +39,9 @@ dotnet add package FluxImprover
 
 ## Quick Start
 
-### Option A: Use Built-in LMSupply (Recommended)
+### 1. Implement ITextCompletionService
 
-FluxImprover includes built-in support for [LMSupply.Generator](https://github.com/iyulab/lm-supply), enabling local LLM inference without external API dependencies:
-
-```csharp
-using FluxImprover;
-using LMSupply.Generator;
-
-// Use default model preset
-var services = await new FluxImproverBuilder()
-    .WithLMSupply()
-    .BuildAsync();
-
-// Or customize the model
-var services = await new FluxImproverBuilder()
-    .WithLMSupply(options =>
-    {
-        options.ModelPreset = GeneratorModelPreset.Quality;
-        options.GenerationDefaults = new LMSupplyGenerationDefaults
-        {
-            Temperature = 0.7f,
-            MaxTokens = 1024
-        };
-    })
-    .BuildAsync();
-
-// Or with DI
-services.AddFluxImproverWithLMSupply();
-services.AddFluxImproverWithLMSupply(opt => opt.ModelPreset = GeneratorModelPreset.Fast);
-```
-
-### Option B: Custom ITextCompletionService
-
-For cloud-based LLMs (OpenAI, Azure, etc.), implement the `ITextCompletionService` interface:
+FluxImprover requires an `ITextCompletionService` implementation to connect to your LLM provider (OpenAI, Azure, Anthropic, local models, etc.):
 
 ```csharp
 public class OpenAICompletionService : ITextCompletionService
@@ -116,16 +85,26 @@ Use the `FluxImproverBuilder` to create all services:
 using FluxImprover;
 using FluxImprover.Services;
 
-// Option A: With LMSupply (async initialization required)
-var services = await new FluxImproverBuilder()
-    .WithLMSupply()
-    .BuildAsync();
-
-// Option B: With custom ITextCompletionService
+// Create your ITextCompletionService implementation
 ITextCompletionService completionService = new OpenAICompletionService(apiKey);
+
+// Build FluxImprover services
 var services = new FluxImproverBuilder()
     .WithCompletionService(completionService)
     .Build();
+```
+
+Or use dependency injection:
+
+```csharp
+// Register your ITextCompletionService
+services.AddSingleton<ITextCompletionService, OpenAICompletionService>();
+
+// Add FluxImprover services
+services.AddFluxImprover();
+
+// Or with factory
+services.AddFluxImprover(sp => new OpenAICompletionService(apiKey));
 ```
 
 ### 3. Enrich Chunks
@@ -300,7 +279,7 @@ Console.WriteLine($"Expanded Keywords: {string.Join(", ", result.ExpandedKeyword
 
 Features:
 - **Query Normalization**: Lowercase, trim, remove extra whitespace
-- **Synonym Expansion**: LLM-based and built-in technical term expansion (e.g., "auth" → "authentication")
+- **Synonym Expansion**: LLM-based and built-in technical term expansion (e.g., "auth" -> "authentication")
 - **Intent Classification**: Classifies queries into types (HowTo, Definition, Code, Search, etc.)
 - **Entity Extraction**: Identifies file names, class names, method names in queries
 - **Search Strategy**: Recommends optimal search strategy (Semantic, Keyword, Hybrid, MultiQuery)
@@ -384,6 +363,8 @@ var enriched = await services.ChunkEnrichment.EnrichAsync(chunk);
 | `QAFilter` | Filters QA pairs by quality thresholds |
 | `QAPipeline` | End-to-end QA generation with quality filtering |
 | `QuestionSuggestion` | Suggests contextual follow-up questions |
+| `ContextualEnrichment` | Document-level contextual retrieval (Anthropic pattern) |
+| `ChunkRelationship` | Discovers relationships between chunks |
 
 ---
 
@@ -412,10 +393,11 @@ public interface ITextCompletionService
 public record CompletionOptions
 {
     public string? SystemPrompt { get; init; }
-    public float Temperature { get; init; } = 0.7f;
+    public float? Temperature { get; init; }
     public int? MaxTokens { get; init; }
     public bool JsonMode { get; init; } = false;
-    public IReadOnlyList<Message>? Messages { get; init; }
+    public string? ResponseSchema { get; init; }
+    public IReadOnlyList<ChatMessage>? Messages { get; init; }
 }
 ```
 
@@ -427,11 +409,11 @@ public record CompletionOptions
 ┌─────────────────────────────────────────────────────────────────────┐
 │                       FluxImproverBuilder                           │
 │  ┌─────────────────────────────────────────────────────────────────┐│
-│  │        ITextCompletionService (Built-in or Custom)              ││
-│  │   ┌─────────────────────┐  ┌────────────────────────────────┐  ││
-│  │   │  LMSupply.Generator  │  │  Custom Implementation         │  ││
-│  │   │  (Built-in)         │  │  (OpenAI, Azure, Claude, etc.) │  ││
-│  │   └─────────────────────┘  └────────────────────────────────┘  ││
+│  │               ITextCompletionService                             ││
+│  │        (Provided by consumer application)                        ││
+│  │   ┌────────────────────────────────────────────────────────┐    ││
+│  │   │  OpenAI, Azure, Anthropic, Local Models, etc.          │    ││
+│  │   └────────────────────────────────────────────────────────┘    ││
 │  └─────────────────────────────────────────────────────────────────┘│
 │         │                    │                    │                 │
 │  ┌──────▼──────┐     ┌──────▼──────┐     ┌──────▼──────┐           │
@@ -443,6 +425,11 @@ public record CompletionOptions
 │  │   Chunk Filtering  │  │ Query Preproc.  │  │ Question Suggest. ││
 │  │  (3-Stage Assess.) │  │ (Expand/Intent) │  │                   ││
 │  └────────────────────┘  └─────────────────┘  └───────────────────┘│
+│                                                                     │
+│  ┌────────────────────┐  ┌─────────────────┐                       │
+│  │ Contextual Enrich. │  │ Chunk Relations │                       │
+│  │ (Anthropic pattern)│  │   Discovery     │                       │
+│  └────────────────────┘  └─────────────────┘                       │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
