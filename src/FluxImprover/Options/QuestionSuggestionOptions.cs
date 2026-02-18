@@ -60,7 +60,7 @@ public sealed class QuestionSuggestionOptions
     /// <summary>
     /// 추천 근거 포함 여부 (기본값: false)
     /// </summary>
-    public bool IncludeReasoning { get; init; } = false;
+    public bool IncludeReasoning { get; init; }
 
     /// <summary>
     /// 최소 관련성 점수 (0.0 ~ 1.0, 기본값: 0.5)

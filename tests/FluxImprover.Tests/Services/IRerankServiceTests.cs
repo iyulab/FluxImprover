@@ -30,7 +30,7 @@ public class IRerankServiceTests
 
         // Assert
         result.Should().HaveCount(3);
-        result.First().Score.Should().BeGreaterThan(result.Last().Score);
+        result[0].Score.Should().BeGreaterThan(result[^1].Score);
     }
 
     [Fact]

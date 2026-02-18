@@ -7,6 +7,8 @@ using NSubstitute;
 
 public class IEmbeddingServiceTests
 {
+    private static readonly float[] TwoElementEmbedding = [0.1f, 0.2f];
+    private static readonly float[] SingleElementEmbedding = [0.0f];
     [Fact]
     public async Task EmbedAsync_WithValidText_ReturnsEmbedding()
     {
@@ -31,7 +33,7 @@ public class IEmbeddingServiceTests
         // Arrange
         var service = Substitute.For<IEmbeddingService>();
         var texts = new[] { "text1", "text2", "text3" };
-        var embeddings = texts.Select(_ => new ReadOnlyMemory<float>(new float[] { 0.1f, 0.2f })).ToList();
+        var embeddings = texts.Select(_ => new ReadOnlyMemory<float>(TwoElementEmbedding)).ToList();
 
         service.EmbedBatchAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<CancellationToken>())
             .Returns(embeddings);
@@ -50,7 +52,7 @@ public class IEmbeddingServiceTests
         // Arrange
         var service = Substitute.For<IEmbeddingService>();
         service.EmbedAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns(new ReadOnlyMemory<float>(new float[] { 0.0f }));
+            .Returns(new ReadOnlyMemory<float>(SingleElementEmbedding));
 
         // Act
         var result = await service.EmbedAsync("");

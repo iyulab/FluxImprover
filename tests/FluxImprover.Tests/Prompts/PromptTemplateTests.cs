@@ -6,6 +6,7 @@ using Xunit;
 
 public sealed class PromptTemplateTests
 {
+    private static readonly string[] KeywordValues = ["AI", "ML", "NLP"];
     [Fact]
     public void Render_WithSimpleVariable_ShouldInterpolate()
     {
@@ -99,7 +100,7 @@ public sealed class PromptTemplateTests
         var template = new PromptTemplate("Keywords: {{keywords}}");
 
         // Act
-        var result = template.Render(new { keywords = new[] { "AI", "ML", "NLP" } });
+        var result = template.Render(new { keywords = KeywordValues });
 
         // Assert
         result.Should().Be("Keywords: AI, ML, NLP");

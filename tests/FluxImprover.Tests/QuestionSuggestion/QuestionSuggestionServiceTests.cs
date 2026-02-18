@@ -65,7 +65,7 @@ public sealed class QuestionSuggestionServiceTests
 
         // Assert
         await _completionService.Received(1).CompleteAsync(
-            Arg.Is<string>(s => s.Contains("3")),
+            Arg.Is<string>(s => s.Contains('3')),
             Arg.Is<CompletionOptions>(o => o.Temperature == 0.5f),
             Arg.Any<CancellationToken>());
     }

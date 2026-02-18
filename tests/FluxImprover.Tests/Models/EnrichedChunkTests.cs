@@ -81,7 +81,7 @@ public class IEnrichedChunkInterfaceTests
     public void EnrichedChunk_ImplementsInterface_Correctly()
     {
         // Arrange
-        IEnrichedChunk chunk = new EnrichedChunk
+        EnrichedChunk chunk = new EnrichedChunk
         {
             Id = "test",
             Text = "content",

@@ -471,7 +471,7 @@ public sealed class ChunkFilteringServiceTests
             Arg.Any<string>(),
             Arg.Any<CompletionOptions>(),
             Arg.Any<CancellationToken>())
-            .Returns<string>(x => throw new Exception("LLM unavailable"));
+            .Returns<string>(x => throw new InvalidOperationException("LLM unavailable"));
 
         var options = new ChunkFilteringOptions { MinRelevanceScore = 0.3 };
 

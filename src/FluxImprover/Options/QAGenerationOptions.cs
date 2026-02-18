@@ -60,7 +60,7 @@ public sealed class QAGenerationOptions
     /// <summary>
     /// Multi-hop 질문 포함 여부 (기본값: false)
     /// </summary>
-    public bool IncludeMultiHop { get; init; } = false;
+    public bool IncludeMultiHop { get; init; }
 
     /// <summary>
     /// 추론 질문 포함 여부 (기본값: true)

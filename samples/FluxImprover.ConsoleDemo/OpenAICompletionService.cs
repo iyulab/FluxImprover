@@ -68,7 +68,7 @@ public sealed class OpenAICompletionService : ITextCompletionService, IDisposabl
         while (await reader.ReadLineAsync(cancellationToken) is { } line)
         {
             if (string.IsNullOrWhiteSpace(line)) continue;
-            if (!line.StartsWith("data: ")) continue;
+            if (!line.StartsWith("data: ", StringComparison.Ordinal)) continue;
 
             var data = line[6..];
             if (data == "[DONE]") break;

@@ -502,7 +502,7 @@ public sealed partial class QueryPreprocessingService : IQueryPreprocessingServi
             .ToList();
     }
 
-    private static IReadOnlyList<string> ParseStringArray(string response)
+    private static List<string> ParseStringArray(string response)
     {
         try
         {
@@ -526,7 +526,7 @@ public sealed partial class QueryPreprocessingService : IQueryPreprocessingServi
         return [];
     }
 
-    private static IReadOnlyDictionary<string, IReadOnlyList<string>> ParseEntityDictionary(string response)
+    private static Dictionary<string, IReadOnlyList<string>> ParseEntityDictionary(string response)
     {
         var result = new Dictionary<string, IReadOnlyList<string>>();
 

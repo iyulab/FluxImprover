@@ -64,7 +64,7 @@ public sealed class QAGeneratorServiceTests
 
         // Assert
         await _completionService.Received(1).CompleteAsync(
-            Arg.Is<string>(s => s.Contains("5")),
+            Arg.Is<string>(s => s.Contains('5')),
             Arg.Is<CompletionOptions>(o => o.Temperature == 0.7f),
             Arg.Any<CancellationToken>());
     }

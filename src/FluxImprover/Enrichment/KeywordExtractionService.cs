@@ -104,7 +104,7 @@ public sealed class KeywordExtractionService : IKeywordExtractionService
             """;
     }
 
-    private static IReadOnlyList<string> ParseKeywords(string response)
+    private static List<string> ParseKeywords(string response)
     {
         try
         {
@@ -189,7 +189,7 @@ public sealed class KeywordExtractionService : IKeywordExtractionService
         return null;
     }
 
-    private static IReadOnlyDictionary<string, double> ParseKeywordsWithScores(string response)
+    private static Dictionary<string, double> ParseKeywordsWithScores(string response)
     {
         try
         {

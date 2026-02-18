@@ -142,7 +142,7 @@ public class QuestionSuggestionService
             """;
     }
 
-    private static IReadOnlyList<SuggestedQuestion> ParseAndFilterResponse(
+    private static List<SuggestedQuestion> ParseAndFilterResponse(
         string response,
         QuestionSuggestionOptions options)
     {

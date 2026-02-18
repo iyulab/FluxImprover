@@ -237,7 +237,7 @@ public sealed class QueryPreprocessingServiceTests
             Arg.Any<string>(),
             Arg.Any<CompletionOptions>(),
             Arg.Any<CancellationToken>())
-            .Returns<string>(x => throw new Exception("LLM failed"));
+            .Returns<string>(x => throw new InvalidOperationException("LLM failed"));
 
         // Act
         var result = await _sut.ExtractKeywordsAsync(query);
@@ -360,7 +360,7 @@ public sealed class QueryPreprocessingServiceTests
             Arg.Any<string>(),
             Arg.Any<CompletionOptions>(),
             Arg.Any<CancellationToken>())
-            .Returns<string>(x => throw new Exception("LLM failed"));
+            .Returns<string>(x => throw new InvalidOperationException("LLM failed"));
 
         // Act
         var result = await _sut.ExtractEntitiesAsync(query);

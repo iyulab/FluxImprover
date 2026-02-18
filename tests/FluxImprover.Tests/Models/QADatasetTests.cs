@@ -63,7 +63,7 @@ public class QADatasetTests
             ],
             Metadata = new DatasetMetadata
             {
-                CreatedAt = DateTimeOffset.Parse("2025-01-01T00:00:00Z"),
+                CreatedAt = DateTimeOffset.Parse("2025-01-01T00:00:00Z", System.Globalization.CultureInfo.InvariantCulture),
                 Generator = "FluxImprover",
                 TotalSamples = 1
             }

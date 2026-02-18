@@ -125,7 +125,7 @@ public class QAGeneratorService
             """;
     }
 
-    private static IReadOnlyList<GeneratedQAPair> ParseResponse(string response, string context, string? sourceId)
+    private static List<GeneratedQAPair> ParseResponse(string response, string context, string? sourceId)
     {
         try
         {

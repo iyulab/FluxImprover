@@ -20,7 +20,7 @@ public sealed record QAPipelineOptions
     /// <summary>
     /// 필터링 건너뛰기 여부 (기본값: false)
     /// </summary>
-    public bool SkipFiltering { get; init; } = false;
+    public bool SkipFiltering { get; init; }
 
     /// <summary>
     /// 소스 ID (옵션)

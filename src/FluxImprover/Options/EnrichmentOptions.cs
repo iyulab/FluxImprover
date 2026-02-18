@@ -23,7 +23,7 @@ public sealed class EnrichmentOptions
     /// <summary>
     /// 개체 추출 활성화 여부 (기본값: false)
     /// </summary>
-    public bool EnableEntityExtraction { get; init; } = false;
+    public bool EnableEntityExtraction { get; init; }
 
     /// <summary>
     /// LLM 온도 (0.0 ~ 2.0).

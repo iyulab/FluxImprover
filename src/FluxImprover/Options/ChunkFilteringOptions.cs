@@ -39,7 +39,7 @@ public sealed record ChunkFilteringOptions
     /// Whether to preserve document order after filtering.
     /// Default is false (sorted by score).
     /// </summary>
-    public bool PreserveOrder { get; init; } = false;
+    public bool PreserveOrder { get; init; }
 
     /// <summary>
     /// Batch size for parallel chunk processing.

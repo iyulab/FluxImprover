@@ -235,7 +235,7 @@ public sealed class ChunkFilteringService : IChunkFilteringService
         return (finalScore, reasoning, factors);
     }
 
-    private (double Score, string Reasoning, List<AssessmentFactor> Factors)
+    private static (double Score, string Reasoning, List<AssessmentFactor> Factors)
         PerformSelfReflection(
             Chunk chunk,
             string? query,
@@ -287,7 +287,7 @@ public sealed class ChunkFilteringService : IChunkFilteringService
         return (reflectedScore, reasoning, factors);
     }
 
-    private (double Score, string Reasoning, List<AssessmentFactor> Factors)
+    private static (double Score, string Reasoning, List<AssessmentFactor> Factors)
         PerformCriticValidation(
             Chunk chunk,
             string? query,
@@ -445,17 +445,15 @@ public sealed class ChunkFilteringService : IChunkFilteringService
 
     private static double EvaluateKeywordPresence(string content, object? value)
     {
-        var contentLower = content.ToLowerInvariant();
-
         if (value is string keyword)
-            return contentLower.Contains(keyword.ToLowerInvariant()) ? 1.0 : 0.0;
+            return content.Contains(keyword, StringComparison.OrdinalIgnoreCase) ? 1.0 : 0.0;
 
         if (value is IEnumerable<string> keywords)
         {
             var keywordList = keywords.ToList();
             if (keywordList.Count == 0) return 0.5;
 
-            var matches = keywordList.Count(k => contentLower.Contains(k.ToLowerInvariant()));
+            var matches = keywordList.Count(k => content.Contains(k, StringComparison.OrdinalIgnoreCase));
             return (double)matches / keywordList.Count;
         }
 

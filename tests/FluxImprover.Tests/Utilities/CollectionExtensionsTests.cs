@@ -6,6 +6,7 @@ using FluxImprover.Utilities;
 
 public sealed class CollectionExtensionsTests
 {
+    private static readonly int[] ExpectedDoubled = [2, 4, 6];
     [Fact]
     public void Batch_ShouldSplitIntoCorrectSizes()
     {
@@ -84,7 +85,7 @@ public sealed class CollectionExtensionsTests
 
         // Assert
         results.Should().HaveCount(3);
-        results.Should().Contain(new[] { 2, 4, 6 });
+        results.Should().Contain(ExpectedDoubled);
     }
 
     [Fact]
@@ -101,7 +102,7 @@ public sealed class CollectionExtensionsTests
         }, maxDegreeOfParallelism: 2);
 
         // Assert
-        results.Should().BeEquivalentTo(new[] { 2, 4, 6 });
+        results.Should().BeEquivalentTo(ExpectedDoubled);
     }
 
     [Fact]

@@ -38,7 +38,7 @@ var config = new ConfigurationBuilder()
 var apiKey = config["OPENAI_API_KEY"];
 // Use gpt-4o-mini as default (ignore invalid model names like gpt-5-nano)
 var configModel = config["OPENAI_MODEL"];
-var model = configModel?.StartsWith("gpt-4") == true || configModel?.StartsWith("gpt-3") == true
+var model = configModel?.StartsWith("gpt-4", StringComparison.Ordinal) == true || configModel?.StartsWith("gpt-3", StringComparison.Ordinal) == true
     ? configModel
     : "gpt-4o-mini";
 
@@ -58,7 +58,7 @@ if (string.IsNullOrEmpty(apiKey))
                 var value = parts[1].Trim();
                 if (key == "OPENAI_API_KEY") apiKey = value;
                 // Only use valid model names
-                if (key == "OPENAI_MODEL" && (value.StartsWith("gpt-4") || value.StartsWith("gpt-3")))
+                if (key == "OPENAI_MODEL" && (value.StartsWith("gpt-4", StringComparison.Ordinal) || value.StartsWith("gpt-3", StringComparison.Ordinal)))
                     model = value;
             }
         }

@@ -200,7 +200,7 @@ public sealed class ChunkRelationshipService : IChunkRelationshipService
             """;
     }
 
-    private static IReadOnlyList<ChunkRelationship> ParseRelationships(
+    private static List<ChunkRelationship> ParseRelationships(
         string response,
         string sourceId,
         string targetId,

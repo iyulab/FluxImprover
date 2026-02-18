@@ -1,0 +1,16 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/samples/">
+    <Project Path="samples/FluxImprover.ConsoleDemo/FluxImprover.ConsoleDemo.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/FluxImprover/FluxImprover.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FluxImprover.Tests/FluxImprover.Tests.csproj" />
+  </Folder>
+</Solution>
