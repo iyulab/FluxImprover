@@ -118,7 +118,7 @@ public sealed class QueryPreprocessingServiceTests
         result.Should().NotBeNull();
         result.OriginalQuery.Should().Be(query);
         result.NormalizedQuery.Should().Be("how do i implement authentication?");
-        result.Intent.Should().Be(QueryIntent.HowTo);
+        result.Intent.Should().Be(QueryClassification.HowTo);
     }
 
     [Fact]
@@ -152,16 +152,16 @@ public sealed class QueryPreprocessingServiceTests
     #region ClassifyIntentAsync Tests
 
     [Theory]
-    [InlineData("What is dependency injection?", QueryIntent.Definition)] // "what is" matches Definition pattern
-    [InlineData("When did the release happen?", QueryIntent.Question)] // "when" matches Question pattern
-    [InlineData("Where is the config file?", QueryIntent.Search)] // "where is" matches Search pattern
-    [InlineData("How do I implement caching?", QueryIntent.HowTo)]
-    [InlineData("Define authentication", QueryIntent.Definition)]
-    [InlineData("Compare REST vs GraphQL", QueryIntent.Comparison)]
-    [InlineData("Error in authentication module", QueryIntent.Troubleshooting)]
-    [InlineData("Find all controllers", QueryIntent.Search)]
+    [InlineData("What is dependency injection?", QueryClassification.Definition)] // "what is" matches Definition pattern
+    [InlineData("When did the release happen?", QueryClassification.Question)] // "when" matches Question pattern
+    [InlineData("Where is the config file?", QueryClassification.Search)] // "where is" matches Search pattern
+    [InlineData("How do I implement caching?", QueryClassification.HowTo)]
+    [InlineData("Define authentication", QueryClassification.Definition)]
+    [InlineData("Compare REST vs GraphQL", QueryClassification.Comparison)]
+    [InlineData("Error in authentication module", QueryClassification.Troubleshooting)]
+    [InlineData("Find all controllers", QueryClassification.Search)]
     public async Task ClassifyIntentAsync_WithHeuristicPatterns_ReturnsExpectedIntent(
-        string query, QueryIntent expectedIntent)
+        string query, QueryClassification expectedIntent)
     {
         // Arrange
         var options = new QueryPreprocessingOptions
@@ -197,7 +197,7 @@ public sealed class QueryPreprocessingServiceTests
         var (intent, confidence) = await _sut.ClassifyIntentAsync(query, options);
 
         // Assert
-        intent.Should().Be(QueryIntent.Code);
+        intent.Should().Be(QueryClassification.Code);
         confidence.Should().BeApproximately(0.95, 0.01);
     }
 
@@ -431,7 +431,7 @@ public sealed class QueryPreprocessingServiceTests
 
     #endregion
 
-    #region SearchStrategy Tests
+    #region RecommendedSearchMode Tests
 
     [Fact]
     public async Task PreprocessAsync_WithCodeIntent_SuggestsKeywordStrategy()
@@ -454,8 +454,8 @@ public sealed class QueryPreprocessingServiceTests
         var result = await _sut.PreprocessAsync(query, options);
 
         // Assert
-        result.Intent.Should().Be(QueryIntent.Code);
-        result.SuggestedStrategy.Should().Be(SearchStrategy.Keyword);
+        result.Intent.Should().Be(QueryClassification.Code);
+        result.SuggestedStrategy.Should().Be(RecommendedSearchMode.Keyword);
     }
 
     [Fact]
@@ -479,8 +479,8 @@ public sealed class QueryPreprocessingServiceTests
         var result = await _sut.PreprocessAsync(query, options);
 
         // Assert
-        result.Intent.Should().Be(QueryIntent.Definition);
-        result.SuggestedStrategy.Should().Be(SearchStrategy.Semantic);
+        result.Intent.Should().Be(QueryClassification.Definition);
+        result.SuggestedStrategy.Should().Be(RecommendedSearchMode.Semantic);
     }
 
     #endregion

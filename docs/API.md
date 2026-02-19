@@ -222,9 +222,9 @@ public sealed record PreprocessedQuery
     public required string OriginalQuery { get; init; }
     public required string NormalizedQuery { get; init; }
     public required string ExpandedQuery { get; init; }
-    public required QueryIntent Intent { get; init; }
+    public required QueryClassification Intent { get; init; }
     public required double IntentConfidence { get; init; }
-    public required SearchStrategy SuggestedStrategy { get; init; }
+    public required RecommendedSearchMode SuggestedStrategy { get; init; }
     public required IReadOnlyList<string> Keywords { get; init; }
     public required IReadOnlyList<string> ExpandedKeywords { get; init; }
 }
@@ -536,10 +536,10 @@ public enum QuestionCategory
 }
 ```
 
-### QueryIntent
+### QueryClassification
 
 ```csharp
-public enum QueryIntent
+public enum QueryClassification
 {
     Unknown,
     HowTo,
@@ -551,10 +551,10 @@ public enum QueryIntent
 }
 ```
 
-### SearchStrategy
+### RecommendedSearchMode
 
 ```csharp
-public enum SearchStrategy
+public enum RecommendedSearchMode
 {
     Semantic,
     Keyword,

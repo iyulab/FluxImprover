@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents the classified intent of a user query.
 /// </summary>
-public enum QueryIntent
+public enum QueryClassification
 {
     /// <summary>
     /// General information retrieval query.

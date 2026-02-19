@@ -33,7 +33,7 @@ public sealed record PreprocessedQuery
     /// <summary>
     /// Classified intent of the query.
     /// </summary>
-    public required QueryIntent Intent { get; init; }
+    public required QueryClassification Intent { get; init; }
 
     /// <summary>
     /// Confidence score for the intent classification (0.0 to 1.0).
@@ -48,7 +48,7 @@ public sealed record PreprocessedQuery
     /// <summary>
     /// Suggested search strategy based on query analysis.
     /// </summary>
-    public required SearchStrategy SuggestedStrategy { get; init; }
+    public required RecommendedSearchMode SuggestedStrategy { get; init; }
 
     /// <summary>
     /// Processing metadata including timing and model info.
@@ -59,7 +59,7 @@ public sealed record PreprocessedQuery
 /// <summary>
 /// Recommended search strategy based on query analysis.
 /// </summary>
-public enum SearchStrategy
+public enum RecommendedSearchMode
 {
     /// <summary>
     /// Standard semantic search.

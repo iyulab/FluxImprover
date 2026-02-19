@@ -47,7 +47,7 @@ public interface IQueryPreprocessingService
     /// <param name="options">Preprocessing options.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Tuple of classified intent and confidence score.</returns>
-    Task<(QueryIntent Intent, double Confidence)> ClassifyIntentAsync(
+    Task<(QueryClassification Intent, double Confidence)> ClassifyIntentAsync(
         string query,
         QueryPreprocessingOptions? options = null,
         CancellationToken cancellationToken = default);

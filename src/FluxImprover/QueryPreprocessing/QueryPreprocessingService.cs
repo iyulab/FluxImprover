@@ -112,7 +112,7 @@ public sealed partial class QueryPreprocessingService : IQueryPreprocessingServi
             : new Dictionary<string, IReadOnlyList<string>>();
 
         // Determine search strategy
-        var strategy = DetermineSearchStrategy(intent, keywords.Count, expandedKeywords.Count);
+        var strategy = DetermineRecommendedSearchMode(intent, keywords.Count, expandedKeywords.Count);
 
         var processingTime = DateTime.UtcNow - startTime;
 
@@ -199,7 +199,7 @@ public sealed partial class QueryPreprocessingService : IQueryPreprocessingServi
     }
 
     /// <inheritdoc />
-    public async Task<(QueryIntent Intent, double Confidence)> ClassifyIntentAsync(
+    public async Task<(QueryClassification Intent, double Confidence)> ClassifyIntentAsync(
         string query,
         QueryPreprocessingOptions? options = null,
         CancellationToken cancellationToken = default)
@@ -369,7 +369,7 @@ public sealed partial class QueryPreprocessingService : IQueryPreprocessingServi
         }
     }
 
-    private async Task<(QueryIntent Intent, double Confidence)> ClassifyIntentWithLlmAsync(
+    private async Task<(QueryClassification Intent, double Confidence)> ClassifyIntentWithLlmAsync(
         string query,
         QueryPreprocessingOptions options,
         CancellationToken cancellationToken)
@@ -409,7 +409,7 @@ public sealed partial class QueryPreprocessingService : IQueryPreprocessingServi
                 var intentStr = doc.RootElement.GetProperty("intent").GetString();
                 var confidence = doc.RootElement.GetProperty("confidence").GetDouble();
 
-                if (Enum.TryParse<QueryIntent>(intentStr, true, out var intent))
+                if (Enum.TryParse<QueryClassification>(intentStr, true, out var intent))
                 {
                     return (intent, Math.Clamp(confidence, 0, 1));
                 }
@@ -423,7 +423,7 @@ public sealed partial class QueryPreprocessingService : IQueryPreprocessingServi
         return ClassifyIntentHeuristic(query);
     }
 
-    private static (QueryIntent Intent, double Confidence) ClassifyIntentHeuristic(string query)
+    private static (QueryClassification Intent, double Confidence) ClassifyIntentHeuristic(string query)
     {
         var lower = query.ToLowerInvariant();
 
@@ -431,34 +431,34 @@ public sealed partial class QueryPreprocessingService : IQueryPreprocessingServi
 
         // How-to patterns (specific: "how to", "how do I")
         if (HowToPatternRegex().IsMatch(lower))
-            return (QueryIntent.HowTo, 0.9);
+            return (QueryClassification.HowTo, 0.9);
 
         // Definition patterns (specific: "define", "explain", "what is")
         if (DefinitionPatternRegex().IsMatch(lower))
-            return (QueryIntent.Definition, 0.85);
+            return (QueryClassification.Definition, 0.85);
 
         // Comparison patterns
         if (ComparisonPatternRegex().IsMatch(lower))
-            return (QueryIntent.Comparison, 0.85);
+            return (QueryClassification.Comparison, 0.85);
 
         // Troubleshooting patterns
         if (TroubleshootingPatternRegex().IsMatch(lower))
-            return (QueryIntent.Troubleshooting, 0.8);
+            return (QueryClassification.Troubleshooting, 0.8);
 
         // Code patterns
         if (CodePatternRegex().IsMatch(lower))
-            return (QueryIntent.Code, 0.75);
+            return (QueryClassification.Code, 0.75);
 
         // Search patterns (explicit)
         if (SearchPatternRegex().IsMatch(lower))
-            return (QueryIntent.Search, 0.8);
+            return (QueryClassification.Search, 0.8);
 
         // General question patterns (less specific: starts with what/where/when/who/which/why/how)
         if (QuestionPatternRegex().IsMatch(lower))
-            return (QueryIntent.Question, 0.7);
+            return (QueryClassification.Question, 0.7);
 
         // Default to general with lower confidence
-        return (QueryIntent.General, 0.5);
+        return (QueryClassification.General, 0.5);
     }
 
     private static string BuildExpandedQuery(string normalizedQuery, IReadOnlyList<string> expandedKeywords)
@@ -474,22 +474,22 @@ public sealed partial class QueryPreprocessingService : IQueryPreprocessingServi
         return string.Join(" ", uniqueTerms);
     }
 
-    private static SearchStrategy DetermineSearchStrategy(QueryIntent intent, int keywordCount, int expandedCount)
+    private static RecommendedSearchMode DetermineRecommendedSearchMode(QueryClassification intent, int keywordCount, int expandedCount)
     {
         // Code queries benefit from keyword search for exact matches
-        if (intent == QueryIntent.Code)
-            return SearchStrategy.Keyword;
+        if (intent == QueryClassification.Code)
+            return RecommendedSearchMode.Keyword;
 
         // Definition queries work well with semantic search
-        if (intent == QueryIntent.Definition || intent == QueryIntent.Conceptual)
-            return SearchStrategy.Semantic;
+        if (intent == QueryClassification.Definition || intent == QueryClassification.Conceptual)
+            return RecommendedSearchMode.Semantic;
 
         // If we have many expanded terms, use multi-query
         if (expandedCount > keywordCount * 2)
-            return SearchStrategy.MultiQuery;
+            return RecommendedSearchMode.MultiQuery;
 
         // Default to hybrid for best coverage
-        return SearchStrategy.Hybrid;
+        return RecommendedSearchMode.Hybrid;
     }
 
     private static List<string> ExtractWords(string text)

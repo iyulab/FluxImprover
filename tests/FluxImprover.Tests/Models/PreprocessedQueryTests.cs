@@ -17,10 +17,10 @@ public sealed class PreprocessedQueryTests
             ExpandedQuery = "test query expanded",
             Keywords = ["test", "query"],
             ExpandedKeywords = ["test", "query", "expanded"],
-            Intent = QueryIntent.Search,
+            Intent = QueryClassification.Search,
             IntentConfidence = 0.85,
             Entities = new Dictionary<string, IReadOnlyList<string>>(),
-            SuggestedStrategy = SearchStrategy.Hybrid
+            SuggestedStrategy = RecommendedSearchMode.Hybrid
         };
 
         // Assert
@@ -29,10 +29,10 @@ public sealed class PreprocessedQueryTests
         query.ExpandedQuery.Should().Be("test query expanded");
         query.Keywords.Should().HaveCount(2);
         query.ExpandedKeywords.Should().HaveCount(3);
-        query.Intent.Should().Be(QueryIntent.Search);
+        query.Intent.Should().Be(QueryClassification.Search);
         query.IntentConfidence.Should().BeApproximately(0.85, 0.01);
         query.Entities.Should().BeEmpty();
-        query.SuggestedStrategy.Should().Be(SearchStrategy.Hybrid);
+        query.SuggestedStrategy.Should().Be(RecommendedSearchMode.Hybrid);
         query.Metadata.Should().BeNull();
     }
 
@@ -47,10 +47,10 @@ public sealed class PreprocessedQueryTests
             ExpandedQuery = "test",
             Keywords = [],
             ExpandedKeywords = [],
-            Intent = QueryIntent.General,
+            Intent = QueryClassification.General,
             IntentConfidence = 0.5,
             Entities = new Dictionary<string, IReadOnlyList<string>>(),
-            SuggestedStrategy = SearchStrategy.Semantic,
+            SuggestedStrategy = RecommendedSearchMode.Semantic,
             Metadata = new Dictionary<string, object>
             {
                 ["processingTimeMs"] = 123.45,
@@ -75,14 +75,14 @@ public sealed class PreprocessedQueryTests
             ExpandedQuery = "userservice config",
             Keywords = ["userservice", "config"],
             ExpandedKeywords = ["userservice", "config", "configuration"],
-            Intent = QueryIntent.Search,
+            Intent = QueryClassification.Search,
             IntentConfidence = 0.75,
             Entities = new Dictionary<string, IReadOnlyList<string>>
             {
                 ["types"] = ["UserService"],
                 ["concepts"] = ["configuration"]
             },
-            SuggestedStrategy = SearchStrategy.Hybrid
+            SuggestedStrategy = RecommendedSearchMode.Hybrid
         };
 
         // Assert
@@ -92,33 +92,33 @@ public sealed class PreprocessedQueryTests
     }
 }
 
-public sealed class QueryIntentTests
+public sealed class QueryClassificationTests
 {
     [Theory]
-    [InlineData(QueryIntent.General, "General")]
-    [InlineData(QueryIntent.Question, "Question")]
-    [InlineData(QueryIntent.Search, "Search")]
-    [InlineData(QueryIntent.Definition, "Definition")]
-    [InlineData(QueryIntent.Comparison, "Comparison")]
-    [InlineData(QueryIntent.HowTo, "HowTo")]
-    [InlineData(QueryIntent.Troubleshooting, "Troubleshooting")]
-    [InlineData(QueryIntent.Code, "Code")]
-    [InlineData(QueryIntent.Conceptual, "Conceptual")]
-    public void QueryIntent_HasExpectedValues(QueryIntent intent, string expectedName)
+    [InlineData(QueryClassification.General, "General")]
+    [InlineData(QueryClassification.Question, "Question")]
+    [InlineData(QueryClassification.Search, "Search")]
+    [InlineData(QueryClassification.Definition, "Definition")]
+    [InlineData(QueryClassification.Comparison, "Comparison")]
+    [InlineData(QueryClassification.HowTo, "HowTo")]
+    [InlineData(QueryClassification.Troubleshooting, "Troubleshooting")]
+    [InlineData(QueryClassification.Code, "Code")]
+    [InlineData(QueryClassification.Conceptual, "Conceptual")]
+    public void QueryClassification_HasExpectedValues(QueryClassification intent, string expectedName)
     {
         // Assert
         intent.ToString().Should().Be(expectedName);
     }
 }
 
-public sealed class SearchStrategyTests
+public sealed class RecommendedSearchModeTests
 {
     [Theory]
-    [InlineData(SearchStrategy.Semantic, "Semantic")]
-    [InlineData(SearchStrategy.Keyword, "Keyword")]
-    [InlineData(SearchStrategy.Hybrid, "Hybrid")]
-    [InlineData(SearchStrategy.MultiQuery, "MultiQuery")]
-    public void SearchStrategy_HasExpectedValues(SearchStrategy strategy, string expectedName)
+    [InlineData(RecommendedSearchMode.Semantic, "Semantic")]
+    [InlineData(RecommendedSearchMode.Keyword, "Keyword")]
+    [InlineData(RecommendedSearchMode.Hybrid, "Hybrid")]
+    [InlineData(RecommendedSearchMode.MultiQuery, "MultiQuery")]
+    public void RecommendedSearchMode_HasExpectedValues(RecommendedSearchMode strategy, string expectedName)
     {
         // Assert
         strategy.ToString().Should().Be(expectedName);
