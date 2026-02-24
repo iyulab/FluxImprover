@@ -1,4 +1,4 @@
-﻿namespace FluxImprover.Tests.QueryPreprocessing;
+namespace FluxImprover.Tests.QueryPreprocessing;
 
 using FluentAssertions;
 using FluxImprover.Models;
@@ -10,12 +10,12 @@ using Xunit;
 
 public sealed class QueryPreprocessingServiceTests
 {
-    private readonly ITextCompletionService _completionService;
+    private readonly ITextGenerationService _completionService;
     private readonly QueryPreprocessingService _sut;
 
     public QueryPreprocessingServiceTests()
     {
-        _completionService = Substitute.For<ITextCompletionService>();
+        _completionService = Substitute.For<ITextGenerationService>();
         _sut = new QueryPreprocessingService(_completionService);
     }
 

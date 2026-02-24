@@ -1,10 +1,10 @@
-﻿namespace FluxImprover.Services;
+namespace FluxImprover.Services;
 
 /// <summary>
 /// LLM 텍스트 생성 서비스 인터페이스.
 /// 소비 애플리케이션에서 구현해야 합니다.
 /// </summary>
-public interface ITextCompletionService
+public interface ITextGenerationService
 {
     /// <summary>
     /// 주어진 프롬프트에 대한 텍스트 완성을 생성합니다.

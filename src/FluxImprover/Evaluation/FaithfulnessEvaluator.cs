@@ -1,4 +1,4 @@
-﻿namespace FluxImprover.Evaluation;
+namespace FluxImprover.Evaluation;
 
 using System.Text.Json;
 using FluxImprover.Options;
@@ -12,9 +12,9 @@ using FluxImprover.Utilities;
 public sealed class FaithfulnessEvaluator
 {
     private const string MetricName = "Faithfulness";
-    private readonly ITextCompletionService _completionService;
+    private readonly ITextGenerationService _completionService;
 
-    public FaithfulnessEvaluator(ITextCompletionService completionService)
+    public FaithfulnessEvaluator(ITextGenerationService completionService)
     {
         _completionService = completionService ?? throw new ArgumentNullException(nameof(completionService));
     }

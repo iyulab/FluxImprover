@@ -1,4 +1,4 @@
-﻿namespace FluxImprover.Enrichment;
+namespace FluxImprover.Enrichment;
 
 using System.Text.Json;
 using FluxImprover.Options;
@@ -10,9 +10,9 @@ using FluxImprover.Utilities;
 /// </summary>
 public sealed class KeywordExtractionService : IKeywordExtractionService
 {
-    private readonly ITextCompletionService _completionService;
+    private readonly ITextGenerationService _completionService;
 
-    public KeywordExtractionService(ITextCompletionService completionService)
+    public KeywordExtractionService(ITextGenerationService completionService)
     {
         _completionService = completionService ?? throw new ArgumentNullException(nameof(completionService));
     }

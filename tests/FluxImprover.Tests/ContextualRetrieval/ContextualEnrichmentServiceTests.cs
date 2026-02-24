@@ -1,4 +1,4 @@
-﻿namespace FluxImprover.Tests.ContextualRetrieval;
+namespace FluxImprover.Tests.ContextualRetrieval;
 
 using FluentAssertions;
 using FluxImprover.ContextualRetrieval;
@@ -10,12 +10,12 @@ using Xunit;
 
 public sealed class ContextualEnrichmentServiceTests
 {
-    private readonly ITextCompletionService _completionService;
+    private readonly ITextGenerationService _completionService;
     private readonly ContextualEnrichmentService _sut;
 
     public ContextualEnrichmentServiceTests()
     {
-        _completionService = Substitute.For<ITextCompletionService>();
+        _completionService = Substitute.For<ITextGenerationService>();
         _sut = new ContextualEnrichmentService(_completionService);
     }
 

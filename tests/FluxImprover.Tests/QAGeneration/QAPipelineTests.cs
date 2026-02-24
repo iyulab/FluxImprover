@@ -1,4 +1,4 @@
-﻿namespace FluxImprover.Tests.QAGeneration;
+namespace FluxImprover.Tests.QAGeneration;
 
 using FluentAssertions;
 using FluxImprover.Evaluation;
@@ -11,14 +11,14 @@ using Xunit;
 
 public sealed class QAPipelineTests
 {
-    private readonly ITextCompletionService _completionService;
+    private readonly ITextGenerationService _completionService;
     private readonly QAGeneratorService _generator;
     private readonly QAFilterService _filter;
     private readonly QAPipeline _sut;
 
     public QAPipelineTests()
     {
-        _completionService = Substitute.For<ITextCompletionService>();
+        _completionService = Substitute.For<ITextGenerationService>();
         _generator = new QAGeneratorService(_completionService);
 
         var faithfulness = new FaithfulnessEvaluator(_completionService);

@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using FluxImprover.Models;
 using FluxImprover.Options;
@@ -14,12 +14,12 @@ namespace FluxImprover.ChunkFiltering;
 /// </summary>
 public sealed class ChunkFilteringService : IChunkFilteringService
 {
-    private readonly ITextCompletionService _completionService;
+    private readonly ITextGenerationService _completionService;
 
     /// <summary>
     /// Initializes a new instance of ChunkFilteringService.
     /// </summary>
-    public ChunkFilteringService(ITextCompletionService completionService)
+    public ChunkFilteringService(ITextGenerationService completionService)
     {
         _completionService = completionService ?? throw new ArgumentNullException(nameof(completionService));
     }

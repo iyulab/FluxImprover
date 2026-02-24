@@ -1,4 +1,4 @@
-﻿namespace FluxImprover.Tests.ChunkFiltering;
+namespace FluxImprover.Tests.ChunkFiltering;
 
 using FluentAssertions;
 using FluxImprover.ChunkFiltering;
@@ -10,12 +10,12 @@ using Xunit;
 
 public sealed class ChunkFilteringServiceTests
 {
-    private readonly ITextCompletionService _completionService;
+    private readonly ITextGenerationService _completionService;
     private readonly ChunkFilteringService _sut;
 
     public ChunkFilteringServiceTests()
     {
-        _completionService = Substitute.For<ITextCompletionService>();
+        _completionService = Substitute.For<ITextGenerationService>();
         _sut = new ChunkFilteringService(_completionService);
     }
 

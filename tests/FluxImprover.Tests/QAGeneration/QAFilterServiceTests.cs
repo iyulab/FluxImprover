@@ -1,4 +1,4 @@
-﻿namespace FluxImprover.Tests.QAGeneration;
+namespace FluxImprover.Tests.QAGeneration;
 
 using FluentAssertions;
 using FluxImprover.Evaluation;
@@ -10,7 +10,7 @@ using Xunit;
 
 public sealed class QAFilterServiceTests
 {
-    private readonly ITextCompletionService _completionService;
+    private readonly ITextGenerationService _completionService;
     private readonly FaithfulnessEvaluator _faithfulnessEvaluator;
     private readonly RelevancyEvaluator _relevancyEvaluator;
     private readonly AnswerabilityEvaluator _answerabilityEvaluator;
@@ -18,7 +18,7 @@ public sealed class QAFilterServiceTests
 
     public QAFilterServiceTests()
     {
-        _completionService = Substitute.For<ITextCompletionService>();
+        _completionService = Substitute.For<ITextGenerationService>();
         _faithfulnessEvaluator = new FaithfulnessEvaluator(_completionService);
         _relevancyEvaluator = new RelevancyEvaluator(_completionService);
         _answerabilityEvaluator = new AnswerabilityEvaluator(_completionService);

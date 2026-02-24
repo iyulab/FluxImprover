@@ -1,4 +1,4 @@
-﻿namespace FluxImprover.Tests.Enrichment;
+namespace FluxImprover.Tests.Enrichment;
 
 using FluentAssertions;
 using FluxImprover.Enrichment;
@@ -9,12 +9,12 @@ using Xunit;
 
 public sealed class SummarizationServiceTests
 {
-    private readonly ITextCompletionService _completionService;
+    private readonly ITextGenerationService _completionService;
     private readonly SummarizationService _sut;
 
     public SummarizationServiceTests()
     {
-        _completionService = Substitute.For<ITextCompletionService>();
+        _completionService = Substitute.For<ITextGenerationService>();
         _sut = new SummarizationService(_completionService);
     }
 

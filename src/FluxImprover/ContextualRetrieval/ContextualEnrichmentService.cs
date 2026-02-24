@@ -1,4 +1,4 @@
-﻿using FluxImprover.Models;
+using FluxImprover.Models;
 using FluxImprover.Options;
 using FluxImprover.Services;
 
@@ -10,9 +10,9 @@ namespace FluxImprover.ContextualRetrieval;
 /// </summary>
 public sealed class ContextualEnrichmentService : IContextualEnrichmentService
 {
-    private readonly ITextCompletionService _completionService;
+    private readonly ITextGenerationService _completionService;
 
-    public ContextualEnrichmentService(ITextCompletionService completionService)
+    public ContextualEnrichmentService(ITextGenerationService completionService)
     {
         _completionService = completionService ?? throw new ArgumentNullException(nameof(completionService));
     }

@@ -1,4 +1,4 @@
-﻿namespace FluxImprover.ConsoleDemo;
+namespace FluxImprover.ConsoleDemo;
 
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
@@ -8,9 +8,9 @@ using System.Text.Json.Serialization;
 using FluxImprover.Services;
 
 /// <summary>
-/// OpenAI API 기반 ITextCompletionService 구현
+/// OpenAI API 기반 ITextGenerationService 구현
 /// </summary>
-public sealed class OpenAICompletionService : ITextCompletionService, IDisposable
+public sealed class OpenAICompletionService : ITextGenerationService, IDisposable
 {
     private readonly HttpClient _httpClient;
     private readonly string _model;

@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using FluxImprover.Models;
 using FluxImprover.Options;
 using FluxImprover.Services;
@@ -11,9 +11,9 @@ namespace FluxImprover.RelationshipDiscovery;
 /// </summary>
 public sealed class ChunkRelationshipService : IChunkRelationshipService
 {
-    private readonly ITextCompletionService _completionService;
+    private readonly ITextGenerationService _completionService;
 
-    public ChunkRelationshipService(ITextCompletionService completionService)
+    public ChunkRelationshipService(ITextGenerationService completionService)
     {
         _completionService = completionService ?? throw new ArgumentNullException(nameof(completionService));
     }

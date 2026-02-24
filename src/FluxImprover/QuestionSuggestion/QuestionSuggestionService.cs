@@ -1,4 +1,4 @@
-﻿namespace FluxImprover.QuestionSuggestion;
+namespace FluxImprover.QuestionSuggestion;
 
 using System.Text.Json;
 using FluxImprover.Models;
@@ -11,9 +11,9 @@ using FluxImprover.Utilities;
 /// </summary>
 public class QuestionSuggestionService
 {
-    private readonly ITextCompletionService _completionService;
+    private readonly ITextGenerationService _completionService;
 
-    public QuestionSuggestionService(ITextCompletionService completionService)
+    public QuestionSuggestionService(ITextGenerationService completionService)
     {
         _completionService = completionService ?? throw new ArgumentNullException(nameof(completionService));
     }

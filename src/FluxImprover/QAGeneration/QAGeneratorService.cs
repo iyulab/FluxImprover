@@ -1,4 +1,4 @@
-﻿namespace FluxImprover.QAGeneration;
+namespace FluxImprover.QAGeneration;
 
 using System.Text.Json;
 using FluxImprover.Models;
@@ -11,9 +11,9 @@ using FluxImprover.Utilities;
 /// </summary>
 public class QAGeneratorService
 {
-    private readonly ITextCompletionService _completionService;
+    private readonly ITextGenerationService _completionService;
 
-    public QAGeneratorService(ITextCompletionService completionService)
+    public QAGeneratorService(ITextGenerationService completionService)
     {
         _completionService = completionService ?? throw new ArgumentNullException(nameof(completionService));
     }

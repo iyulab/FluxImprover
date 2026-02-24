@@ -1,4 +1,4 @@
-﻿namespace FluxImprover.Evaluation;
+namespace FluxImprover.Evaluation;
 
 using System.Text.Json;
 using FluxImprover.Options;
@@ -12,9 +12,9 @@ using FluxImprover.Utilities;
 public sealed class RelevancyEvaluator
 {
     private const string MetricName = "Relevancy";
-    private readonly ITextCompletionService _completionService;
+    private readonly ITextGenerationService _completionService;
 
-    public RelevancyEvaluator(ITextCompletionService completionService)
+    public RelevancyEvaluator(ITextGenerationService completionService)
     {
         _completionService = completionService ?? throw new ArgumentNullException(nameof(completionService));
     }

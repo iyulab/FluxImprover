@@ -1,4 +1,4 @@
-﻿namespace FluxImprover.Tests.Evaluation;
+namespace FluxImprover.Tests.Evaluation;
 
 using FluentAssertions;
 using FluxImprover.Evaluation;
@@ -10,12 +10,12 @@ using Xunit;
 
 public sealed class RelevancyEvaluatorTests
 {
-    private readonly ITextCompletionService _completionService;
+    private readonly ITextGenerationService _completionService;
     private readonly RelevancyEvaluator _sut;
 
     public RelevancyEvaluatorTests()
     {
-        _completionService = Substitute.For<ITextCompletionService>();
+        _completionService = Substitute.For<ITextGenerationService>();
         _sut = new RelevancyEvaluator(_completionService);
     }
 

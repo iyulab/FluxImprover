@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using FluxImprover.Models;
 using FluxImprover.Options;
@@ -12,7 +12,7 @@ namespace FluxImprover.QueryPreprocessing;
 /// </summary>
 public sealed partial class QueryPreprocessingService : IQueryPreprocessingService
 {
-    private readonly ITextCompletionService _completionService;
+    private readonly ITextGenerationService _completionService;
 
     // Technical term expansions for common abbreviations
     private static readonly Dictionary<string, string[]> TechnicalTermExpansions = new(StringComparer.OrdinalIgnoreCase)
@@ -74,7 +74,7 @@ public sealed partial class QueryPreprocessingService : IQueryPreprocessingServi
     /// <summary>
     /// Initializes a new instance of QueryPreprocessingService.
     /// </summary>
-    public QueryPreprocessingService(ITextCompletionService completionService)
+    public QueryPreprocessingService(ITextGenerationService completionService)
     {
         _completionService = completionService ?? throw new ArgumentNullException(nameof(completionService));
     }

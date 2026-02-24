@@ -1,4 +1,4 @@
-﻿namespace FluxImprover.Tests.QAGeneration;
+namespace FluxImprover.Tests.QAGeneration;
 
 using FluentAssertions;
 using FluxImprover.Models;
@@ -10,12 +10,12 @@ using Xunit;
 
 public sealed class QAGeneratorServiceTests
 {
-    private readonly ITextCompletionService _completionService;
+    private readonly ITextGenerationService _completionService;
     private readonly QAGeneratorService _sut;
 
     public QAGeneratorServiceTests()
     {
-        _completionService = Substitute.For<ITextCompletionService>();
+        _completionService = Substitute.For<ITextGenerationService>();
         _sut = new QAGeneratorService(_completionService);
     }
 

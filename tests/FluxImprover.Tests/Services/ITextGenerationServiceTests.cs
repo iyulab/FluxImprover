@@ -1,4 +1,4 @@
-﻿using Xunit;
+using Xunit;
 namespace FluxImprover.Tests.Services;
 
 using FluentAssertions;
@@ -6,13 +6,13 @@ using FluxImprover.Services;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 
-public class ITextCompletionServiceTests
+public class ITextGenerationServiceTests
 {
     [Fact]
     public async Task CompleteAsync_WithValidPrompt_ReturnsNonEmptyString()
     {
         // Arrange
-        var service = Substitute.For<ITextCompletionService>();
+        var service = Substitute.For<ITextGenerationService>();
         service.CompleteAsync(Arg.Any<string>(), Arg.Any<CompletionOptions?>(), Arg.Any<CancellationToken>())
             .Returns("Generated response");
 
@@ -28,7 +28,7 @@ public class ITextCompletionServiceTests
     public async Task CompleteAsync_WithOptions_PassesOptionsCorrectly()
     {
         // Arrange
-        var service = Substitute.For<ITextCompletionService>();
+        var service = Substitute.For<ITextGenerationService>();
         var options = new CompletionOptions
         {
             Temperature = 0.5f,
@@ -51,7 +51,7 @@ public class ITextCompletionServiceTests
     public async Task CompleteAsync_WithCancellation_ThrowsOperationCanceledException()
     {
         // Arrange
-        var service = Substitute.For<ITextCompletionService>();
+        var service = Substitute.For<ITextGenerationService>();
         using var cts = new CancellationTokenSource();
         await cts.CancelAsync();
 
@@ -67,7 +67,7 @@ public class ITextCompletionServiceTests
     public async Task CompleteStreamingAsync_WithValidPrompt_YieldsTokens()
     {
         // Arrange
-        var service = Substitute.For<ITextCompletionService>();
+        var service = Substitute.For<ITextGenerationService>();
         var tokens = new[] { "Hello", " ", "World" };
 
         service.CompleteStreamingAsync(Arg.Any<string>(), Arg.Any<CompletionOptions?>(), Arg.Any<CancellationToken>())

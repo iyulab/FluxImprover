@@ -1,4 +1,4 @@
-﻿namespace FluxImprover;
+namespace FluxImprover;
 
 using FluxImprover.ChunkFiltering;
 using FluxImprover.ContextualRetrieval;
@@ -15,12 +15,12 @@ using FluxImprover.Services;
 /// </summary>
 public sealed class FluxImproverBuilder
 {
-    private ITextCompletionService? _completionService;
+    private ITextGenerationService? _completionService;
 
     /// <summary>
     /// LLM 완성 서비스를 설정합니다.
     /// </summary>
-    public FluxImproverBuilder WithCompletionService(ITextCompletionService completionService)
+    public FluxImproverBuilder WithCompletionService(ITextGenerationService completionService)
     {
         _completionService = completionService ?? throw new ArgumentNullException(nameof(completionService));
         return this;
@@ -37,7 +37,7 @@ public sealed class FluxImproverBuilder
         return BuildServices(_completionService);
     }
 
-    private static FluxImproverServices BuildServices(ITextCompletionService completionService)
+    private static FluxImproverServices BuildServices(ITextGenerationService completionService)
     {
         // Enrichment Services
         var summarizationService = new SummarizationService(completionService);

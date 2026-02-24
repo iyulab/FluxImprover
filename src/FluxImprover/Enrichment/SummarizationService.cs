@@ -1,4 +1,4 @@
-﻿namespace FluxImprover.Enrichment;
+namespace FluxImprover.Enrichment;
 
 using FluxImprover.Options;
 using FluxImprover.Services;
@@ -8,9 +8,9 @@ using FluxImprover.Services;
 /// </summary>
 public sealed class SummarizationService : ISummarizationService
 {
-    private readonly ITextCompletionService _completionService;
+    private readonly ITextGenerationService _completionService;
 
-    public SummarizationService(ITextCompletionService completionService)
+    public SummarizationService(ITextGenerationService completionService)
     {
         _completionService = completionService ?? throw new ArgumentNullException(nameof(completionService));
     }

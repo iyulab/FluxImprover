@@ -1,4 +1,4 @@
-﻿namespace FluxImprover.Tests;
+namespace FluxImprover.Tests;
 
 using FluentAssertions;
 using FluxImprover.Services;
@@ -11,7 +11,7 @@ public sealed class FluxImproverBuilderTests
     public void Build_WithCompletionService_ReturnsAllServices()
     {
         // Arrange
-        var completionService = Substitute.For<ITextCompletionService>();
+        var completionService = Substitute.For<ITextGenerationService>();
         var builder = new FluxImproverBuilder();
 
         // Act
@@ -65,7 +65,7 @@ public sealed class FluxImproverBuilderTests
     public void WithCompletionService_ReturnsBuilderForChaining()
     {
         // Arrange
-        var completionService = Substitute.For<ITextCompletionService>();
+        var completionService = Substitute.For<ITextGenerationService>();
         var builder = new FluxImproverBuilder();
 
         // Act
@@ -79,7 +79,7 @@ public sealed class FluxImproverBuilderTests
     public void Build_CanBeCalledMultipleTimes()
     {
         // Arrange
-        var completionService = Substitute.For<ITextCompletionService>();
+        var completionService = Substitute.For<ITextGenerationService>();
         var builder = new FluxImproverBuilder()
             .WithCompletionService(completionService);
 
@@ -97,7 +97,7 @@ public sealed class FluxImproverBuilderTests
     public void FluxImproverServices_IsRecord_WithValueEquality()
     {
         // Arrange
-        var completionService = Substitute.For<ITextCompletionService>();
+        var completionService = Substitute.For<ITextGenerationService>();
         var builder = new FluxImproverBuilder()
             .WithCompletionService(completionService);
 

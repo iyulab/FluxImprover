@@ -1,4 +1,4 @@
-﻿namespace FluxImprover.Tests.Enrichment;
+namespace FluxImprover.Tests.Enrichment;
 
 using FluentAssertions;
 using FluxImprover.Enrichment;
@@ -9,12 +9,12 @@ using Xunit;
 
 public sealed class KeywordExtractionServiceTests
 {
-    private readonly ITextCompletionService _completionService;
+    private readonly ITextGenerationService _completionService;
     private readonly KeywordExtractionService _sut;
 
     public KeywordExtractionServiceTests()
     {
-        _completionService = Substitute.For<ITextCompletionService>();
+        _completionService = Substitute.For<ITextGenerationService>();
         _sut = new KeywordExtractionService(_completionService);
     }
 

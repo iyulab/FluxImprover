@@ -1,4 +1,4 @@
-﻿namespace FluxImprover.Tests.Integration;
+namespace FluxImprover.Tests.Integration;
 
 using FluentAssertions;
 using FluxImprover.Models;
@@ -14,12 +14,12 @@ using Xunit;
 /// </summary>
 public sealed class EndToEndPipelineTests
 {
-    private readonly ITextCompletionService _completionService;
+    private readonly ITextGenerationService _completionService;
     private readonly FluxImproverServices _services;
 
     public EndToEndPipelineTests()
     {
-        _completionService = Substitute.For<ITextCompletionService>();
+        _completionService = Substitute.For<ITextGenerationService>();
         _services = new FluxImproverBuilder()
             .WithCompletionService(_completionService)
             .Build();

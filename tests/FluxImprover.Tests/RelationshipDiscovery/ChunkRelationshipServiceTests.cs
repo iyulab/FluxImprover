@@ -1,4 +1,4 @@
-﻿namespace FluxImprover.Tests.RelationshipDiscovery;
+namespace FluxImprover.Tests.RelationshipDiscovery;
 
 using FluentAssertions;
 using FluxImprover.Models;
@@ -10,12 +10,12 @@ using Xunit;
 
 public sealed class ChunkRelationshipServiceTests
 {
-    private readonly ITextCompletionService _completionService;
+    private readonly ITextGenerationService _completionService;
     private readonly ChunkRelationshipService _sut;
 
     public ChunkRelationshipServiceTests()
     {
-        _completionService = Substitute.For<ITextCompletionService>();
+        _completionService = Substitute.For<ITextGenerationService>();
         _sut = new ChunkRelationshipService(_completionService);
     }
 

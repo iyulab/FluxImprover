@@ -1,4 +1,4 @@
-﻿namespace FluxImprover.Tests;
+namespace FluxImprover.Tests;
 
 using FluentAssertions;
 using FluxImprover.ChunkFiltering;
@@ -21,7 +21,7 @@ public sealed class ServiceCollectionExtensionsTests
     {
         // Arrange
         var services = new ServiceCollection();
-        var completionService = Substitute.For<ITextCompletionService>();
+        var completionService = Substitute.For<ITextGenerationService>();
 
         // Act
         services.AddFluxImprover(_ => completionService);
@@ -37,7 +37,7 @@ public sealed class ServiceCollectionExtensionsTests
     {
         // Arrange
         var services = new ServiceCollection();
-        var completionService = Substitute.For<ITextCompletionService>();
+        var completionService = Substitute.For<ITextGenerationService>();
 
         // Act
         services.AddFluxImprover(_ => completionService);
@@ -56,7 +56,7 @@ public sealed class ServiceCollectionExtensionsTests
     {
         // Arrange
         var services = new ServiceCollection();
-        var completionService = Substitute.For<ITextCompletionService>();
+        var completionService = Substitute.For<ITextGenerationService>();
 
         // Act
         services.AddFluxImprover(_ => completionService);
@@ -73,7 +73,7 @@ public sealed class ServiceCollectionExtensionsTests
     {
         // Arrange
         var services = new ServiceCollection();
-        var completionService = Substitute.For<ITextCompletionService>();
+        var completionService = Substitute.For<ITextGenerationService>();
 
         // Act
         services.AddFluxImprover(_ => completionService);
@@ -90,7 +90,7 @@ public sealed class ServiceCollectionExtensionsTests
     {
         // Arrange
         var services = new ServiceCollection();
-        var completionService = Substitute.For<ITextCompletionService>();
+        var completionService = Substitute.For<ITextGenerationService>();
 
         // Act
         services.AddFluxImprover(_ => completionService);
@@ -109,7 +109,7 @@ public sealed class ServiceCollectionExtensionsTests
     {
         // Arrange
         var services = new ServiceCollection();
-        var completionService = Substitute.For<ITextCompletionService>();
+        var completionService = Substitute.For<ITextGenerationService>();
 
         // Act
         services.AddFluxImprover(_ => completionService);
@@ -136,11 +136,11 @@ public sealed class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddFluxImprover_WithRegisteredITextCompletionService_Works()
+    public void AddFluxImprover_WithRegisteredITextGenerationService_Works()
     {
         // Arrange
         var services = new ServiceCollection();
-        var completionService = Substitute.For<ITextCompletionService>();
+        var completionService = Substitute.For<ITextGenerationService>();
         services.AddSingleton(completionService);
 
         // Act
@@ -153,7 +153,7 @@ public sealed class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddFluxImprover_WithoutRegisteredITextCompletionService_ThrowsOnResolve()
+    public void AddFluxImprover_WithoutRegisteredITextGenerationService_ThrowsOnResolve()
     {
         // Arrange
         var services = new ServiceCollection();
@@ -172,8 +172,8 @@ public sealed class ServiceCollectionExtensionsTests
     {
         // Arrange
         var services = new ServiceCollection();
-        var completionService1 = Substitute.For<ITextCompletionService>();
-        var completionService2 = Substitute.For<ITextCompletionService>();
+        var completionService1 = Substitute.For<ITextGenerationService>();
+        var completionService2 = Substitute.For<ITextGenerationService>();
 
         // Act
         services.AddFluxImprover(_ => completionService1);
@@ -190,7 +190,7 @@ public sealed class ServiceCollectionExtensionsTests
     {
         // Arrange
         var services = new ServiceCollection();
-        var completionService = Substitute.For<ITextCompletionService>();
+        var completionService = Substitute.For<ITextGenerationService>();
 
         // Act
         var result = services.AddFluxImprover(_ => completionService);
@@ -204,7 +204,7 @@ public sealed class ServiceCollectionExtensionsTests
     {
         // Arrange
         var services = new ServiceCollection();
-        var completionService = Substitute.For<ITextCompletionService>();
+        var completionService = Substitute.For<ITextGenerationService>();
 
         // Act
         services.AddFluxImprover(_ => completionService);

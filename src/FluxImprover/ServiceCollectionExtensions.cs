@@ -1,4 +1,4 @@
-﻿namespace FluxImprover;
+namespace FluxImprover;
 
 using FluxImprover.ChunkFiltering;
 using FluxImprover.ContextualRetrieval;
@@ -22,17 +22,17 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <param name="services">The service collection.</param>
     /// <param name="completionServiceFactory">
-    /// Factory function to create the ITextCompletionService from the service provider.
+    /// Factory function to create the ITextGenerationService from the service provider.
     /// This is the only external dependency required by FluxImprover.
     /// </param>
     /// <returns>The service collection for chaining.</returns>
     /// <example>
     /// <code>
-    /// // Register with your own ITextCompletionService implementation
+    /// // Register with your own ITextGenerationService implementation
     /// services.AddFluxImprover(sp => sp.GetRequiredService&lt;MyTextCompletionService&gt;());
     ///
     /// // Or create directly
-    /// services.AddFluxImprover(_ => new OpenAITextCompletionService(apiKey));
+    /// services.AddFluxImprover(_ => new OpenAITextGenerationService(apiKey));
     ///
     /// // Then inject individual services as needed
     /// public class MyService(ChunkEnrichmentService enrichment, QAPipeline pipeline) { }
@@ -40,7 +40,7 @@ public static class ServiceCollectionExtensions
     /// </example>
     public static IServiceCollection AddFluxImprover(
         this IServiceCollection services,
-        Func<IServiceProvider, ITextCompletionService> completionServiceFactory)
+        Func<IServiceProvider, ITextGenerationService> completionServiceFactory)
     {
         ArgumentNullException.ThrowIfNull(completionServiceFactory);
 
@@ -64,17 +64,17 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Adds all FluxImprover services using an already registered ITextCompletionService.
+    /// Adds all FluxImprover services using an already registered ITextGenerationService.
     /// </summary>
     /// <param name="services">The service collection.</param>
     /// <returns>The service collection for chaining.</returns>
     /// <remarks>
-    /// This overload requires ITextCompletionService to be already registered in the container.
+    /// This overload requires ITextGenerationService to be already registered in the container.
     /// </remarks>
     /// <example>
     /// <code>
-    /// // First register your ITextCompletionService
-    /// services.AddSingleton&lt;ITextCompletionService, MyTextCompletionService&gt;();
+    /// // First register your ITextGenerationService
+    /// services.AddSingleton&lt;ITextGenerationService, MyTextCompletionService&gt;();
     ///
     /// // Then add FluxImprover
     /// services.AddFluxImprover();
@@ -82,7 +82,7 @@ public static class ServiceCollectionExtensions
     /// </example>
     public static IServiceCollection AddFluxImprover(this IServiceCollection services)
     {
-        return services.AddFluxImprover(sp => sp.GetRequiredService<ITextCompletionService>());
+        return services.AddFluxImprover(sp => sp.GetRequiredService<ITextGenerationService>());
     }
 
     private static void RegisterEnrichmentServices(IServiceCollection services)

@@ -1,4 +1,4 @@
-﻿namespace FluxImprover.Tests.QuestionSuggestion;
+namespace FluxImprover.Tests.QuestionSuggestion;
 
 using FluentAssertions;
 using FluxImprover.Models;
@@ -10,12 +10,12 @@ using Xunit;
 
 public sealed class QuestionSuggestionServiceTests
 {
-    private readonly ITextCompletionService _completionService;
+    private readonly ITextGenerationService _completionService;
     private readonly QuestionSuggestionService _sut;
 
     public QuestionSuggestionServiceTests()
     {
-        _completionService = Substitute.For<ITextCompletionService>();
+        _completionService = Substitute.For<ITextGenerationService>();
         _sut = new QuestionSuggestionService(_completionService);
     }
 
