@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>FluxImprover.LMSupply</PackageId>
+    <Description>LMSupply.Generator integration for FluxImprover - offline LLM text completion using local GGUF/ONNX models</Description>
+    <PackageTags>RAG;LLM;LMSupply;GGUF;ONNX;LocalAI;FluxImprover</PackageTags>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="FluxImprover.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FluxImprover\FluxImprover.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LMSupply.Generator" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
+
+</Project>

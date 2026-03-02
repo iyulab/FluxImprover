@@ -9,6 +9,7 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/FluxImprover/FluxImprover.csproj" />
+    <Project Path="src/FluxImprover.LMSupply/FluxImprover.LMSupply.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/FluxImprover.Tests/FluxImprover.Tests.csproj" />

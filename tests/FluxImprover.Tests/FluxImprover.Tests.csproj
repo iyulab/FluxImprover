@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\FluxImprover\FluxImprover.csproj" />
+    <ProjectReference Include="..\..\src\FluxImprover.LMSupply\FluxImprover.LMSupply.csproj" />
   </ItemGroup>
 
   <ItemGroup>
