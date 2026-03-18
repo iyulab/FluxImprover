@@ -17,19 +17,23 @@ public static class LMSupplyCompletionServiceExtensions
     /// <param name="modelFactory">Factory function to create the IGeneratorModel from the service provider.</param>
     /// <param name="defaultTemperature">Default temperature when not specified in options. Defaults to 0.3.</param>
     /// <param name="defaultMaxTokens">Default max tokens when not specified in options. Defaults to 512.</param>
+    /// <param name="lifetime">
+    /// The service lifetime for all FluxImprover services. Defaults to <see cref="ServiceLifetime.Scoped"/>.
+    /// </param>
     /// <returns>The service collection for chaining.</returns>
     public static IServiceCollection AddFluxImproverWithLMSupply(
         this IServiceCollection services,
         Func<IServiceProvider, IGeneratorModel> modelFactory,
         float defaultTemperature = 0.3f,
-        int defaultMaxTokens = 512)
+        int defaultMaxTokens = 512,
+        ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
         return services.AddFluxImprover(sp =>
         {
             var model = modelFactory(sp);
             var logger = sp.GetRequiredService<ILogger<LMSupplyCompletionService>>();
             return new LMSupplyCompletionService(model, logger, defaultTemperature, defaultMaxTokens);
-        });
+        }, lifetime);
     }
 
     /// <summary>
@@ -38,15 +42,20 @@ public static class LMSupplyCompletionServiceExtensions
     /// <param name="services">The service collection.</param>
     /// <param name="defaultTemperature">Default temperature when not specified in options. Defaults to 0.3.</param>
     /// <param name="defaultMaxTokens">Default max tokens when not specified in options. Defaults to 512.</param>
+    /// <param name="lifetime">
+    /// The service lifetime for all FluxImprover services. Defaults to <see cref="ServiceLifetime.Scoped"/>.
+    /// </param>
     /// <returns>The service collection for chaining.</returns>
     public static IServiceCollection AddFluxImproverWithLMSupply(
         this IServiceCollection services,
         float defaultTemperature = 0.3f,
-        int defaultMaxTokens = 512)
+        int defaultMaxTokens = 512,
+        ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
         return services.AddFluxImproverWithLMSupply(
             sp => sp.GetRequiredService<IGeneratorModel>(),
             defaultTemperature,
-            defaultMaxTokens);
+            defaultMaxTokens,
+            lifetime);
     }
 }

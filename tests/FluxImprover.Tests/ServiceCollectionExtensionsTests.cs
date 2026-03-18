@@ -25,10 +25,11 @@ public sealed class ServiceCollectionExtensionsTests
 
         // Act
         services.AddFluxImprover(_ => completionService);
-        var provider = services.BuildServiceProvider();
+        using var provider = services.BuildServiceProvider();
 
         // Assert
-        var fluxServices = provider.GetService<FluxImproverServices>();
+        using var scope = provider.CreateScope();
+        var fluxServices = scope.ServiceProvider.GetService<FluxImproverServices>();
         fluxServices.Should().NotBeNull();
     }
 
@@ -41,14 +42,16 @@ public sealed class ServiceCollectionExtensionsTests
 
         // Act
         services.AddFluxImprover(_ => completionService);
-        var provider = services.BuildServiceProvider();
+        using var provider = services.BuildServiceProvider();
 
         // Assert
-        provider.GetService<SummarizationService>().Should().NotBeNull();
-        provider.GetService<ISummarizationService>().Should().NotBeNull();
-        provider.GetService<KeywordExtractionService>().Should().NotBeNull();
-        provider.GetService<IKeywordExtractionService>().Should().NotBeNull();
-        provider.GetService<ChunkEnrichmentService>().Should().NotBeNull();
+        using var scope = provider.CreateScope();
+        var sp = scope.ServiceProvider;
+        sp.GetService<SummarizationService>().Should().NotBeNull();
+        sp.GetService<ISummarizationService>().Should().NotBeNull();
+        sp.GetService<KeywordExtractionService>().Should().NotBeNull();
+        sp.GetService<IKeywordExtractionService>().Should().NotBeNull();
+        sp.GetService<ChunkEnrichmentService>().Should().NotBeNull();
     }
 
     [Fact]
@@ -60,12 +63,14 @@ public sealed class ServiceCollectionExtensionsTests
 
         // Act
         services.AddFluxImprover(_ => completionService);
-        var provider = services.BuildServiceProvider();
+        using var provider = services.BuildServiceProvider();
 
         // Assert
-        provider.GetService<FaithfulnessEvaluator>().Should().NotBeNull();
-        provider.GetService<RelevancyEvaluator>().Should().NotBeNull();
-        provider.GetService<AnswerabilityEvaluator>().Should().NotBeNull();
+        using var scope = provider.CreateScope();
+        var sp = scope.ServiceProvider;
+        sp.GetService<FaithfulnessEvaluator>().Should().NotBeNull();
+        sp.GetService<RelevancyEvaluator>().Should().NotBeNull();
+        sp.GetService<AnswerabilityEvaluator>().Should().NotBeNull();
     }
 
     [Fact]
@@ -77,12 +82,14 @@ public sealed class ServiceCollectionExtensionsTests
 
         // Act
         services.AddFluxImprover(_ => completionService);
-        var provider = services.BuildServiceProvider();
+        using var provider = services.BuildServiceProvider();
 
         // Assert
-        provider.GetService<QAGeneratorService>().Should().NotBeNull();
-        provider.GetService<QAFilterService>().Should().NotBeNull();
-        provider.GetService<QAPipeline>().Should().NotBeNull();
+        using var scope = provider.CreateScope();
+        var sp = scope.ServiceProvider;
+        sp.GetService<QAGeneratorService>().Should().NotBeNull();
+        sp.GetService<QAFilterService>().Should().NotBeNull();
+        sp.GetService<QAPipeline>().Should().NotBeNull();
     }
 
     [Fact]
@@ -94,14 +101,16 @@ public sealed class ServiceCollectionExtensionsTests
 
         // Act
         services.AddFluxImprover(_ => completionService);
-        var provider = services.BuildServiceProvider();
+        using var provider = services.BuildServiceProvider();
 
         // Assert
-        provider.GetService<QuestionSuggestionService>().Should().NotBeNull();
-        provider.GetService<IChunkFilteringService>().Should().NotBeNull();
-        provider.GetService<IQueryPreprocessingService>().Should().NotBeNull();
-        provider.GetService<IContextualEnrichmentService>().Should().NotBeNull();
-        provider.GetService<IChunkRelationshipService>().Should().NotBeNull();
+        using var scope = provider.CreateScope();
+        var sp = scope.ServiceProvider;
+        sp.GetService<QuestionSuggestionService>().Should().NotBeNull();
+        sp.GetService<IChunkFilteringService>().Should().NotBeNull();
+        sp.GetService<IQueryPreprocessingService>().Should().NotBeNull();
+        sp.GetService<IContextualEnrichmentService>().Should().NotBeNull();
+        sp.GetService<IChunkRelationshipService>().Should().NotBeNull();
     }
 
     [Fact]
@@ -113,11 +122,13 @@ public sealed class ServiceCollectionExtensionsTests
 
         // Act
         services.AddFluxImprover(_ => completionService);
-        var provider = services.BuildServiceProvider();
+        using var provider = services.BuildServiceProvider();
 
-        // Assert - Services should come from the same FluxImproverServices instance
-        var fluxServices = provider.GetRequiredService<FluxImproverServices>();
-        var summarization = provider.GetRequiredService<SummarizationService>();
+        // Assert - Services should come from the same FluxImproverServices instance within a scope
+        using var scope = provider.CreateScope();
+        var sp = scope.ServiceProvider;
+        var fluxServices = sp.GetRequiredService<FluxImproverServices>();
+        var summarization = sp.GetRequiredService<SummarizationService>();
 
         summarization.Should().BeSameAs(fluxServices.Summarization);
     }
@@ -145,10 +156,11 @@ public sealed class ServiceCollectionExtensionsTests
 
         // Act
         services.AddFluxImprover();
-        var provider = services.BuildServiceProvider();
+        using var provider = services.BuildServiceProvider();
 
         // Assert
-        var fluxServices = provider.GetService<FluxImproverServices>();
+        using var scope = provider.CreateScope();
+        var fluxServices = scope.ServiceProvider.GetService<FluxImproverServices>();
         fluxServices.Should().NotBeNull();
     }
 
@@ -158,10 +170,11 @@ public sealed class ServiceCollectionExtensionsTests
         // Arrange
         var services = new ServiceCollection();
         services.AddFluxImprover();
-        var provider = services.BuildServiceProvider();
+        using var provider = services.BuildServiceProvider();
 
         // Act
-        var act = () => provider.GetRequiredService<FluxImproverServices>();
+        using var scope = provider.CreateScope();
+        var act = () => scope.ServiceProvider.GetRequiredService<FluxImproverServices>();
 
         // Assert
         act.Should().Throw<InvalidOperationException>();
@@ -178,10 +191,11 @@ public sealed class ServiceCollectionExtensionsTests
         // Act
         services.AddFluxImprover(_ => completionService1);
         services.AddFluxImprover(_ => completionService2); // Should be ignored (TryAdd)
-        var provider = services.BuildServiceProvider();
+        using var provider = services.BuildServiceProvider();
 
         // Assert
-        var fluxServices = provider.GetRequiredService<FluxImproverServices>();
+        using var scope = provider.CreateScope();
+        var fluxServices = scope.ServiceProvider.GetRequiredService<FluxImproverServices>();
         fluxServices.Should().NotBeNull();
     }
 
@@ -200,7 +214,7 @@ public sealed class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddFluxImprover_ServicesAreSingleton()
+    public void AddFluxImprover_DefaultLifetime_IsScoped()
     {
         // Arrange
         var services = new ServiceCollection();
@@ -208,11 +222,152 @@ public sealed class ServiceCollectionExtensionsTests
 
         // Act
         services.AddFluxImprover(_ => completionService);
-        var provider = services.BuildServiceProvider();
+        using var provider = services.BuildServiceProvider();
 
-        // Assert - Same instance should be returned
-        var services1 = provider.GetRequiredService<FluxImproverServices>();
-        var services2 = provider.GetRequiredService<FluxImproverServices>();
+        // Assert - Different scopes should get different instances
+        using var scope1 = provider.CreateScope();
+        using var scope2 = provider.CreateScope();
+        var services1 = scope1.ServiceProvider.GetRequiredService<FluxImproverServices>();
+        var services2 = scope2.ServiceProvider.GetRequiredService<FluxImproverServices>();
+        services1.Should().NotBeSameAs(services2);
+    }
+
+    [Fact]
+    public void AddFluxImprover_WithinSameScope_ReturnsSameInstance()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        var completionService = Substitute.For<ITextGenerationService>();
+
+        // Act
+        services.AddFluxImprover(_ => completionService);
+        using var provider = services.BuildServiceProvider();
+
+        // Assert - Same scope should return same instance
+        using var scope = provider.CreateScope();
+        var services1 = scope.ServiceProvider.GetRequiredService<FluxImproverServices>();
+        var services2 = scope.ServiceProvider.GetRequiredService<FluxImproverServices>();
         services1.Should().BeSameAs(services2);
+    }
+
+    [Fact]
+    public void AddFluxImprover_WithSingletonLifetime_ReturnsSameInstanceAcrossScopes()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        var completionService = Substitute.For<ITextGenerationService>();
+
+        // Act
+        services.AddFluxImprover(_ => completionService, ServiceLifetime.Singleton);
+        using var provider = services.BuildServiceProvider();
+
+        // Assert
+        using var scope1 = provider.CreateScope();
+        using var scope2 = provider.CreateScope();
+        var services1 = scope1.ServiceProvider.GetRequiredService<FluxImproverServices>();
+        var services2 = scope2.ServiceProvider.GetRequiredService<FluxImproverServices>();
+        services1.Should().BeSameAs(services2);
+    }
+
+    [Fact]
+    public void AddFluxImprover_Scoped_ResolvesFromServiceScopeFactory()
+    {
+        // Arrange — simulates the real-world pattern:
+        // Singleton tool class uses IServiceScopeFactory to create per-request scopes
+        var services = new ServiceCollection();
+        var completionService = Substitute.For<ITextGenerationService>();
+        services.AddFluxImprover(_ => completionService);
+
+        using var provider = services.BuildServiceProvider(
+            new ServiceProviderOptions { ValidateScopes = true });
+
+        // Act — resolve from a manually created scope (as Singleton tools do)
+        using var scope = provider.GetRequiredService<IServiceScopeFactory>().CreateScope();
+        var queryPreprocessing = scope.ServiceProvider.GetService<IQueryPreprocessingService>();
+        var chunkFiltering = scope.ServiceProvider.GetService<IChunkFilteringService>();
+        var fluxServices = scope.ServiceProvider.GetService<FluxImproverServices>();
+
+        // Assert
+        queryPreprocessing.Should().NotBeNull();
+        chunkFiltering.Should().NotBeNull();
+        fluxServices.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void AddFluxImprover_Scoped_WithValidateScopes_DoesNotThrow()
+    {
+        // Arrange — ASP.NET Core Development environment enables ValidateScopes
+        var services = new ServiceCollection();
+        var completionService = Substitute.For<ITextGenerationService>();
+        services.AddFluxImprover(_ => completionService);
+
+        // Act — build with scope validation (as ASP.NET Core does in Development)
+        using var provider = services.BuildServiceProvider(
+            new ServiceProviderOptions { ValidateScopes = true });
+
+        // Assert — all services should resolve without scope validation errors
+        using var scope = provider.CreateScope();
+        var sp = scope.ServiceProvider;
+
+        var resolve = () =>
+        {
+            _ = sp.GetRequiredService<FluxImproverServices>();
+            _ = sp.GetRequiredService<SummarizationService>();
+            _ = sp.GetRequiredService<ISummarizationService>();
+            _ = sp.GetRequiredService<KeywordExtractionService>();
+            _ = sp.GetRequiredService<IKeywordExtractionService>();
+            _ = sp.GetRequiredService<ChunkEnrichmentService>();
+            _ = sp.GetRequiredService<FaithfulnessEvaluator>();
+            _ = sp.GetRequiredService<RelevancyEvaluator>();
+            _ = sp.GetRequiredService<AnswerabilityEvaluator>();
+            _ = sp.GetRequiredService<QAGeneratorService>();
+            _ = sp.GetRequiredService<QAFilterService>();
+            _ = sp.GetRequiredService<QAPipeline>();
+            _ = sp.GetRequiredService<QuestionSuggestionService>();
+            _ = sp.GetRequiredService<IChunkFilteringService>();
+            _ = sp.GetRequiredService<IQueryPreprocessingService>();
+            _ = sp.GetRequiredService<IContextualEnrichmentService>();
+            _ = sp.GetRequiredService<IChunkRelationshipService>();
+        };
+
+        resolve.Should().NotThrow();
+    }
+
+    [Fact]
+    public void AddFluxImprover_Scoped_CannotResolveFromRootWithValidateScopes()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        var completionService = Substitute.For<ITextGenerationService>();
+        services.AddFluxImprover(_ => completionService);
+
+        using var provider = services.BuildServiceProvider(
+            new ServiceProviderOptions { ValidateScopes = true });
+
+        // Act — resolving scoped service from root provider should throw
+        var act = () => provider.GetRequiredService<FluxImproverServices>();
+
+        // Assert
+        act.Should().Throw<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void AddFluxImprover_ParameterlessOverload_DefaultsToScoped()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        var completionService = Substitute.For<ITextGenerationService>();
+        services.AddSingleton(completionService);
+
+        // Act
+        services.AddFluxImprover();
+        using var provider = services.BuildServiceProvider();
+
+        // Assert — different scopes, different instances
+        using var scope1 = provider.CreateScope();
+        using var scope2 = provider.CreateScope();
+        var s1 = scope1.ServiceProvider.GetRequiredService<FluxImproverServices>();
+        var s2 = scope2.ServiceProvider.GetRequiredService<FluxImproverServices>();
+        s1.Should().NotBeSameAs(s2);
     }
 }

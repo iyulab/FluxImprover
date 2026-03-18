@@ -100,12 +100,19 @@ Or use dependency injection:
 // Register your ITextCompletionService
 services.AddSingleton<ITextCompletionService, OpenAICompletionService>();
 
-// Add FluxImprover services
+// Add FluxImprover services (default: Scoped lifetime)
 services.AddFluxImprover();
 
 // Or with factory
 services.AddFluxImprover(sp => new OpenAICompletionService(apiKey));
+
+// Use Singleton lifetime when all dependencies are also singletons
+services.AddFluxImprover(_ => new OpenAICompletionService(apiKey), ServiceLifetime.Singleton);
 ```
+
+> **Service Lifetime**: All FluxImprover services default to `Scoped`, which is compatible with
+> the standard ASP.NET Core `IServiceScopeFactory.CreateScope()` pattern used by singleton tool classes.
+> Use `ServiceLifetime.Singleton` only when the `ITextGenerationService` and all its dependencies are also singletons.
 
 ### 3. Enrich Chunks
 

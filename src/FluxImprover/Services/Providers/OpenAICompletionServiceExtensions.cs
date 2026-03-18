@@ -15,17 +15,21 @@ public static class OpenAICompletionServiceExtensions
     /// <param name="endpoint">Base API URL (e.g., "https://api.openai.com/v1").</param>
     /// <param name="apiKey">API key for authentication. Pass null for endpoints that don't require authentication.</param>
     /// <param name="model">Model name (e.g., "gpt-4o-mini").</param>
+    /// <param name="lifetime">
+    /// The service lifetime for all FluxImprover services. Defaults to <see cref="ServiceLifetime.Scoped"/>.
+    /// </param>
     /// <returns>The service collection for chaining.</returns>
     public static IServiceCollection AddFluxImproverWithOpenAI(
         this IServiceCollection services,
         string endpoint,
         string? apiKey,
-        string model)
+        string model,
+        ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
         return services.AddFluxImprover(sp =>
         {
             var logger = sp.GetRequiredService<ILogger<OpenAICompatibleCompletionService>>();
             return new OpenAICompatibleCompletionService(endpoint, apiKey, model, logger);
-        });
+        }, lifetime);
     }
 }
