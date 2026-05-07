@@ -114,6 +114,15 @@ services.AddFluxImprover(_ => new OpenAICompletionService(apiKey), ServiceLifeti
 > the standard ASP.NET Core `IServiceScopeFactory.CreateScope()` pattern used by singleton tool classes.
 > Use `ServiceLifetime.Singleton` only when the `ITextGenerationService` and all its dependencies are also singletons.
 
+> **Breaking Change (Scoped default)**: Prior to this change, `AddFluxImprover()` registered all services as
+> `Singleton`. Services are now `Scoped` by default. Consumers that resolve FluxImprover services
+> directly from the root provider (e.g. `app.Services.GetRequiredService<...>()`) must either:
+> - Wrap the call in a scope: `using var scope = services.CreateScope(); scope.ServiceProvider.GetRequiredService<...>()`
+> - Or opt back into Singleton explicitly: `services.AddFluxImprover(_ => ..., ServiceLifetime.Singleton)`
+>
+> **Note**: `ServiceLifetime.Singleton` is safe only when the underlying `ITextGenerationService`
+> and all its transitive dependencies are also singletons.
+
 ### 3. Enrich Chunks
 
 Add summaries and keywords to your document chunks:

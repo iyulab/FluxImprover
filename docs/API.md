@@ -697,13 +697,26 @@ public sealed record ChatMessage
 ### Registration Methods
 
 ```csharp
-// With factory
+// With factory (default: Scoped lifetime)
 services.AddFluxImprover(sp => new OpenAICompletionService(apiKey));
 
-// With pre-registered ITextCompletionService
-services.AddSingleton<ITextCompletionService, OpenAICompletionService>();
+// With factory, explicit Singleton lifetime
+services.AddFluxImprover(_ => new OpenAICompletionService(apiKey), ServiceLifetime.Singleton);
+
+// With pre-registered ITextGenerationService (default: Scoped lifetime)
+services.AddSingleton<ITextGenerationService, OpenAICompletionService>();
 services.AddFluxImprover();
+
+// With pre-registered service, explicit Singleton lifetime
+services.AddFluxImprover(ServiceLifetime.Singleton);
 ```
+
+All FluxImprover services are registered with `Scoped` lifetime by default, compatible with the
+standard ASP.NET Core `IServiceScopeFactory.CreateScope()` pattern.
+
+> **Breaking Change**: Prior to this change, all services were registered as `Singleton`.
+> Consumers resolving FluxImprover services from the **root provider** must now either create a
+> scope or opt into Singleton explicitly (safe only when all dependencies are also singletons).
 
 ---
 
@@ -720,4 +733,4 @@ All services may throw the following exceptions:
 ---
 
 *API Reference for FluxImprover v0.6.0*
-*Last updated: 2025-01-19*
+*Last updated: 2026-05-07*
