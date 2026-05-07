@@ -17,7 +17,7 @@ public class LogLanguageConventionTests
     public static IEnumerable<object[]> FluxImproverAssemblyTypes()
     {
         var assembly = typeof(OpenAICompatibleCompletionService).Assembly;
-        foreach (var type in SafeGetTypes(assembly).Where(t => !t.IsCompilerGenerated()))
+        foreach (var type in SafeGetTypes(assembly).Where(t => t is not null && !t.IsCompilerGenerated()))
         {
             yield return new object[] { type };
         }
@@ -26,7 +26,7 @@ public class LogLanguageConventionTests
     public static IEnumerable<object[]> FluxImproverLMSupplyAssemblyTypes()
     {
         var assembly = typeof(LMSupplyCompletionService).Assembly;
-        foreach (var type in SafeGetTypes(assembly).Where(t => !t.IsCompilerGenerated()))
+        foreach (var type in SafeGetTypes(assembly).Where(t => t is not null && !t.IsCompilerGenerated()))
         {
             yield return new object[] { type };
         }
