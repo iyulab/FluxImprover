@@ -15,7 +15,8 @@ RAG system performance directly depends on data quality. FluxImprover acts as a 
   - `Microsoft.Extensions.DependencyInjection.Abstractions`
   - `Microsoft.Extensions.Options`
   - `Polly.Core` (for resilience)
-- No LLM SDK dependencies - consumers provide their own `ITextCompletionService` implementation
+- No LLM SDK dependencies in the core package — consumers implement `ITextGenerationService` or use the built-in providers
+- The optional `FluxImprover.LMSupply` adapter package carries an `LMSupply.Generator` dependency for offline local model support
 
 ### Self-Contained
 - All prompt templates embedded as resources
@@ -68,9 +69,9 @@ RAG system performance directly depends on data quality. FluxImprover acts as a 
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                  Consumer Application                    │
-│         (OpenAI, Azure AI, Anthropic, etc.)             │
+│  (OpenAI, Azure AI, Ollama, LMSupply local, custom...)  │
 └─────────────────────────┬───────────────────────────────┘
-                          │ ITextCompletionService
+                          │ ITextGenerationService
 ┌─────────────────────────▼───────────────────────────────┐
 │                    FluxImprover                          │
 │  ┌────────────┬────────────┬────────────┬────────────┐  │
@@ -97,10 +98,13 @@ FluxImprover/
 │       ├── ServiceCollectionExtensions.cs  # DI extensions
 │       │
 │       ├── Services/                       # Core abstractions
-│       │   ├── ITextCompletionService.cs
+│       │   ├── ITextGenerationService.cs
 │       │   ├── IEmbeddingService.cs
 │       │   ├── IRerankService.cs
-│       │   └── ITokenizer.cs
+│       │   ├── ITokenizer.cs
+│       │   └── Providers/
+│       │       ├── OpenAICompatibleCompletionService.cs
+│       │       └── OpenAICompletionServiceExtensions.cs
 │       │
 │       ├── Models/                         # Domain models
 │       │   ├── Chunk.cs
@@ -161,6 +165,12 @@ FluxImprover/
 │           ├── JsonHelpers.cs
 │           └── StringExtensions.cs
 │
+├── src/
+│   └── FluxImprover.LMSupply/               # Optional LMSupply adapter package
+│       ├── FluxImprover.LMSupply.csproj
+│       ├── LMSupplyCompletionService.cs
+│       └── LMSupplyCompletionServiceExtensions.cs
+│
 ├── tests/
 │   └── FluxImprover.Tests/
 │
@@ -176,10 +186,12 @@ FluxImprover/
 
 ## 4. Core Interface
 
-### ITextCompletionService (Consumer Implements)
+### ITextGenerationService
+
+The core abstraction. Built-in implementations are `OpenAICompatibleCompletionService` (core package) and `LMSupplyCompletionService` (`FluxImprover.LMSupply` package). Consumers can also provide their own implementation.
 
 ```csharp
-public interface ITextCompletionService
+public interface ITextGenerationService
 {
     Task<string> CompleteAsync(
         string prompt,
@@ -320,11 +332,20 @@ var score = await services.Faithfulness.EvaluateAsync(context, answer);
 ### Dependency Injection
 
 ```csharp
-// Register
-services.AddSingleton<ITextCompletionService, MyCompletionService>();
+// Option A: built-in OpenAI-compatible provider
+services.AddFluxImproverWithOpenAI(
+    endpoint: "https://api.openai.com/v1",
+    apiKey: "<key>",
+    model: "gpt-4o-mini");
+
+// Option B: built-in LMSupply local provider (FluxImprover.LMSupply package)
+services.AddFluxImproverWithLMSupply();
+
+// Option C: custom ITextGenerationService implementation
+services.AddSingleton<ITextGenerationService, MyCompletionService>();
 services.AddFluxImprover();
 
-// Inject
+// Inject individual services
 public class MyService(ChunkEnrichmentService enrichment)
 {
     public Task ProcessAsync(Chunk chunk)
@@ -345,10 +366,12 @@ public class MyService(ChunkEnrichmentService enrichment)
 </ItemGroup>
 ```
 
-### Not Allowed
-- LLM SDK packages (OpenAI, Azure.AI, etc.)
+### Not Allowed (core package)
+- LLM SDK packages (OpenAI, Azure.AI, etc.) — the core package stays SDK-free
 - JSON libraries (use System.Text.Json)
 - Any other external NuGet packages
+
+The optional `FluxImprover.LMSupply` adapter package is an exception: it intentionally carries an `LMSupply.Generator` dependency to enable offline local model support.
 
 ---
 
@@ -361,7 +384,10 @@ public class MyService(ChunkEnrichmentService enrichment)
 | 0.3.0 | Added chunk filtering and query preprocessing |
 | 0.4.0 | Added contextual enrichment and relationships |
 | 0.5.0 | Added built-in LMSupply integration |
-| 0.6.0 | Removed LMSupply dependency - pure abstraction model |
+| 0.6.0 | Removed LMSupply dependency — pure abstraction model |
+| 0.7.1 | **Breaking**: renamed `ITextCompletionService` → `ITextGenerationService` |
+| 0.8.0 | Added built-in `OpenAICompatibleCompletionService` + `FluxImprover.LMSupply` adapter package; **Breaking**: DI default lifetime changed from Singleton to Scoped |
+| 0.9.0 | NuGet package updates and dependency maintenance |
 
 ---
 

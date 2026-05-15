@@ -32,7 +32,7 @@ Entry point for configuring and creating all FluxImprover services.
 ```csharp
 public class FluxImproverBuilder
 {
-    public FluxImproverBuilder WithCompletionService(ITextCompletionService service);
+    public FluxImproverBuilder WithCompletionService(ITextGenerationService service);
     public FluxImproverServices Build();
 }
 ```
@@ -647,12 +647,12 @@ public sealed record QueryPreprocessingOptions
 
 ## Interfaces
 
-### ITextCompletionService
+### ITextGenerationService
 
-The core interface you must implement to connect FluxImprover to your LLM provider.
+The core interface for LLM text generation. Built-in implementations are `OpenAICompatibleCompletionService` (core package, registered via `AddFluxImproverWithOpenAI`) and `LMSupplyCompletionService` (`FluxImprover.LMSupply` package, registered via `AddFluxImproverWithLMSupply`). Custom providers can implement this interface directly.
 
 ```csharp
-public interface ITextCompletionService
+public interface ITextGenerationService
 {
     Task<string> CompleteAsync(
         string prompt,

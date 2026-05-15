@@ -23,7 +23,7 @@ It acts as the **quality assurance and value-add layer**, leveraging Large Langu
 * **QA Pair Generation**: Automatically generates **Golden QA datasets** from document chunks for RAG benchmarking
 * **Quality Assessment**: Provides **Faithfulness**, **Relevancy**, and **Answerability** evaluators
 * **Question Suggestion**: Generates contextual follow-up questions from content or conversations
-* **Decoupled Design**: Works with any LLM through the `ITextCompletionService` abstraction
+* **Decoupled Design**: Works with any LLM through the `ITextGenerationService` abstraction
 
 ---
 
@@ -35,95 +35,93 @@ Install the main package via NuGet:
 dotnet add package FluxImprover
 ```
 
+For the built-in OpenAI-compatible provider (OpenAI, Azure OpenAI, Ollama, etc.), no additional package is required — it ships with the core package.
+
+For the built-in local model provider using LMSupply:
+
+```bash
+dotnet add package FluxImprover.LMSupply
+```
+
 ---
 
 ## Quick Start
 
-### 1. Implement ITextCompletionService
+### 1. Configure and Build Services
 
-FluxImprover requires an `ITextCompletionService` implementation to connect to your LLM provider (OpenAI, Azure, Anthropic, local models, etc.):
+FluxImprover ships with two built-in providers. Choose the one that matches your setup.
 
-```csharp
-public class OpenAICompletionService : ITextCompletionService
-{
-    private readonly HttpClient _httpClient;
-    private readonly string _model;
-
-    public OpenAICompletionService(string apiKey, string model = "gpt-4o-mini")
-    {
-        _model = model;
-        _httpClient = new HttpClient
-        {
-            BaseAddress = new Uri("https://api.openai.com/v1/")
-        };
-        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
-    }
-
-    public async Task<string> CompleteAsync(
-        string prompt,
-        CompletionOptions? options = null,
-        CancellationToken cancellationToken = default)
-    {
-        // Your OpenAI API implementation
-    }
-
-    public async IAsyncEnumerable<string> CompleteStreamingAsync(
-        string prompt,
-        CompletionOptions? options = null,
-        CancellationToken cancellationToken = default)
-    {
-        // Your streaming implementation
-    }
-}
-```
-
-### 2. Configure and Build Services
-
-Use the `FluxImproverBuilder` to create all services:
+#### Option A: OpenAI-compatible API (OpenAI, Azure OpenAI, Ollama, etc.)
 
 ```csharp
-using FluxImprover;
-using FluxImprover.Services;
+// Using dependency injection (ASP.NET Core, Worker Service, etc.)
+services.AddFluxImproverWithOpenAI(
+    endpoint: "https://api.openai.com/v1",
+    apiKey: "<your-key>",
+    model: "gpt-4o-mini");
 
-// Create your ITextCompletionService implementation
-ITextCompletionService completionService = new OpenAICompletionService(apiKey);
+// Or using the builder pattern (no DI container required)
+using var completionService = new OpenAICompatibleCompletionService(
+    endpoint: "https://api.openai.com/v1",
+    apiKey: "<your-key>",
+    model: "gpt-4o-mini",
+    logger: loggerFactory.CreateLogger<OpenAICompatibleCompletionService>());
 
-// Build FluxImprover services
 var services = new FluxImproverBuilder()
     .WithCompletionService(completionService)
     .Build();
 ```
 
-Or use dependency injection:
+`AddFluxImproverWithOpenAI` is defined in `FluxImprover.Services.Providers` and is included in the core `FluxImprover` package. It works with any OpenAI-compatible endpoint (Ollama, Azure OpenAI, Fireworks, etc.) by adjusting the `endpoint` parameter.
+
+#### Option B: Local model via LMSupply (offline, GGUF/ONNX)
+
+Requires `dotnet add package FluxImprover.LMSupply`.
 
 ```csharp
-// Register your ITextCompletionService
-services.AddSingleton<ITextCompletionService, OpenAICompletionService>();
+// Assuming IGeneratorModel is registered by LMSupply
+services.AddFluxImproverWithLMSupply(
+    modelFactory: sp => sp.GetRequiredService<IGeneratorModel>(),
+    defaultTemperature: 0.3f,
+    defaultMaxTokens: 512);
 
-// Add FluxImprover services (default: Scoped lifetime)
-services.AddFluxImprover();
-
-// Or with factory
-services.AddFluxImprover(sp => new OpenAICompletionService(apiKey));
-
-// Use Singleton lifetime when all dependencies are also singletons
-services.AddFluxImprover(_ => new OpenAICompletionService(apiKey), ServiceLifetime.Singleton);
+// Shorthand when IGeneratorModel is already in the container
+services.AddFluxImproverWithLMSupply();
 ```
 
-> **Service Lifetime**: All FluxImprover services default to `Scoped`, which is compatible with
-> the standard ASP.NET Core `IServiceScopeFactory.CreateScope()` pattern used by singleton tool classes.
-> Use `ServiceLifetime.Singleton` only when the `ITextGenerationService` and all its dependencies are also singletons.
+#### Option C: Custom ITextGenerationService
 
-> **Breaking Change (Scoped default)**: Prior to this change, `AddFluxImprover()` registered all services as
+For any other provider, implement `ITextGenerationService` and register it:
+
+```csharp
+// Register your own implementation
+services.AddSingleton<ITextGenerationService, MyCompletionService>();
+
+// Then add FluxImprover (resolves ITextGenerationService from the container)
+services.AddFluxImprover();
+
+// Or pass a factory directly
+services.AddFluxImprover(sp => new MyCompletionService(sp.GetRequiredService<...>()));
+```
+
+#### Service Lifetime
+
+All FluxImprover services default to `Scoped`, compatible with the standard ASP.NET Core
+`IServiceScopeFactory.CreateScope()` pattern. Use `ServiceLifetime.Singleton` only when the
+`ITextGenerationService` and all its dependencies are also singletons:
+
+```csharp
+services.AddFluxImproverWithOpenAI(endpoint, apiKey, model, ServiceLifetime.Singleton);
+services.AddFluxImprover(_ => new MyCompletionService(apiKey), ServiceLifetime.Singleton);
+```
+
+> **Breaking Change (v0.8.0 — Scoped default)**: Prior to v0.8.0, `AddFluxImprover()` registered all services as
 > `Singleton`. Services are now `Scoped` by default. Consumers that resolve FluxImprover services
 > directly from the root provider (e.g. `app.Services.GetRequiredService<...>()`) must either:
 > - Wrap the call in a scope: `using var scope = services.CreateScope(); scope.ServiceProvider.GetRequiredService<...>()`
 > - Or opt back into Singleton explicitly: `services.AddFluxImprover(_ => ..., ServiceLifetime.Singleton)`
->
-> **Note**: `ServiceLifetime.Singleton` is safe only when the underlying `ITextGenerationService`
-> and all its transitive dependencies are also singletons.
 
-### 3. Enrich Chunks
+### 2. Enrich Chunks
 
 Add summaries and keywords to your document chunks:
 
@@ -143,7 +141,7 @@ Console.WriteLine($"Summary: {enrichedChunk.Summary}");
 Console.WriteLine($"Keywords: {string.Join(", ", enrichedChunk.Keywords ?? [])}");
 ```
 
-### 4. Generate QA Pairs
+### 3. Generate QA Pairs
 
 Create question-answer pairs for RAG testing:
 
@@ -167,7 +165,7 @@ foreach (var qa in qaPairs)
 }
 ```
 
-### 5. Evaluate Quality
+### 4. Evaluate Quality
 
 Assess answer quality with multiple metrics:
 
@@ -196,7 +194,7 @@ foreach (var detail in faithfulness.Details)
 }
 ```
 
-### 6. Filter QA Pairs by Quality
+### 5. Filter QA Pairs by Quality
 
 Use the QA Pipeline to generate and automatically filter low-quality pairs:
 
@@ -229,7 +227,7 @@ var allQAPairs = results.SelectMany(r => r.QAPairs).ToList();
 Console.WriteLine($"Generated: {totalGenerated}, Passed Filter: {totalFiltered}");
 ```
 
-### 7. Filter Chunks with 3-Stage Assessment
+### 6. Filter Chunks with 3-Stage Assessment
 
 Use intelligent chunk filtering with self-reflection and critic validation:
 
@@ -265,7 +263,7 @@ The 3-stage assessment process:
 2. **Self-Reflection**: LLM reviews its initial assessment for consistency
 3. **Critic Validation**: Independent LLM evaluation validates the assessment
 
-### 8. Preprocess Queries for Better Retrieval
+### 7. Preprocess Queries for Better Retrieval
 
 Optimize queries before RAG retrieval with normalization, synonym expansion, and intent classification:
 
@@ -300,7 +298,7 @@ Features:
 - **Entity Extraction**: Identifies file names, class names, method names in queries
 - **Search Strategy**: Recommends optimal search strategy (Semantic, Keyword, Hybrid, MultiQuery)
 
-### 9. Suggest Follow-up Questions
+### 8. Suggest Follow-up Questions
 
 Generate contextual questions from content or conversations:
 
@@ -384,12 +382,12 @@ var enriched = await services.ChunkEnrichment.EnrichAsync(chunk);
 
 ---
 
-## ITextCompletionService Interface
+## ITextGenerationService Interface
 
-FluxImprover requires an implementation of `ITextCompletionService` to communicate with LLMs:
+FluxImprover's core abstraction is `ITextGenerationService`. The built-in providers implement this interface. To use a custom LLM provider, implement this interface and register it with the DI container (see Quick Start Option C).
 
 ```csharp
-public interface ITextCompletionService
+public interface ITextGenerationService
 {
     Task<string> CompleteAsync(
         string prompt,
@@ -406,7 +404,7 @@ public interface ITextCompletionService
 ### CompletionOptions
 
 ```csharp
-public record CompletionOptions
+public sealed record CompletionOptions
 {
     public string? SystemPrompt { get; init; }
     public float? Temperature { get; init; }
@@ -425,10 +423,11 @@ public record CompletionOptions
 ┌─────────────────────────────────────────────────────────────────────┐
 │                       FluxImproverBuilder                           │
 │  ┌─────────────────────────────────────────────────────────────────┐│
-│  │               ITextCompletionService                             ││
-│  │        (Provided by consumer application)                        ││
+│  │               ITextGenerationService                             ││
+│  │   (Built-in: OpenAICompatibleCompletionService,                  ││
+│  │    LMSupplyCompletionService — or custom implementation)         ││
 │  │   ┌────────────────────────────────────────────────────────┐    ││
-│  │   │  OpenAI, Azure, Anthropic, Local Models, etc.          │    ││
+│  │   │  OpenAI, Azure, Ollama, LMSupply local models, etc.    │    ││
 │  │   └────────────────────────────────────────────────────────┘    ││
 │  └─────────────────────────────────────────────────────────────────┘│
 │         │                    │                    │                 │
