@@ -48,8 +48,8 @@ public sealed class ChunkEnrichmentServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.Id.Should().Be("chunk-1");
-        result.Text.Should().Be(chunk.Content);
+        result.ChunkId.Should().Be("chunk-1");
+        result.Content.Should().Be(chunk.Content);
         result.Summary.Should().Be("Test summary");
         result.Keywords.Should().Contain("test");
     }
@@ -311,17 +311,17 @@ public sealed class ChunkEnrichmentServiceTests
         {
             new()
             {
-                Id = "1", Text = "Text1", SourceId = "1", Summary = "Summary",
+                ChunkId = "1", Content = "Text1", SourceId = "1", Summary = "Summary",
                 Metadata = new Dictionary<string, object> { [EnrichmentMetadataKeys.WasSkipped] = false }
             },
             new()
             {
-                Id = "2", Text = "Text2", SourceId = "2", Summary = null,
+                ChunkId = "2", Content = "Text2", SourceId = "2", Summary = null,
                 Metadata = new Dictionary<string, object> { [EnrichmentMetadataKeys.WasSkipped] = true }
             },
             new()
             {
-                Id = "3", Text = "Text3", SourceId = "3", Summary = "Summary", Keywords = ["a", "b"],
+                ChunkId = "3", Content = "Text3", SourceId = "3", Summary = "Summary", Keywords = ["a", "b"],
                 Metadata = new Dictionary<string, object> { [EnrichmentMetadataKeys.WasSkipped] = false }
             }
         };
@@ -410,8 +410,8 @@ public sealed class ChunkEnrichmentServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.Id.Should().Be("korean-chunk-1");
-        result.Text.Should().Contain("ClusterPlex");
+        result.ChunkId.Should().Be("korean-chunk-1");
+        result.Content.Should().Contain("ClusterPlex");
         result.Summary.Should().Be(expectedSummary);
         result.Keywords.Should().Contain("ClusterPlex");
         result.Keywords.Should().Contain("고가용성");

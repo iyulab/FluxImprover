@@ -1,70 +1,74 @@
-﻿namespace FluxImprover.Models;
+namespace FluxImprover.Models;
 
 /// <summary>
-/// 강화된 청크 인터페이스.
-/// FileFlux/WebFlux의 청크와 호환되는 공통 인터페이스.
+/// LLM-enriched chunk implementation. Implements <see cref="ILlmEnrichedChunk"/>
+/// which extends <see cref="Flux.Abstractions.IEnrichedChunk"/> with LLM-generated metadata.
 /// </summary>
-public interface IEnrichedChunk
+public sealed record EnrichedChunk : ILlmEnrichedChunk
 {
-    /// <summary>
-    /// 청크 고유 식별자
-    /// </summary>
-    string Id { get; }
+    /// <summary>Unique chunk identifier.</summary>
+    public required string ChunkId { get; init; }
 
-    /// <summary>
-    /// 청크 텍스트 내용
-    /// </summary>
-    string Text { get; }
+    /// <summary>Chunk content text.</summary>
+    public required string Content { get; init; }
 
-    /// <summary>
-    /// 원본 문서 식별자
-    /// </summary>
-    string SourceId { get; }
-
-    /// <summary>
-    /// 문서 구조 경로 (예: "Chapter 1 > Section 1.1")
-    /// </summary>
-    string? HeadingPath { get; }
-
-    /// <summary>
-    /// LLM 생성 요약
-    /// </summary>
-    string? Summary { get; }
-
-    /// <summary>
-    /// 추출된 키워드 목록
-    /// </summary>
-    IReadOnlyList<string>? Keywords { get; }
-
-    /// <summary>
-    /// 추가 메타데이터
-    /// </summary>
-    IReadOnlyDictionary<string, object>? Metadata { get; }
-}
-
-/// <summary>
-/// 강화된 청크 기본 구현
-/// </summary>
-public sealed record EnrichedChunk : IEnrichedChunk
-{
-    /// <inheritdoc />
-    public required string Id { get; init; }
-
-    /// <inheritdoc />
-    public required string Text { get; init; }
-
-    /// <inheritdoc />
+    /// <summary>Original document identifier used to build <see cref="Flux.Abstractions.IEnrichedChunk.Source"/>.</summary>
     public required string SourceId { get; init; }
 
-    /// <inheritdoc />
-    public string? HeadingPath { get; init; }
+    /// <summary>Zero-based chunk index within the document.</summary>
+    public int ChunkIndex { get; init; }
 
-    /// <inheritdoc />
+    /// <summary>Hierarchical heading path from document root.</summary>
+    public IReadOnlyList<string> HeadingPath { get; init; } = [];
+
+    /// <summary>Current section title.</summary>
+    public string? SectionTitle { get; init; }
+
+    /// <summary>Start page (1-based).</summary>
+    public int? StartPage { get; init; }
+
+    /// <summary>End page.</summary>
+    public int? EndPage { get; init; }
+
+    /// <summary>Overall chunk quality score (0.0–1.0).</summary>
+    public double Quality { get; init; }
+
+    /// <summary>Context dependency score (0.0–1.0).</summary>
+    public double ContextDependency { get; init; }
+
+    /// <summary>Estimated token count.</summary>
+    public int? TokenCount { get; init; }
+
+    // ILlmEnrichedChunk additions
+
+    /// <summary>LLM-generated summary.</summary>
     public string? Summary { get; init; }
 
-    /// <inheritdoc />
+    /// <summary>LLM-extracted keywords.</summary>
     public IReadOnlyList<string>? Keywords { get; init; }
 
-    /// <inheritdoc />
+    /// <summary>Additional enrichment metadata.</summary>
     public IReadOnlyDictionary<string, object>? Metadata { get; init; }
+
+    // Flux.Abstractions.IEnrichedChunk.Source — computed from SourceId, not serialized
+    Flux.Abstractions.ISourceMetadata Flux.Abstractions.IEnrichedChunk.Source
+        => new LlmEnrichedChunkSource { SourceId = SourceId };
+}
+
+file sealed record LlmEnrichedChunkSource : Flux.Abstractions.ISourceMetadata
+{
+    public required string SourceId { get; init; }
+    public string SourceType => "llm-enriched";
+    public string Title => SourceId;
+    public string? FilePath => null;
+    public string? Url => null;
+    public DateTime CreatedAt => default;
+    public string Language => string.Empty;
+    public double? LanguageConfidence => null;
+    public int WordCount => 0;
+    public int ChunkCount => 0;
+    public int? PageCount => null;
+    public DateTime? PublishedAt => null;
+    public string? Author => null;
+    public IReadOnlyList<string>? Keywords => null;
 }

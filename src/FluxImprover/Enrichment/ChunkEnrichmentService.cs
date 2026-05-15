@@ -220,8 +220,8 @@ public sealed class ChunkEnrichmentService
 
         return new EnrichedChunk
         {
-            Id = chunk.Id,
-            Text = chunk.Content,
+            ChunkId = chunk.Id,
+            Content = chunk.Content,
             SourceId = chunk.Id,
             Summary = summary,
             Keywords = keywords,
