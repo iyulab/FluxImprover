@@ -4,26 +4,26 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- Core Dependencies (Minimal) -->
-    <PackageVersion Include="Flux.Abstractions" Version="0.13.10" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.7" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.7" />
-    <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.7" />
+    <PackageVersion Include="Flux.Abstractions" Version="0.13.12" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.8" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.8" />
     <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.3" />
     <!-- LMSupply Integration -->
-    <PackageVersion Include="LMSupply.Generator" Version="0.32.7" />
+    <PackageVersion Include="LMSupply.Generator" Version="0.34.17" />
     <!-- Optional Dependencies -->
     <PackageVersion Include="Polly.Core" Version="8.6.6" />
     <!-- Sample/Demo Dependencies -->
-    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.7" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.7" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.7" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.8" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.8" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.8" />
     <!-- Test Dependencies -->
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.7" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.8" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
-    <PackageVersion Include="FluentAssertions" Version="8.9.0" />
+    <PackageVersion Include="FluentAssertions" Version="8.10.0" />
     <PackageVersion Include="NSubstitute" Version="5.3.0" />
-    <PackageVersion Include="coverlet.collector" Version="10.0.0" />
+    <PackageVersion Include="coverlet.collector" Version="10.0.1" />
   </ItemGroup>
 </Project>
