@@ -368,3 +368,6 @@ local-docs/
 claudedocs/
 .env.local
 .serena/
+
+# IDE language server cache
+*.lscache
