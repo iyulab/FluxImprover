@@ -66,6 +66,10 @@ jobs:
           ls -la ./nupkgs/
           version="${{ steps.version.outputs.version }}"
           missing=0
+          # Assumes PackageId matches the csproj filename, which holds in this repository (verified).
+          # If a project ever declares a differing PackageId, read it from the csproj instead — a
+          # mismatch here would report a package as missing when it was in fact produced, and a gate
+          # that cries wolf gets ignored.
           for csproj in $(grep -oP '(?<=Path=")src/[^"]+\.csproj' FluxImprover.slnx); do
             id=$(basename "$csproj" .csproj)
             if [ ! -f "./nupkgs/${id}.${version}.nupkg" ]; then
