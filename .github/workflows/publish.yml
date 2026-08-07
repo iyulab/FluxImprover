@@ -50,13 +50,30 @@ jobs:
       - name: Test
         run: dotnet test --no-build --configuration Release --verbosity normal
 
+      # Pack every packable project, not just the one named after the repository. Packing a single
+      # csproj left FluxImprover.LMSupply — packable, and in the solution since it was added — never
+      # published at any version. Nothing failed: a package that is never produced cannot fail to push.
       - name: Pack
         run: |
-          dotnet pack src/FluxImprover/FluxImprover.csproj \
+          dotnet pack FluxImprover.slnx \
             --no-build \
             --configuration Release \
             --output ./nupkgs \
             -p:PackageVersion=${{ steps.version.outputs.version }}
+
+      - name: Verify packages
+        run: |
+          ls -la ./nupkgs/
+          version="${{ steps.version.outputs.version }}"
+          missing=0
+          for csproj in $(grep -oP '(?<=Path=")src/[^"]+\.csproj' FluxImprover.slnx); do
+            id=$(basename "$csproj" .csproj)
+            if [ ! -f "./nupkgs/${id}.${version}.nupkg" ]; then
+              echo "::error::${id}.${version}.nupkg was not produced"
+              missing=1
+            fi
+          done
+          [ "$missing" -eq 0 ]
 
       - name: Push to NuGet
         run: |
