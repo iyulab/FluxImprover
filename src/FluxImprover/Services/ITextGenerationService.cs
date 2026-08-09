@@ -66,6 +66,27 @@ public sealed record CompletionOptions
     /// 응답 형식 스키마 (JSON 모드에서 사용)
     /// </summary>
     public string? ResponseSchema { get; init; }
+
+    /// <summary>
+    /// Reasoning/thinking 활성화 여부. null(기본)이면 모델 기본 동작을 따른다.
+    /// </summary>
+    public ThinkingMode? Thinking { get; init; }
+}
+
+/// <summary>
+/// Reasoning/thinking 모드. 값 순서는 <c>LMSupply.Generator.Models.ThinkingMode</c>와 관용구를
+/// 일치시킨다(어셈블리 의존은 만들지 않음) — 값 순서를 바꾸면 그 관용구가 깨진다.
+/// </summary>
+public enum ThinkingMode
+{
+    /// <summary>모델 자체 기본값 유지</summary>
+    Auto = 0,
+
+    /// <summary>강제 on</summary>
+    On = 1,
+
+    /// <summary>강제 off — 예산과 무관하게 reasoning을 요청하지 않음</summary>
+    Off = 2,
 }
 
 /// <summary>

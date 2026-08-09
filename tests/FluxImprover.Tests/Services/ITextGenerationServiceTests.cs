@@ -117,6 +117,26 @@ public class CompletionOptionsTests
         options.MaxTokens.Should().Be(500);
         options.SystemPrompt.Should().Be("Custom system prompt");
     }
+
+    [Fact]
+    public void Options_DefaultThinking_IsNull()
+    {
+        // Act
+        var options = new CompletionOptions();
+
+        // Assert
+        options.Thinking.Should().BeNull();
+    }
+
+    [Fact]
+    public void Options_WithThinkingOff_RetainsValue()
+    {
+        // Act
+        var options = new CompletionOptions { Thinking = ThinkingMode.Off };
+
+        // Assert
+        options.Thinking.Should().Be(ThinkingMode.Off);
+    }
 }
 
 public class ChatMessageTests

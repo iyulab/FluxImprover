@@ -677,8 +677,27 @@ public sealed record CompletionOptions
     public bool JsonMode { get; init; } = false;
     public string? ResponseSchema { get; init; }
     public IReadOnlyList<ChatMessage>? Messages { get; init; }
+    public ThinkingMode? Thinking { get; init; }
 }
 ```
+
+`Thinking` is a budget-independent reasoning toggle. `null` (default) means "follow the model's own
+default". Implementations of `ITextGenerationService` read this value and map it onto their backend's
+own reasoning knob — FluxImprover itself does not interpret it.
+
+### ThinkingMode
+
+```csharp
+public enum ThinkingMode
+{
+    Auto = 0, // keep the model's built-in default
+    On = 1,   // force reasoning on
+    Off = 2,  // force reasoning off, regardless of any token budget
+}
+```
+
+Value order intentionally mirrors `LMSupply.Generator.Models.ThinkingMode` (no assembly dependency —
+idiom parity only). Do not reorder the values.
 
 ### ChatMessage
 

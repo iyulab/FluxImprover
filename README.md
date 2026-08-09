@@ -412,8 +412,13 @@ public sealed record CompletionOptions
     public bool JsonMode { get; init; } = false;
     public string? ResponseSchema { get; init; }
     public IReadOnlyList<ChatMessage>? Messages { get; init; }
+    public ThinkingMode? Thinking { get; init; }
 }
 ```
+
+`Thinking` is a budget-independent reasoning toggle (`Auto` / `On` / `Off`, default `null` = follow
+the model's own default). Implementations of `ITextGenerationService` read it and map it onto their
+backend's own reasoning knob. See [docs/API.md](docs/API.md#thinkingmode) for details.
 
 ---
 
