@@ -10,7 +10,9 @@ using Xunit;
 using LMChatMessage = LMSupply.Generator.Models.ChatMessage;
 using LMChatRole = LMSupply.Generator.Models.ChatRole;
 using LMGenerationOptions = LMSupply.Generator.Models.GenerationOptions;
+using LMThinkingMode = LMSupply.Generator.Models.ThinkingMode;
 using FluxChatMessage = FluxImprover.Services.ChatMessage;
+using FluxThinkingMode = FluxImprover.Services.ThinkingMode;
 
 namespace FluxImprover.Tests.Services.Providers;
 
@@ -261,6 +263,54 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
 
         // Assert
         capturedOptions!.JsonSchema.Should().BeNull();
+    }
+
+    [Theory]
+    [InlineData(FluxThinkingMode.Auto, LMThinkingMode.Auto)]
+    [InlineData(FluxThinkingMode.On, LMThinkingMode.On)]
+    [InlineData(FluxThinkingMode.Off, LMThinkingMode.Off)]
+    public async Task CompleteAsync_WithThinking_MapsToGeneratorThinkingMode(
+        FluxThinkingMode flux, LMThinkingMode generator)
+    {
+        // Arrange
+        _model.ModelId.Returns("test-model");
+        LMGenerationOptions? capturedOptions = null;
+        _model.GenerateChatCompleteAsync(
+                Arg.Any<IEnumerable<LMChatMessage>>(),
+                Arg.Do<LMGenerationOptions>(o => capturedOptions = o),
+                Arg.Any<CancellationToken>())
+            .Returns("text");
+
+        _sut = new LMSupplyCompletionService(_model, _logger);
+
+        var options = new CompletionOptions { Thinking = flux };
+
+        // Act
+        await _sut.CompleteAsync("Test", options);
+
+        // Assert
+        capturedOptions!.Thinking.Should().Be(generator);
+    }
+
+    [Fact]
+    public async Task CompleteAsync_WithoutThinking_LeavesGeneratorDefault()
+    {
+        // Arrange
+        _model.ModelId.Returns("test-model");
+        LMGenerationOptions? capturedOptions = null;
+        _model.GenerateChatCompleteAsync(
+                Arg.Any<IEnumerable<LMChatMessage>>(),
+                Arg.Do<LMGenerationOptions>(o => capturedOptions = o),
+                Arg.Any<CancellationToken>())
+            .Returns("text");
+
+        _sut = new LMSupplyCompletionService(_model, _logger);
+
+        // Act
+        await _sut.CompleteAsync("Test", options: null);
+
+        // Assert
+        capturedOptions!.Thinking.Should().Be(LMThinkingMode.Auto);
     }
 
     #endregion

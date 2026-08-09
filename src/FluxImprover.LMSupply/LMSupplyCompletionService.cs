@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using LMChatMessage = LMSupply.Generator.Models.ChatMessage;
 using LMChatRole = LMSupply.Generator.Models.ChatRole;
 using LMGenerationOptions = LMSupply.Generator.Models.GenerationOptions;
+using LMThinkingMode = LMSupply.Generator.Models.ThinkingMode;
 
 namespace FluxImprover.LMSupply;
 
@@ -117,8 +118,27 @@ public sealed partial class LMSupplyCompletionService : ITextGenerationService, 
             genOptions.JsonSchema = options.ResponseSchema;
         }
 
+        if (options?.Thinking is { } thinking)
+        {
+            genOptions.Thinking = MapThinkingMode(thinking);
+        }
+
         return genOptions;
     }
+
+    /// <summary>
+    /// Maps FluxImprover's <see cref="ThinkingMode"/> onto LMSupply.Generator's own
+    /// <see cref="LMThinkingMode"/>. The two enums are idiom-matched (<c>Auto=0</c>/<c>On=1</c>/
+    /// <c>Off=2</c>) but kept as distinct types to avoid an assembly dependency on FluxImprover's
+    /// part, so the mapping is explicit rather than an unchecked cast.
+    /// </summary>
+    private static LMThinkingMode MapThinkingMode(ThinkingMode mode) => mode switch
+    {
+        ThinkingMode.Auto => LMThinkingMode.Auto,
+        ThinkingMode.On => LMThinkingMode.On,
+        ThinkingMode.Off => LMThinkingMode.Off,
+        _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, "Unknown ThinkingMode value.")
+    };
 
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
