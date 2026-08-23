@@ -37,5 +37,8 @@ jobs:
         run: dotnet build --no-restore --configuration Release
 
       - name: Test
-        run: dotnet test --no-build --configuration Release --verbosity normal --logger trx --results-directory ./test-results
+        # Category=Integration drives real local models via LMSupply.Generator (multi-GB download,
+        # CPU-bound inference) — excluded here the same way FileFlux/memory-indexer exclude it; run
+        # locally with `dotnet test --filter "Category=Integration"` to exercise it.
+        run: dotnet test --no-build --configuration Release --verbosity normal --logger trx --results-directory ./test-results --filter "Category!=Integration"
 
