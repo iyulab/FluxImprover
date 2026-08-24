@@ -48,44 +48,38 @@ public sealed class LMSupplyCompletionServiceRealModelTests
     }
 
     [Fact]
-    public async Task AddFluxImproverWithLMSupply_RealLocalModel_DrivesRealSummarization()
+    public async Task AddFluxImproverWithLMSupply_RealLocalModel_ContainerDisposesCompletionServiceAutomatically()
     {
-        // AddFluxImprover(Func<IServiceProvider, ITextGenerationService>, ...) does not register
-        // ITextGenerationService itself as a resolvable service — only the composed
-        // FluxImproverServices facade (and its member services, which take it via constructor
-        // injection internally). GetRequiredService<ITextGenerationService>() confirmed this by
-        // throwing on an earlier version of this test. So the real wiring proof is driving one of
-        // FluxImproverServices's member services end to end, not resolving the interface directly.
-        //
-        // Deliberate manual disposal below, NOT `await using`: FluxImproverServices is a plain
-        // record with no IAsyncDisposable, and the LMSupplyCompletionService that
-        // AddFluxImproverWithLMSupply's factory creates internally is never exposed to the
-        // container as its own tracked service (only wrapped inside the FluxImproverServices
-        // graph it returns) — so the container has no path to dispose it, and neither does a
-        // caller resolving FluxImproverServices. Confirmed empirically: `await using var
-        // provider` alone left an ONNX Runtime GenAI native handle leaked (OGA leak diagnostic on
-        // process exit) until this test disposed `model` directly. Filed as a structural finding:
-        // claudedocs/FluxImprover/issues/ISSUE-FluxImprover-20260824-030000-di-completion-service-never-disposed.md
+        // ISSUE-FluxImprover-20260824-030000, AC1+AC2, resolved in v0.11.0: AddFluxImprover now
+        // registers the completion service the factory creates as its own ITextGenerationService
+        // service, so the container tracks and disposes it (and, transitively, the
+        // LMSupplyCompletionService's underlying native model handle) without any manual cleanup
+        // by the caller — and GetRequiredService<ITextGenerationService>() resolves directly
+        // instead of throwing. Provable only against a real model: a mock can't detect a leaked
+        // ONNX Runtime GenAI native handle (OGA leak diagnostic on process exit), which is what
+        // this test's absence of that diagnostic actually proves. No manual `model.DisposeAsync()`
+        // anywhere below — that used to be required (see git history) and would now double-dispose.
         var model = await LocalGenerator.LoadAsync(ModelAlias);
-        try
+        var services = new ServiceCollection();
+        services.AddSingleton<ILogger<LMSupplyCompletionService>>(NullLogger<LMSupplyCompletionService>.Instance);
+        services.AddSingleton(model);
+        services.AddFluxImproverWithLMSupply(defaultMaxTokens: 16, lifetime: ServiceLifetime.Singleton);
+
+        await using (var provider = services.BuildServiceProvider())
         {
-            var services = new ServiceCollection();
-            services.AddSingleton<ILogger<LMSupplyCompletionService>>(NullLogger<LMSupplyCompletionService>.Instance);
-            services.AddSingleton(model);
-            services.AddFluxImproverWithLMSupply(defaultMaxTokens: 16, lifetime: ServiceLifetime.Singleton);
+            // AC2 — resolvable directly, not only reachable through FluxImproverServices's
+            // constructor-injected member services.
+            var completionService = provider.GetRequiredService<ITextGenerationService>();
+            completionService.Should().BeOfType<LMSupplyCompletionService>();
 
-            await using var provider = services.BuildServiceProvider();
             var fluxImprover = provider.GetRequiredService<FluxImproverServices>();
-
             var summary = await fluxImprover.Summarization.SummarizeAsync(
                 "Paris is the capital of France. It is well known for the Eiffel Tower and the Louvre museum.",
                 new EnrichmentOptions { MaxTokens = 16, Temperature = 0.1f });
 
             summary.Should().NotBeNullOrWhiteSpace();
         }
-        finally
-        {
-            await model.DisposeAsync();
-        }
+        // AC1 — the `await using` block above disposed the provider, which must have disposed the
+        // registered ITextGenerationService (LMSupplyCompletionService) and, through it, the model.
     }
 }

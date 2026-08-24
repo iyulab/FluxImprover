@@ -370,4 +370,89 @@ public sealed class ServiceCollectionExtensionsTests
         var s2 = scope2.ServiceProvider.GetRequiredService<FluxImproverServices>();
         s1.Should().NotBeSameAs(s2);
     }
+
+    // ISSUE-FluxImprover-20260824-030000 (AC1+AC2, resolved v0.11.0): the factory overload now
+    // registers the completion service it creates as its own ITextGenerationService service, so
+    // the container can resolve and dispose it directly — previously it existed only as a
+    // constructor-injected dependency buried inside FluxImproverServices's member services, which
+    // the container's resolution pipeline never saw.
+
+    [Fact]
+    public void AddFluxImprover_WithFactory_ITextGenerationServiceResolvesToTheSameInstanceUsedByFluxImproverServices()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        var completionService = Substitute.For<ITextGenerationService>();
+
+        // Act
+        services.AddFluxImprover(_ => completionService);
+        using var provider = services.BuildServiceProvider();
+
+        // Assert
+        using var scope = provider.CreateScope();
+        var resolved = scope.ServiceProvider.GetRequiredService<ITextGenerationService>();
+        var fluxServices = scope.ServiceProvider.GetRequiredService<FluxImproverServices>();
+
+        resolved.Should().BeSameAs(completionService);
+        fluxServices.Summarization.Should().NotBeNull();
+    }
+
+    private sealed class DisposableTextGenerationService : ITextGenerationService, IAsyncDisposable
+    {
+        public bool Disposed { get; private set; }
+
+        public Task<string> CompleteAsync(string prompt, CompletionOptions? options = null, CancellationToken cancellationToken = default)
+            => Task.FromResult(string.Empty);
+
+        public IAsyncEnumerable<string> CompleteStreamingAsync(string prompt, CompletionOptions? options = null, CancellationToken cancellationToken = default)
+            => AsyncEnumerable.Empty<string>();
+
+        public ValueTask DisposeAsync()
+        {
+            Disposed = true;
+            return ValueTask.CompletedTask;
+        }
+    }
+
+    [Fact]
+    public async Task AddFluxImprover_WithFactory_ContainerDisposesIAsyncDisposableCompletionServiceOnScopeDispose()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        var completionService = new DisposableTextGenerationService();
+        services.AddFluxImprover(_ => completionService);
+        using var provider = services.BuildServiceProvider();
+
+        // Act
+        await using (var scope = provider.CreateAsyncScope())
+        {
+            _ = scope.ServiceProvider.GetRequiredService<FluxImproverServices>();
+            completionService.Disposed.Should().BeFalse("the scope has not been disposed yet");
+        }
+
+        // Assert — disposal happened as a side effect of the scope's own disposal, with no manual
+        // cleanup by the caller (this is exactly what the container failed to do before v0.11.0).
+        completionService.Disposed.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task AddFluxImprover_WithFactory_ContainerDoesNotDisposeNonDisposableCompletionService()
+    {
+        // Arrange — most consumers' ITextGenerationService implementations are not disposable;
+        // the fix must not require IAsyncDisposable, only honor it when present.
+        var services = new ServiceCollection();
+        var completionService = Substitute.For<ITextGenerationService>();
+        services.AddFluxImprover(_ => completionService);
+        using var provider = services.BuildServiceProvider();
+
+        // Act / Assert — resolving and disposing a scope must not throw for a plain, non-disposable
+        // implementation.
+        var act = async () =>
+        {
+            await using var scope = provider.CreateAsyncScope();
+            _ = scope.ServiceProvider.GetRequiredService<FluxImproverServices>();
+        };
+
+        await act.Should().NotThrowAsync();
+    }
 }

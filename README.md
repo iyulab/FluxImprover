@@ -104,6 +104,15 @@ services.AddFluxImprover();
 services.AddFluxImprover(sp => new MyCompletionService(sp.GetRequiredService<...>()));
 ```
 
+> **Disposal (v0.11.0+)**: The factory overload (`AddFluxImprover(factory, lifetime)` and anything
+> built on it, e.g. `AddFluxImproverWithLMSupply`) registers the completion service the factory
+> creates as its own `ITextGenerationService` service in the container — not only reachable through
+> `FluxImproverServices`'s constructor-injected member services. Two consequences: `sp.GetRequiredService<ITextGenerationService>()`
+> now resolves directly, and if your implementation is `IAsyncDisposable`/`IDisposable`, the
+> container disposes it automatically when its scope/provider is disposed — no manual cleanup
+> needed. The parameterless overload (`AddFluxImprover()`) does not re-register it: you already
+> registered `ITextGenerationService` yourself, and its lifetime remains yours to manage.
+
 #### Service Lifetime
 
 All FluxImprover services default to `Scoped`, compatible with the standard ASP.NET Core

@@ -54,25 +54,14 @@ public static class ServiceCollectionExtensions
     {
         ArgumentNullException.ThrowIfNull(completionServiceFactory);
 
-        // Register the core services container
-        services.TryAdd(new ServiceDescriptor(
-            typeof(FluxImproverServices),
-            sp =>
-            {
-                var completionService = completionServiceFactory(sp);
-                return new FluxImproverBuilder()
-                    .WithCompletionService(completionService)
-                    .Build();
-            },
-            lifetime));
+        // Register the completion service as its own DI service so the container tracks and
+        // disposes the instance the factory creates (e.g. an IAsyncDisposable adapter owning a
+        // native model handle) and callers can resolve ITextGenerationService directly. Without
+        // this, an instance created only as a side effect of another factory's delegate is never
+        // seen by the container's resolution pipeline and is never tracked for disposal.
+        services.TryAdd(new ServiceDescriptor(typeof(ITextGenerationService), completionServiceFactory, lifetime));
 
-        // Register individual services as facades for convenience
-        // This allows consumers to inject specific services directly
-        RegisterEnrichmentServices(services, lifetime);
-        RegisterEvaluationServices(services, lifetime);
-        RegisterQAServices(services, lifetime);
-        RegisterOtherServices(services, lifetime);
-
+        RegisterCore(services, lifetime);
         return services;
     }
 
@@ -100,9 +89,37 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
-        return services.AddFluxImprover(
-            sp => sp.GetRequiredService<ITextGenerationService>(),
-            lifetime);
+        // Deliberately does NOT register an ITextGenerationService descriptor here — the caller
+        // is expected to have already registered one themselves (that is this overload's whole
+        // contract). Registering a self-referencing `sp => sp.GetRequiredService<...>()`
+        // descriptor would recurse into itself when nothing else provides the service.
+        RegisterCore(services, lifetime);
+        return services;
+    }
+
+    private static void RegisterCore(IServiceCollection services, ServiceLifetime lifetime)
+    {
+        // Register the core services container. Resolves the completion service through the
+        // container rather than re-invoking a factory delegate, so both overloads above share the
+        // exact same instance the container itself is tracking (and, for the factory overload,
+        // disposing).
+        services.TryAdd(new ServiceDescriptor(
+            typeof(FluxImproverServices),
+            sp =>
+            {
+                var completionService = sp.GetRequiredService<ITextGenerationService>();
+                return new FluxImproverBuilder()
+                    .WithCompletionService(completionService)
+                    .Build();
+            },
+            lifetime));
+
+        // Register individual services as facades for convenience
+        // This allows consumers to inject specific services directly
+        RegisterEnrichmentServices(services, lifetime);
+        RegisterEvaluationServices(services, lifetime);
+        RegisterQAServices(services, lifetime);
+        RegisterOtherServices(services, lifetime);
     }
 
     private static void TryAddService<TService>(
