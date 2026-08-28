@@ -1,6 +1,6 @@
 namespace FluxImprover.Tests.Enrichment;
 
-using FluentAssertions;
+using AwesomeAssertions;
 using FluxImprover.Enrichment;
 using FluxImprover.Options;
 using FluxImprover.Services;

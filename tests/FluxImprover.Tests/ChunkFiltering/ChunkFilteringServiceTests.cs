@@ -1,6 +1,6 @@
 namespace FluxImprover.Tests.ChunkFiltering;
 
-using FluentAssertions;
+using AwesomeAssertions;
 using FluxImprover.ChunkFiltering;
 using FluxImprover.Models;
 using FluxImprover.Options;

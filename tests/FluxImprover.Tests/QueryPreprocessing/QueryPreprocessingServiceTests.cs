@@ -1,6 +1,6 @@
 namespace FluxImprover.Tests.QueryPreprocessing;
 
-using FluentAssertions;
+using AwesomeAssertions;
 using FluxImprover.Models;
 using FluxImprover.Options;
 using FluxImprover.QueryPreprocessing;

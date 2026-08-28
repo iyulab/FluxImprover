@@ -1,6 +1,6 @@
 namespace FluxImprover.Tests.ContextualRetrieval;
 
-using FluentAssertions;
+using AwesomeAssertions;
 using FluxImprover.ContextualRetrieval;
 using FluxImprover.Models;
 using FluxImprover.Options;

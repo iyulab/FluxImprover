@@ -1,6 +1,6 @@
 ﻿namespace FluxImprover.Tests.Options;
 
-using FluentAssertions;
+using AwesomeAssertions;
 using FluxImprover.Options;
 using Xunit;
 

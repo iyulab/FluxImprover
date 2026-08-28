@@ -1,6 +1,6 @@
 ﻿namespace FluxImprover.Tests.Models;
 
-using FluentAssertions;
+using AwesomeAssertions;
 using FluxImprover.Models;
 using Xunit;
 

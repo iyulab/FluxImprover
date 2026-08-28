@@ -1,6 +1,6 @@
 namespace FluxImprover.Tests.Integration;
 
-using FluentAssertions;
+using AwesomeAssertions;
 using FluxImprover.Models;
 using FluxImprover.Options;
 using FluxImprover.QAGeneration;

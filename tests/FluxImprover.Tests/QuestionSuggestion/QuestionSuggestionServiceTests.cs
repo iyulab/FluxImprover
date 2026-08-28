@@ -1,6 +1,6 @@
 namespace FluxImprover.Tests.QuestionSuggestion;
 
-using FluentAssertions;
+using AwesomeAssertions;
 using FluxImprover.Models;
 using FluxImprover.Options;
 using FluxImprover.QuestionSuggestion;

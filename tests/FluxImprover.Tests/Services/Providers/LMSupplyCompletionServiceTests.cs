@@ -1,4 +1,4 @@
-using FluentAssertions;
+using AwesomeAssertions;
 using FluxImprover.LMSupply;
 using FluxImprover.Services;
 using LMSupply.Generator.Abstractions;

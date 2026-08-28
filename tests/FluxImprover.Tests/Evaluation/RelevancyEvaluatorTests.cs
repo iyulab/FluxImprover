@@ -1,6 +1,6 @@
 namespace FluxImprover.Tests.Evaluation;
 
-using FluentAssertions;
+using AwesomeAssertions;
 using FluxImprover.Evaluation;
 using FluxImprover.Models;
 using FluxImprover.Options;

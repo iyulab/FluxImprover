@@ -2,7 +2,7 @@ using Xunit;
 namespace FluxImprover.Tests.Models;
 
 using System.Text.Json;
-using FluentAssertions;
+using AwesomeAssertions;
 using FluxImprover.Models;
 
 public class EnrichedChunkTests

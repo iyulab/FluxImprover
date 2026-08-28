@@ -1,6 +1,6 @@
 namespace FluxImprover.Tests.QAGeneration;
 
-using FluentAssertions;
+using AwesomeAssertions;
 using FluxImprover.Evaluation;
 using FluxImprover.Options;
 using FluxImprover.QAGeneration;

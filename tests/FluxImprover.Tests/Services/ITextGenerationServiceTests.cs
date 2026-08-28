@@ -1,7 +1,7 @@
 using Xunit;
 namespace FluxImprover.Tests.Services;
 
-using FluentAssertions;
+using AwesomeAssertions;
 using FluxImprover.Services;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;

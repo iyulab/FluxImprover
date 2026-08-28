@@ -1,7 +1,7 @@
 using System.Net;
 using System.Text;
 using System.Text.Json;
-using FluentAssertions;
+using AwesomeAssertions;
 using FluxImprover.Services;
 using FluxImprover.Services.Providers;
 using Microsoft.Extensions.Logging;

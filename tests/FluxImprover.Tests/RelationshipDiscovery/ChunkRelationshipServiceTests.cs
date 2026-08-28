@@ -1,6 +1,6 @@
 namespace FluxImprover.Tests.RelationshipDiscovery;
 
-using FluentAssertions;
+using AwesomeAssertions;
 using FluxImprover.Models;
 using FluxImprover.Options;
 using FluxImprover.RelationshipDiscovery;

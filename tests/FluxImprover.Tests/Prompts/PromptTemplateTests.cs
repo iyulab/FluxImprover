@@ -1,6 +1,6 @@
 ﻿namespace FluxImprover.Tests.Prompts;
 
-using FluentAssertions;
+using AwesomeAssertions;
 using FluxImprover.Prompts;
 using Xunit;
 

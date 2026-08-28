@@ -1,6 +1,6 @@
 namespace FluxImprover.Tests;
 
-using FluentAssertions;
+using AwesomeAssertions;
 using FluxImprover.ChunkFiltering;
 using FluxImprover.ContextualRetrieval;
 using FluxImprover.Enrichment;
