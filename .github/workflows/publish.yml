@@ -50,7 +50,7 @@ jobs:
       - name: Test
         # Category=Integration drives real local models via LMSupply.Generator — excluded here the
         # same way FileFlux/memory-indexer exclude it (see ci.yml for detail).
-        run: dotnet test --no-build --configuration Release --verbosity normal --filter "Category!=Integration"
+        run: dotnet test --no-build --configuration Release --verbosity normal --filter "Category!=Integration" --blame-hang --blame-hang-timeout 5m
 
       # Pack every packable project, not just the one named after the repository. Packing a single
       # csproj left FluxImprover.LMSupply — packable, and in the solution since it was added — never
