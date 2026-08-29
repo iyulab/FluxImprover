@@ -86,7 +86,7 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
         _sut = new LMSupplyCompletionService(_model, _logger);
 
         // Act
-        var result = await _sut.CompleteAsync("Hello");
+        var result = await _sut.CompleteAsync("Hello", cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().Be("Generated response");
@@ -109,7 +109,7 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
         var options = new CompletionOptions { SystemPrompt = "Be helpful" };
 
         // Act
-        await _sut.CompleteAsync("Question", options);
+        await _sut.CompleteAsync("Question", options, TestContext.Current.CancellationToken);
 
         // Assert
         var messages = capturedMessages!.ToList();
@@ -145,7 +145,7 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
         };
 
         // Act
-        await _sut.CompleteAsync("Follow-up", options);
+        await _sut.CompleteAsync("Follow-up", options, TestContext.Current.CancellationToken);
 
         // Assert
         var messages = capturedMessages!.ToList();
@@ -180,7 +180,7 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
         };
 
         // Act
-        await _sut.CompleteAsync("Test", options);
+        await _sut.CompleteAsync("Test", options, TestContext.Current.CancellationToken);
 
         // Assert
         capturedOptions.Should().NotBeNull();
@@ -205,7 +205,7 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
             defaultTemperature: 0.5f, defaultMaxTokens: 256);
 
         // Act
-        await _sut.CompleteAsync("Test");
+        await _sut.CompleteAsync("Test", cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         capturedOptions.Should().NotBeNull();
@@ -235,7 +235,7 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
         };
 
         // Act
-        await _sut.CompleteAsync("Return JSON", options);
+        await _sut.CompleteAsync("Return JSON", options, TestContext.Current.CancellationToken);
 
         // Assert
         capturedOptions.Should().NotBeNull();
@@ -259,7 +259,7 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
         var options = new CompletionOptions { JsonMode = false, ResponseSchema = "should-be-ignored" };
 
         // Act
-        await _sut.CompleteAsync("Test", options);
+        await _sut.CompleteAsync("Test", options, TestContext.Current.CancellationToken);
 
         // Assert
         capturedOptions!.JsonSchema.Should().BeNull();
@@ -286,7 +286,7 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
         var options = new CompletionOptions { Thinking = flux };
 
         // Act
-        await _sut.CompleteAsync("Test", options);
+        await _sut.CompleteAsync("Test", options, TestContext.Current.CancellationToken);
 
         // Assert
         capturedOptions!.Thinking.Should().Be(generator);
@@ -307,7 +307,7 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
         _sut = new LMSupplyCompletionService(_model, _logger);
 
         // Act
-        await _sut.CompleteAsync("Test", options: null);
+        await _sut.CompleteAsync("Test", options: null, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         capturedOptions!.Thinking.Should().Be(LMThinkingMode.Auto);
@@ -333,7 +333,7 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
 
         // Act
         var results = new List<string>();
-        await foreach (var token in _sut.CompleteStreamingAsync("Test"))
+        await foreach (var token in _sut.CompleteStreamingAsync("Test", cancellationToken: TestContext.Current.CancellationToken))
         {
             results.Add(token);
         }
@@ -360,7 +360,7 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
         var options = new CompletionOptions { Temperature = 1.0f, MaxTokens = 500 };
 
         // Act
-        await foreach (var _ in _sut.CompleteStreamingAsync("Test", options)) { }
+        await foreach (var _ in _sut.CompleteStreamingAsync("Test", options, TestContext.Current.CancellationToken)) { }
 
         // Assert
         capturedOptions.Should().NotBeNull();
@@ -417,7 +417,7 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
         };
 
         // Act
-        await _sut.CompleteAsync("Prompt", options);
+        await _sut.CompleteAsync("Prompt", options, TestContext.Current.CancellationToken);
 
         // Assert
         var messages = capturedMessages!.ToList();

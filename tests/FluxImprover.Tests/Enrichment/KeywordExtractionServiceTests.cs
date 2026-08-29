@@ -32,7 +32,7 @@ public sealed class KeywordExtractionServiceTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.ExtractKeywordsAsync(text);
+        var result = await _sut.ExtractKeywordsAsync(text, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeEmpty();
@@ -54,7 +54,7 @@ public sealed class KeywordExtractionServiceTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.ExtractKeywordsAsync(text, options);
+        var result = await _sut.ExtractKeywordsAsync(text, options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().HaveCountLessThanOrEqualTo(3);
@@ -64,7 +64,7 @@ public sealed class KeywordExtractionServiceTests
     public async Task ExtractKeywordsAsync_WithEmptyText_ReturnsEmptyList()
     {
         // Arrange & Act
-        var result = await _sut.ExtractKeywordsAsync(string.Empty);
+        var result = await _sut.ExtractKeywordsAsync(string.Empty, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeEmpty();
@@ -86,7 +86,7 @@ public sealed class KeywordExtractionServiceTests
             .Returns("invalid json response");
 
         // Act
-        var result = await _sut.ExtractKeywordsAsync(text);
+        var result = await _sut.ExtractKeywordsAsync(text, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeEmpty();
@@ -106,7 +106,7 @@ public sealed class KeywordExtractionServiceTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.ExtractKeywordsWithScoresAsync(text);
+        var result = await _sut.ExtractKeywordsWithScoresAsync(text, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeEmpty();
@@ -128,7 +128,7 @@ public sealed class KeywordExtractionServiceTests
                      """{"keywords": [{"keyword": "ML", "relevance": 0.9}]}""");
 
         // Act
-        var results = await _sut.ExtractKeywordsBatchAsync(texts);
+        var results = await _sut.ExtractKeywordsBatchAsync(texts, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         results.Should().HaveCount(2);
@@ -151,7 +151,7 @@ public sealed class KeywordExtractionServiceTests
             .Returns(response);
 
         // Act
-        var result = await _sut.ExtractKeywordsAsync(text);
+        var result = await _sut.ExtractKeywordsAsync(text, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().Contain(expectedKeyword);
@@ -170,7 +170,7 @@ public sealed class KeywordExtractionServiceTests
             .Returns(response);
 
         // Act
-        var result = await _sut.ExtractKeywordsAsync(text);
+        var result = await _sut.ExtractKeywordsAsync(text, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().HaveCount(3);
@@ -195,7 +195,7 @@ public sealed class KeywordExtractionServiceTests
             .Returns(response);
 
         // Act
-        var result = await _sut.ExtractKeywordsWithScoresAsync(text);
+        var result = await _sut.ExtractKeywordsWithScoresAsync(text, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().ContainKey(expectedKeyword);
@@ -215,7 +215,7 @@ public sealed class KeywordExtractionServiceTests
             .Returns(response);
 
         // Act
-        var result = await _sut.ExtractKeywordsAsync(text);
+        var result = await _sut.ExtractKeywordsAsync(text, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().HaveCount(2);

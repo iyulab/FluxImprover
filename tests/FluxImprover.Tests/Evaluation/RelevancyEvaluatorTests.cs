@@ -34,7 +34,7 @@ public sealed class RelevancyEvaluatorTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.EvaluateAsync(question, answer);
+        var result = await _sut.EvaluateAsync(question, answer, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -57,7 +57,7 @@ public sealed class RelevancyEvaluatorTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.EvaluateAsync(question, answer);
+        var result = await _sut.EvaluateAsync(question, answer, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Score.Should().BeApproximately(0.0, 0.01);
@@ -78,7 +78,7 @@ public sealed class RelevancyEvaluatorTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.EvaluateAsync(question, answer);
+        var result = await _sut.EvaluateAsync(question, answer, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Score.Should().BeApproximately(0.5, 0.01);
@@ -88,7 +88,7 @@ public sealed class RelevancyEvaluatorTests
     public async Task EvaluateAsync_WithEmptyQuestion_ReturnsZeroScore()
     {
         // Arrange & Act
-        var result = await _sut.EvaluateAsync(string.Empty, "Some answer");
+        var result = await _sut.EvaluateAsync(string.Empty, "Some answer", cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Score.Should().Be(0.0);
@@ -102,7 +102,7 @@ public sealed class RelevancyEvaluatorTests
     public async Task EvaluateAsync_WithEmptyAnswer_ReturnsZeroScore()
     {
         // Arrange & Act
-        var result = await _sut.EvaluateAsync("What is X?", string.Empty);
+        var result = await _sut.EvaluateAsync("What is X?", string.Empty, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Score.Should().Be(0.0);
@@ -122,7 +122,7 @@ public sealed class RelevancyEvaluatorTests
             .Returns(expectedResponse);
 
         // Act
-        await _sut.EvaluateAsync("question", "answer", options);
+        await _sut.EvaluateAsync("question", "answer", options, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         await _completionService.Received(1).CompleteAsync(
@@ -147,7 +147,7 @@ public sealed class RelevancyEvaluatorTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.EvaluateAsync(question, answer, context: context);
+        var result = await _sut.EvaluateAsync(question, answer, context: context, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Score.Should().BeApproximately(0.9, 0.01);
@@ -170,7 +170,7 @@ public sealed class RelevancyEvaluatorTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.EvaluateAsync("question", "answer");
+        var result = await _sut.EvaluateAsync("question", "answer", cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Details.Should().ContainKey("reasoning");
@@ -195,7 +195,7 @@ public sealed class RelevancyEvaluatorTests
                 @"{""score"": 0.7, ""reasoning"": ""Fair""}");
 
         // Act
-        var results = await _sut.EvaluateBatchAsync(pairs);
+        var results = await _sut.EvaluateBatchAsync(pairs, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         results.Should().HaveCount(2);

@@ -37,12 +37,10 @@ public sealed class LMSupplyCompletionServiceRealModelTests
         // LMSupplyCompletionService.DisposeAsync() disposes the model it was given (see its
         // source) — a separate `await using` on `model` here would double-dispose the underlying
         // ONNX Runtime GenAI native handle.
-        var model = await LocalGenerator.LoadAsync(ModelAlias);
+        var model = await LocalGenerator.LoadAsync(ModelAlias, cancellationToken: TestContext.Current.CancellationToken);
         await using var service = new LMSupplyCompletionService(model, NullLogger<LMSupplyCompletionService>.Instance);
 
-        var result = await service.CompleteAsync(
-            "Reply with exactly one word: the color of the sky on a clear day.",
-            new CompletionOptions { MaxTokens = 16, Temperature = 0.1f });
+        var result = await service.CompleteAsync("Reply with exactly one word: the color of the sky on a clear day.", new CompletionOptions { MaxTokens = 16, Temperature = 0.1f }, TestContext.Current.CancellationToken);
 
         result.Should().NotBeNullOrWhiteSpace();
     }
@@ -59,7 +57,7 @@ public sealed class LMSupplyCompletionServiceRealModelTests
         // ONNX Runtime GenAI native handle (OGA leak diagnostic on process exit), which is what
         // this test's absence of that diagnostic actually proves. No manual `model.DisposeAsync()`
         // anywhere below — that used to be required (see git history) and would now double-dispose.
-        var model = await LocalGenerator.LoadAsync(ModelAlias);
+        var model = await LocalGenerator.LoadAsync(ModelAlias, cancellationToken: TestContext.Current.CancellationToken);
         var services = new ServiceCollection();
         services.AddSingleton<ILogger<LMSupplyCompletionService>>(NullLogger<LMSupplyCompletionService>.Instance);
         services.AddSingleton(model);
@@ -73,9 +71,7 @@ public sealed class LMSupplyCompletionServiceRealModelTests
             completionService.Should().BeOfType<LMSupplyCompletionService>();
 
             var fluxImprover = provider.GetRequiredService<FluxImproverServices>();
-            var summary = await fluxImprover.Summarization.SummarizeAsync(
-                "Paris is the capital of France. It is well known for the Eiffel Tower and the Louvre museum.",
-                new EnrichmentOptions { MaxTokens = 16, Temperature = 0.1f });
+            var summary = await fluxImprover.Summarization.SummarizeAsync("Paris is the capital of France. It is well known for the Eiffel Tower and the Louvre museum.", new EnrichmentOptions { MaxTokens = 16, Temperature = 0.1f }, TestContext.Current.CancellationToken);
 
             summary.Should().NotBeNullOrWhiteSpace();
         }

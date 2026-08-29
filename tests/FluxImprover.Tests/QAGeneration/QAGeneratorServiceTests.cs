@@ -33,7 +33,7 @@ public sealed class QAGeneratorServiceTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.GenerateAsync(context);
+        var result = await _sut.GenerateAsync(context, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeEmpty();
@@ -60,7 +60,7 @@ public sealed class QAGeneratorServiceTests
             .Returns(expectedResponse);
 
         // Act
-        await _sut.GenerateAsync(context, options);
+        await _sut.GenerateAsync(context, options, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         await _completionService.Received(1).CompleteAsync(
@@ -73,7 +73,7 @@ public sealed class QAGeneratorServiceTests
     public async Task GenerateAsync_WithEmptyContext_ReturnsEmptyList()
     {
         // Arrange & Act
-        var result = await _sut.GenerateAsync(string.Empty);
+        var result = await _sut.GenerateAsync(string.Empty, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeEmpty();
@@ -94,7 +94,7 @@ public sealed class QAGeneratorServiceTests
             .Returns("invalid json");
 
         // Act
-        var result = await _sut.GenerateAsync("Some context");
+        var result = await _sut.GenerateAsync("Some context", cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeEmpty();
@@ -115,7 +115,7 @@ public sealed class QAGeneratorServiceTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.GenerateAsync(context, sourceId: sourceId);
+        var result = await _sut.GenerateAsync(context, sourceId: sourceId, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().AllSatisfy(pair => pair.SourceId.Should().Be(sourceId));
@@ -136,7 +136,7 @@ public sealed class QAGeneratorServiceTests
                 @"{""qa_pairs"": [{""question"": ""Q2"", ""answer"": ""A2""}]}");
 
         // Act
-        var results = await _sut.GenerateBatchAsync(contexts);
+        var results = await _sut.GenerateBatchAsync(contexts, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         results.Should().HaveCount(2);
@@ -160,7 +160,7 @@ public sealed class QAGeneratorServiceTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.GenerateFromChunkAsync(chunk);
+        var result = await _sut.GenerateFromChunkAsync(chunk, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeEmpty();
@@ -181,7 +181,7 @@ public sealed class QAGeneratorServiceTests
             .Returns(expectedResponse);
 
         // Act
-        await _sut.GenerateAsync("Context", options);
+        await _sut.GenerateAsync("Context", options, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         await _completionService.Received(1).CompleteAsync(
@@ -204,7 +204,7 @@ public sealed class QAGeneratorServiceTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.GenerateAsync(context);
+        var result = await _sut.GenerateAsync(context, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().AllSatisfy(pair => pair.Context.Should().Be(context));

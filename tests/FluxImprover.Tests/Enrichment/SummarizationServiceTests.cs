@@ -32,7 +32,7 @@ public sealed class SummarizationServiceTests
             .Returns(expectedSummary);
 
         // Act
-        var result = await _sut.SummarizeAsync(text);
+        var result = await _sut.SummarizeAsync(text, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().Be(expectedSummary);
@@ -52,7 +52,7 @@ public sealed class SummarizationServiceTests
             .Returns("Summary");
 
         // Act
-        await _sut.SummarizeAsync(text, options);
+        await _sut.SummarizeAsync(text, options, TestContext.Current.CancellationToken);
 
         // Assert
         await _completionService.Received(1).CompleteAsync(
@@ -65,7 +65,7 @@ public sealed class SummarizationServiceTests
     public async Task SummarizeAsync_WithEmptyText_ReturnsEmpty()
     {
         // Arrange & Act
-        var result = await _sut.SummarizeAsync(string.Empty);
+        var result = await _sut.SummarizeAsync(string.Empty, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeEmpty();
@@ -113,7 +113,7 @@ public sealed class SummarizationServiceTests
             .Returns(summaries[2]);
 
         // Act
-        var results = await _sut.SummarizeBatchAsync(texts);
+        var results = await _sut.SummarizeBatchAsync(texts, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         results.Should().HaveCount(3);

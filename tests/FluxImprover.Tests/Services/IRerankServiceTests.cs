@@ -26,7 +26,7 @@ public class IRerankServiceTests
             .Returns(rerankResults);
 
         // Act
-        var result = await service.RerankAsync(query, documents);
+        var result = await service.RerankAsync(query, documents, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().HaveCount(3);
@@ -48,7 +48,7 @@ public class IRerankServiceTests
             .Returns(rerankResults);
 
         // Act
-        var result = await service.RerankAsync("query", ["doc1", "doc2", "doc3"], topK: 2);
+        var result = await service.RerankAsync("query", ["doc1", "doc2", "doc3"], topK: 2, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().HaveCount(2);

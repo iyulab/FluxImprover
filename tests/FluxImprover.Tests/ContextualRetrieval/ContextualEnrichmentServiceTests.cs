@@ -43,7 +43,7 @@ public sealed class ContextualEnrichmentServiceTests
             .Returns(expectedContext);
 
         // Act
-        var result = await _sut.EnrichAsync(chunk, fullDocument);
+        var result = await _sut.EnrichAsync(chunk, fullDocument, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -73,7 +73,7 @@ public sealed class ContextualEnrichmentServiceTests
             .Returns("Context summary");
 
         // Act
-        await _sut.EnrichAsync(chunk, document, options);
+        await _sut.EnrichAsync(chunk, document, options, TestContext.Current.CancellationToken);
 
         // Assert
         await _completionService.Received(1).CompleteAsync(
@@ -90,7 +90,7 @@ public sealed class ContextualEnrichmentServiceTests
         var document = "Full document";
 
         // Act
-        var result = await _sut.EnrichAsync(chunk, document);
+        var result = await _sut.EnrichAsync(chunk, document, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.ContextSummary.Should().BeNull();
@@ -105,7 +105,7 @@ public sealed class ContextualEnrichmentServiceTests
     {
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            _sut.EnrichAsync(null!, "document"));
+            _sut.EnrichAsync(null!, "document", cancellationToken: TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -116,7 +116,7 @@ public sealed class ContextualEnrichmentServiceTests
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            _sut.EnrichAsync(chunk, null!));
+            _sut.EnrichAsync(chunk, null!, cancellationToken: TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -137,7 +137,7 @@ public sealed class ContextualEnrichmentServiceTests
             .Returns("Context summary");
 
         // Act
-        var results = await _sut.EnrichBatchAsync(chunks, document);
+        var results = await _sut.EnrichBatchAsync(chunks, document, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         results.Should().HaveCount(2);
@@ -164,7 +164,7 @@ public sealed class ContextualEnrichmentServiceTests
             .Returns("Context");
 
         // Act
-        var results = await _sut.EnrichBatchAsync(chunks, document);
+        var results = await _sut.EnrichBatchAsync(chunks, document, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         results[0].Position.Should().Be(0);
@@ -253,7 +253,7 @@ public sealed class ContextualEnrichmentServiceTests
             .Returns(expectedContext);
 
         // Act
-        var result = await _sut.EnrichAsync(chunk, fullDocument);
+        var result = await _sut.EnrichAsync(chunk, fullDocument, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -281,7 +281,7 @@ public sealed class ContextualEnrichmentServiceTests
             .Returns("Context summary");
 
         // Act
-        await _sut.EnrichAsync(chunk, fullDocument);
+        await _sut.EnrichAsync(chunk, fullDocument, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         capturedPrompt.Should().NotBeNull();
@@ -309,7 +309,7 @@ public sealed class ContextualEnrichmentServiceTests
             .Returns("한국어 컨텍스트 요약");
 
         // Act
-        var results = await _sut.EnrichBatchAsync(chunks, document);
+        var results = await _sut.EnrichBatchAsync(chunks, document, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         results.Should().HaveCount(3);
@@ -340,7 +340,7 @@ public sealed class ContextualEnrichmentServiceTests
             .Returns("Kubernetes 배포 가이드에서 kubectl 배포 명령어를 설명하는 섹션");
 
         // Act
-        var result = await _sut.EnrichAsync(chunk, fullDocument);
+        var result = await _sut.EnrichAsync(chunk, fullDocument, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();

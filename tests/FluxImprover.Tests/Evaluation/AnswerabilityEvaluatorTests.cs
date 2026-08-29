@@ -34,7 +34,7 @@ public sealed class AnswerabilityEvaluatorTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.EvaluateAsync(context, question);
+        var result = await _sut.EvaluateAsync(context, question, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -57,7 +57,7 @@ public sealed class AnswerabilityEvaluatorTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.EvaluateAsync(context, question);
+        var result = await _sut.EvaluateAsync(context, question, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Score.Should().BeApproximately(0.0, 0.01);
@@ -78,7 +78,7 @@ public sealed class AnswerabilityEvaluatorTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.EvaluateAsync(context, question);
+        var result = await _sut.EvaluateAsync(context, question, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Score.Should().BeApproximately(0.5, 0.01);
@@ -88,7 +88,7 @@ public sealed class AnswerabilityEvaluatorTests
     public async Task EvaluateAsync_WithEmptyContext_ReturnsZeroScore()
     {
         // Arrange & Act
-        var result = await _sut.EvaluateAsync(string.Empty, "What is X?");
+        var result = await _sut.EvaluateAsync(string.Empty, "What is X?", cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Score.Should().Be(0.0);
@@ -102,7 +102,7 @@ public sealed class AnswerabilityEvaluatorTests
     public async Task EvaluateAsync_WithEmptyQuestion_ReturnsZeroScore()
     {
         // Arrange & Act
-        var result = await _sut.EvaluateAsync("Some context", string.Empty);
+        var result = await _sut.EvaluateAsync("Some context", string.Empty, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Score.Should().Be(0.0);
@@ -122,7 +122,7 @@ public sealed class AnswerabilityEvaluatorTests
             .Returns(expectedResponse);
 
         // Act
-        await _sut.EvaluateAsync("context", "question", options);
+        await _sut.EvaluateAsync("context", "question", options, TestContext.Current.CancellationToken);
 
         // Assert
         await _completionService.Received(1).CompleteAsync(
@@ -144,7 +144,7 @@ public sealed class AnswerabilityEvaluatorTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.EvaluateAsync("context", "question");
+        var result = await _sut.EvaluateAsync("context", "question", cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Details.Should().ContainKey("reasoning");
@@ -162,7 +162,7 @@ public sealed class AnswerabilityEvaluatorTests
             .Returns("invalid json");
 
         // Act
-        var result = await _sut.EvaluateAsync("context", "question");
+        var result = await _sut.EvaluateAsync("context", "question", cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Score.Should().Be(0.0);
@@ -187,7 +187,7 @@ public sealed class AnswerabilityEvaluatorTests
                 @"{""score"": 0.0, ""reasoning"": ""Not answerable"", ""answerable"": false}");
 
         // Act
-        var results = await _sut.EvaluateBatchAsync(pairs);
+        var results = await _sut.EvaluateBatchAsync(pairs, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         results.Should().HaveCount(2);
@@ -208,7 +208,7 @@ public sealed class AnswerabilityEvaluatorTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.EvaluateWithMultipleContextsAsync(contexts, question);
+        var result = await _sut.EvaluateWithMultipleContextsAsync(contexts, question, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Score.Should().BeApproximately(1.0, 0.01);

@@ -60,7 +60,7 @@ public sealed class ChunkRelationshipServiceTests
             .Returns(jsonResponse);
 
         // Act
-        var result = await _sut.AnalyzePairAsync(sourceChunk, targetChunk);
+        var result = await _sut.AnalyzePairAsync(sourceChunk, targetChunk, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().HaveCount(2);
@@ -86,7 +86,7 @@ public sealed class ChunkRelationshipServiceTests
             .Returns(jsonResponse);
 
         // Act
-        var result = await _sut.AnalyzePairAsync(sourceChunk, targetChunk);
+        var result = await _sut.AnalyzePairAsync(sourceChunk, targetChunk, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeEmpty();
@@ -116,7 +116,7 @@ public sealed class ChunkRelationshipServiceTests
             .Returns(jsonResponse);
 
         // Act
-        var result = await _sut.AnalyzePairAsync(sourceChunk, targetChunk, options);
+        var result = await _sut.AnalyzePairAsync(sourceChunk, targetChunk, options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().HaveCount(1);
@@ -137,7 +137,7 @@ public sealed class ChunkRelationshipServiceTests
             .Returns("Invalid JSON response");
 
         // Act
-        var result = await _sut.AnalyzePairAsync(sourceChunk, targetChunk);
+        var result = await _sut.AnalyzePairAsync(sourceChunk, targetChunk, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeEmpty();
@@ -151,7 +151,7 @@ public sealed class ChunkRelationshipServiceTests
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            _sut.AnalyzePairAsync(null!, targetChunk));
+            _sut.AnalyzePairAsync(null!, targetChunk, cancellationToken: TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -173,7 +173,7 @@ public sealed class ChunkRelationshipServiceTests
             .Returns("""{ "relationships": [{ "type": "SameTopic", "confidence": 0.8, "bidirectional": true }] }""");
 
         // Act
-        var result = await _sut.AnalyzeRelationshipsAsync(sourceChunk, candidates, options);
+        var result = await _sut.AnalyzeRelationshipsAsync(sourceChunk, candidates, options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Success.Should().BeTrue();
@@ -199,7 +199,7 @@ public sealed class ChunkRelationshipServiceTests
             .Returns("""{ "relationships": [{ "type": "SameTopic", "confidence": 0.7, "bidirectional": true }] }""");
 
         // Act
-        var result = await _sut.DiscoverAllRelationshipsAsync(chunks);
+        var result = await _sut.DiscoverAllRelationshipsAsync(chunks, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         // 3 chunks = 3 pairs: (1,2), (1,3), (2,3)
@@ -231,7 +231,7 @@ public sealed class ChunkRelationshipServiceTests
             .Returns(jsonResponse);
 
         // Act
-        var result = await _sut.AnalyzePairAsync(sourceChunk, targetChunk, options);
+        var result = await _sut.AnalyzePairAsync(sourceChunk, targetChunk, options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().HaveCount(1);

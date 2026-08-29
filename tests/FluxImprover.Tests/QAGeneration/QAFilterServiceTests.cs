@@ -38,7 +38,7 @@ public sealed class QAFilterServiceTests
         SetupHighScoreEvaluators();
 
         // Act
-        var result = await _sut.FilterAsync(pairs);
+        var result = await _sut.FilterAsync(pairs, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().HaveCount(2);
@@ -68,7 +68,7 @@ public sealed class QAFilterServiceTests
                 @"{""score"": 0.3, ""reasoning"": ""Bad""}");
 
         // Act
-        var result = await _sut.FilterAsync(pairs);
+        var result = await _sut.FilterAsync(pairs, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().HaveCount(1);
@@ -99,7 +99,7 @@ public sealed class QAFilterServiceTests
             .Returns(@"{""score"": 0.75, ""reasoning"": ""Below threshold""}");
 
         // Act
-        var result = await _sut.FilterAsync(pairs, options);
+        var result = await _sut.FilterAsync(pairs, options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeEmpty();
@@ -109,7 +109,7 @@ public sealed class QAFilterServiceTests
     public async Task FilterAsync_WithEmptyList_ReturnsEmptyList()
     {
         // Arrange & Act
-        var result = await _sut.FilterAsync(Array.Empty<GeneratedQAPair>());
+        var result = await _sut.FilterAsync(Array.Empty<GeneratedQAPair>(), cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeEmpty();
@@ -127,7 +127,7 @@ public sealed class QAFilterServiceTests
         SetupHighScoreEvaluators();
 
         // Act
-        var result = await _sut.FilterAsync(pairs);
+        var result = await _sut.FilterAsync(pairs, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().ContainSingle();
@@ -152,7 +152,7 @@ public sealed class QAFilterServiceTests
                 @"{""score"": 0.5, ""reasoning"": ""Low answerability""}");
 
         // Act
-        var result = await _sut.EvaluateAsync(pair);
+        var result = await _sut.EvaluateAsync(pair, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -170,7 +170,7 @@ public sealed class QAFilterServiceTests
         };
 
         // Act
-        var result = await _sut.FilterAsync(pairs);
+        var result = await _sut.FilterAsync(pairs, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeEmpty();

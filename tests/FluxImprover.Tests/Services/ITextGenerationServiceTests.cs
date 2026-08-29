@@ -17,7 +17,7 @@ public class ITextGenerationServiceTests
             .Returns("Generated response");
 
         // Act
-        var result = await service.CompleteAsync("Test prompt");
+        var result = await service.CompleteAsync("Test prompt", cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNullOrEmpty();
@@ -40,7 +40,7 @@ public class ITextGenerationServiceTests
             .Returns("Response with options");
 
         // Act
-        var result = await service.CompleteAsync("prompt", options);
+        var result = await service.CompleteAsync("prompt", options, TestContext.Current.CancellationToken);
 
         // Assert
         await service.Received(1).CompleteAsync("prompt", options, Arg.Any<CancellationToken>());
@@ -75,7 +75,7 @@ public class ITextGenerationServiceTests
 
         // Act
         var results = new List<string>();
-        await foreach (var token in service.CompleteStreamingAsync("Test prompt"))
+        await foreach (var token in service.CompleteStreamingAsync("Test prompt", cancellationToken: TestContext.Current.CancellationToken))
         {
             results.Add(token);
         }

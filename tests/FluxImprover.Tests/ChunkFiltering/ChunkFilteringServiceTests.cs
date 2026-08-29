@@ -41,7 +41,7 @@ public sealed class ChunkFilteringServiceTests
         var chunks = Array.Empty<Chunk>();
 
         // Act
-        var result = await _sut.FilterAsync(chunks, "test query");
+        var result = await _sut.FilterAsync(chunks, "test query", cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeEmpty();
@@ -66,7 +66,7 @@ public sealed class ChunkFilteringServiceTests
         var options = new ChunkFilteringOptions { MinRelevanceScore = 0.5 };
 
         // Act
-        var result = await _sut.FilterAsync([chunk], "machine learning", options);
+        var result = await _sut.FilterAsync([chunk], "machine learning", options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().HaveCount(1);
@@ -93,7 +93,7 @@ public sealed class ChunkFilteringServiceTests
         var options = new ChunkFilteringOptions { MinRelevanceScore = 0.7 };
 
         // Act
-        var result = await _sut.FilterAsync([chunk], "machine learning", options);
+        var result = await _sut.FilterAsync([chunk], "machine learning", options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeEmpty();
@@ -123,7 +123,7 @@ public sealed class ChunkFilteringServiceTests
         };
 
         // Act
-        var result = await _sut.FilterAsync(chunks, "AI", options);
+        var result = await _sut.FilterAsync(chunks, "AI", options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().HaveCount(2);
@@ -153,7 +153,7 @@ public sealed class ChunkFilteringServiceTests
         };
 
         // Act
-        var result = await _sut.FilterAsync(chunks, "AI", options);
+        var result = await _sut.FilterAsync(chunks, "AI", options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().HaveCount(3);
@@ -193,7 +193,7 @@ public sealed class ChunkFilteringServiceTests
         };
 
         // Act
-        var result = await _sut.FilterAsync([chunk], null, options);
+        var result = await _sut.FilterAsync([chunk], null, options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().HaveCount(1);
@@ -227,7 +227,7 @@ public sealed class ChunkFilteringServiceTests
         };
 
         // Act
-        var result = await _sut.FilterAsync([chunk], "container technology", options);
+        var result = await _sut.FilterAsync([chunk], "container technology", options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().HaveCount(1);
@@ -254,7 +254,7 @@ public sealed class ChunkFilteringServiceTests
             .Returns("0.85");
 
         // Act
-        var result = await _sut.AssessAsync(chunk, "React JavaScript");
+        var result = await _sut.AssessAsync(chunk, "React JavaScript", cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -287,7 +287,7 @@ public sealed class ChunkFilteringServiceTests
             .Returns("0.75");
 
         // Act
-        var result = await _sut.AssessAsync(chunk, "Python programming", options);
+        var result = await _sut.AssessAsync(chunk, "Python programming", options, TestContext.Current.CancellationToken);
 
         // Assert
         result.ReflectionScore.Should().NotBeNull();
@@ -317,7 +317,7 @@ public sealed class ChunkFilteringServiceTests
             .Returns("0.80");
 
         // Act
-        var result = await _sut.AssessAsync(chunk, "TypeScript", options);
+        var result = await _sut.AssessAsync(chunk, "TypeScript", options, TestContext.Current.CancellationToken);
 
         // Assert
         result.CriticScore.Should().NotBeNull();
@@ -347,7 +347,7 @@ public sealed class ChunkFilteringServiceTests
             .Returns("0.70");
 
         // Act
-        var result = await _sut.AssessAsync(chunk, "Node.js", options);
+        var result = await _sut.AssessAsync(chunk, "Node.js", options, TestContext.Current.CancellationToken);
 
         // Assert
         result.ReflectionScore.Should().BeNull();
@@ -373,7 +373,7 @@ public sealed class ChunkFilteringServiceTests
         };
 
         // Act
-        var result = await _sut.AssessAsync(chunk, "test query", options);
+        var result = await _sut.AssessAsync(chunk, "test query", options, TestContext.Current.CancellationToken);
 
         // Assert
         result.FinalScore.Should().BeLessThan(0.5);
@@ -401,7 +401,7 @@ public sealed class ChunkFilteringServiceTests
             .Returns("0.85");
 
         // Act
-        var result = await _sut.AssessAsync(chunk, "Docker containers");
+        var result = await _sut.AssessAsync(chunk, "Docker containers", cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Factors.Should().Contain(f => f.Name == "Content Relevance");
@@ -424,7 +424,7 @@ public sealed class ChunkFilteringServiceTests
             .Returns("0.80");
 
         // Act
-        var result = await _sut.AssessAsync(chunk, "Kubernetes");
+        var result = await _sut.AssessAsync(chunk, "Kubernetes", cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Factors.Should().Contain(f => f.Name == "Information Density");
@@ -447,7 +447,7 @@ public sealed class ChunkFilteringServiceTests
             .Returns("0.90");
 
         // Act
-        var result = await _sut.AssessAsync(chunk, "GraphQL API");
+        var result = await _sut.AssessAsync(chunk, "GraphQL API", cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Factors.Should().Contain(f => f.Name == "LLM Assessment");
@@ -476,7 +476,7 @@ public sealed class ChunkFilteringServiceTests
         var options = new ChunkFilteringOptions { MinRelevanceScore = 0.3 };
 
         // Act
-        var result = await _sut.FilterAsync([chunk], "PostgreSQL database", options);
+        var result = await _sut.FilterAsync([chunk], "PostgreSQL database", options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -501,7 +501,7 @@ public sealed class ChunkFilteringServiceTests
         var options = new ChunkFilteringOptions { MinRelevanceScore = 0.3 };
 
         // Act
-        var result = await _sut.FilterAsync([chunk], "Redis cache", options);
+        var result = await _sut.FilterAsync([chunk], "Redis cache", options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -528,7 +528,7 @@ public sealed class ChunkFilteringServiceTests
         };
 
         // Act
-        var result = await _sut.FilterAsync(chunks, "technology", options);
+        var result = await _sut.FilterAsync(chunks, "technology", options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeEmpty();
@@ -556,7 +556,7 @@ public sealed class ChunkFilteringServiceTests
         };
 
         // Act
-        var result = await _sut.AssessAsync(chunk, "Python code", options);
+        var result = await _sut.AssessAsync(chunk, "Python code", options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Factors.Should().Contain(f => f.Name == "Structural Importance");
@@ -581,7 +581,7 @@ public sealed class ChunkFilteringServiceTests
         };
 
         // Act
-        var result = await _sut.AssessAsync(chunk, "machine learning intro", options);
+        var result = await _sut.AssessAsync(chunk, "machine learning intro", options, TestContext.Current.CancellationToken);
 
         // Assert
         var structuralFactor = result.Factors.First(f => f.Name == "Structural Importance");
@@ -618,7 +618,7 @@ public sealed class ChunkFilteringServiceTests
         };
 
         // Act
-        var result = await _sut.FilterAsync([chunk], null, options);
+        var result = await _sut.FilterAsync([chunk], null, options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeEmpty();
@@ -650,7 +650,7 @@ public sealed class ChunkFilteringServiceTests
         };
 
         // Act
-        var result = await _sut.FilterAsync([chunk], null, options);
+        var result = await _sut.FilterAsync([chunk], null, options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeEmpty();
@@ -686,7 +686,7 @@ public sealed class ChunkFilteringServiceTests
         };
 
         // Act
-        var result = await _sut.FilterAsync([chunk], null, options);
+        var result = await _sut.FilterAsync([chunk], null, options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeEmpty();
@@ -722,7 +722,7 @@ public sealed class ChunkFilteringServiceTests
         };
 
         // Act
-        var result = await _sut.FilterAsync([chunk], null, options);
+        var result = await _sut.FilterAsync([chunk], null, options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeEmpty();
@@ -754,7 +754,7 @@ public sealed class ChunkFilteringServiceTests
         };
 
         // Act
-        var result = await _sut.FilterAsync([chunk], null, options);
+        var result = await _sut.FilterAsync([chunk], null, options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeEmpty();
@@ -789,7 +789,7 @@ public sealed class ChunkFilteringServiceTests
         };
 
         // Act
-        var result = await _sut.FilterAsync(chunks, "content", options);
+        var result = await _sut.FilterAsync(chunks, "content", options, TestContext.Current.CancellationToken);
 
         // Assert
         if (result.Count > 0)

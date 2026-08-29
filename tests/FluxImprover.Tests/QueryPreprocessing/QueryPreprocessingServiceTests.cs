@@ -112,7 +112,7 @@ public sealed class QueryPreprocessingServiceTests
             .Returns("""["authentication", "implement", "security"]""");
 
         // Act
-        var result = await _sut.PreprocessAsync(query);
+        var result = await _sut.PreprocessAsync(query, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -139,7 +139,7 @@ public sealed class QueryPreprocessingServiceTests
             .Returns("""["auth", "config", "database"]""");
 
         // Act
-        var result = await _sut.PreprocessAsync(query, options);
+        var result = await _sut.PreprocessAsync(query, options, TestContext.Current.CancellationToken);
 
         // Assert
         result.ExpandedKeywords.Should().Contain("authentication");
@@ -170,7 +170,7 @@ public sealed class QueryPreprocessingServiceTests
         };
 
         // Act
-        var (intent, confidence) = await _sut.ClassifyIntentAsync(query, options);
+        var (intent, confidence) = await _sut.ClassifyIntentAsync(query, options, TestContext.Current.CancellationToken);
 
         // Assert
         intent.Should().Be(expectedIntent);
@@ -194,7 +194,7 @@ public sealed class QueryPreprocessingServiceTests
             .Returns("""{"intent": "Code", "confidence": 0.95}""");
 
         // Act
-        var (intent, confidence) = await _sut.ClassifyIntentAsync(query, options);
+        var (intent, confidence) = await _sut.ClassifyIntentAsync(query, options, TestContext.Current.CancellationToken);
 
         // Assert
         intent.Should().Be(QueryClassification.Code);
@@ -218,7 +218,7 @@ public sealed class QueryPreprocessingServiceTests
             .Returns("""["implement", "user", "authentication", "JWT"]""");
 
         // Act
-        var result = await _sut.ExtractKeywordsAsync(query);
+        var result = await _sut.ExtractKeywordsAsync(query, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeEmpty();
@@ -240,7 +240,7 @@ public sealed class QueryPreprocessingServiceTests
             .Returns<string>(x => throw new InvalidOperationException("LLM failed"));
 
         // Act
-        var result = await _sut.ExtractKeywordsAsync(query);
+        var result = await _sut.ExtractKeywordsAsync(query, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeEmpty();
@@ -264,7 +264,7 @@ public sealed class QueryPreprocessingServiceTests
         };
 
         // Act
-        var result = await _sut.ExpandWithSynonymsAsync(query, options);
+        var result = await _sut.ExpandWithSynonymsAsync(query, options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().Contain("auth");
@@ -289,7 +289,7 @@ public sealed class QueryPreprocessingServiceTests
         };
 
         // Act
-        var result = await _sut.ExpandWithSynonymsAsync(query, options);
+        var result = await _sut.ExpandWithSynonymsAsync(query, options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().Contain("custom");
@@ -314,7 +314,7 @@ public sealed class QueryPreprocessingServiceTests
             .Returns("""["cache", "memorization", "storage"]""");
 
         // Act
-        var result = await _sut.ExpandWithSynonymsAsync(query, options);
+        var result = await _sut.ExpandWithSynonymsAsync(query, options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().Contain("implement");
@@ -341,7 +341,7 @@ public sealed class QueryPreprocessingServiceTests
             .Returns("""{"types": ["UserService"], "files": ["config.json"]}""");
 
         // Act
-        var result = await _sut.ExtractEntitiesAsync(query, options);
+        var result = await _sut.ExtractEntitiesAsync(query, options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().ContainKey("types");
@@ -363,7 +363,7 @@ public sealed class QueryPreprocessingServiceTests
             .Returns<string>(x => throw new InvalidOperationException("LLM failed"));
 
         // Act
-        var result = await _sut.ExtractEntitiesAsync(query);
+        var result = await _sut.ExtractEntitiesAsync(query, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeEmpty();
@@ -386,7 +386,7 @@ public sealed class QueryPreprocessingServiceTests
             .Returns("""["query", "one"]""");
 
         // Act
-        var results = await _sut.PreprocessBatchAsync(queries);
+        var results = await _sut.PreprocessBatchAsync(queries, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         results.Should().HaveCount(3);
@@ -402,7 +402,7 @@ public sealed class QueryPreprocessingServiceTests
         var queries = Array.Empty<string>();
 
         // Act
-        var results = await _sut.PreprocessBatchAsync(queries);
+        var results = await _sut.PreprocessBatchAsync(queries, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         results.Should().BeEmpty();
@@ -451,7 +451,7 @@ public sealed class QueryPreprocessingServiceTests
             .Returns("""["function", "implementation"]""");
 
         // Act
-        var result = await _sut.PreprocessAsync(query, options);
+        var result = await _sut.PreprocessAsync(query, options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Intent.Should().Be(QueryClassification.Code);
@@ -476,7 +476,7 @@ public sealed class QueryPreprocessingServiceTests
             .Returns("""["dependency", "injection"]""");
 
         // Act
-        var result = await _sut.PreprocessAsync(query, options);
+        var result = await _sut.PreprocessAsync(query, options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Intent.Should().Be(QueryClassification.Definition);

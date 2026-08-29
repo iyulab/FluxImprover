@@ -50,7 +50,7 @@ public sealed class QAPipelineTests
             .Returns(@"{""score"": 0.9, ""reasoning"": ""Good""}");
 
         // Act
-        var result = await _sut.ExecuteAsync(context);
+        var result = await _sut.ExecuteAsync(context, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -72,7 +72,7 @@ public sealed class QAPipelineTests
         var options = new QAPipelineOptions { SkipFiltering = true };
 
         // Act
-        var result = await _sut.ExecuteAsync(context, options);
+        var result = await _sut.ExecuteAsync(context, options, TestContext.Current.CancellationToken);
 
         // Assert
         result.GeneratedCount.Should().Be(2);
@@ -83,7 +83,7 @@ public sealed class QAPipelineTests
     public async Task ExecuteAsync_WithEmptyContext_ReturnsEmptyResult()
     {
         // Arrange & Act
-        var result = await _sut.ExecuteAsync(string.Empty);
+        var result = await _sut.ExecuteAsync(string.Empty, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.GeneratedCount.Should().Be(0);
@@ -111,7 +111,7 @@ public sealed class QAPipelineTests
                 @"{""score"": 0.9, ""reasoning"": ""Good""}");
 
         // Act
-        var results = await _sut.ExecuteBatchAsync(contexts);
+        var results = await _sut.ExecuteBatchAsync(contexts, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         results.Should().HaveCount(2);
@@ -138,7 +138,7 @@ public sealed class QAPipelineTests
         var options = new QAPipelineOptions { SkipFiltering = true };
 
         // Act
-        var result = await _sut.ExecuteFromChunkAsync(chunk, options);
+        var result = await _sut.ExecuteFromChunkAsync(chunk, options, TestContext.Current.CancellationToken);
 
         // Assert
         result.QAPairs.Should().ContainSingle();
@@ -172,7 +172,7 @@ public sealed class QAPipelineTests
                 @"{""score"": 0.3, ""reasoning"": ""Bad""}");
 
         // Act
-        var result = await _sut.ExecuteAsync(context);
+        var result = await _sut.ExecuteAsync(context, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.GeneratedCount.Should().Be(2);

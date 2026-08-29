@@ -34,7 +34,7 @@ public sealed class FaithfulnessEvaluatorTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.EvaluateAsync(context, answer);
+        var result = await _sut.EvaluateAsync(context, answer, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -57,7 +57,7 @@ public sealed class FaithfulnessEvaluatorTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.EvaluateAsync(context, answer);
+        var result = await _sut.EvaluateAsync(context, answer, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Score.Should().BeApproximately(0.0, 0.01);
@@ -79,7 +79,7 @@ public sealed class FaithfulnessEvaluatorTests
             .Returns(expectedResponse);
 
         // Act
-        await _sut.EvaluateAsync(context, answer, options);
+        await _sut.EvaluateAsync(context, answer, options, TestContext.Current.CancellationToken);
 
         // Assert
         await _completionService.Received(1).CompleteAsync(
@@ -92,7 +92,7 @@ public sealed class FaithfulnessEvaluatorTests
     public async Task EvaluateAsync_WithEmptyContext_ReturnsZeroScore()
     {
         // Arrange & Act
-        var result = await _sut.EvaluateAsync(string.Empty, "Some answer");
+        var result = await _sut.EvaluateAsync(string.Empty, "Some answer", cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Score.Should().Be(0.0);
@@ -106,7 +106,7 @@ public sealed class FaithfulnessEvaluatorTests
     public async Task EvaluateAsync_WithEmptyAnswer_ReturnsZeroScore()
     {
         // Arrange & Act
-        var result = await _sut.EvaluateAsync("Some context", string.Empty);
+        var result = await _sut.EvaluateAsync("Some context", string.Empty, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Score.Should().Be(0.0);
@@ -123,7 +123,7 @@ public sealed class FaithfulnessEvaluatorTests
             .Returns("invalid json response");
 
         // Act
-        var result = await _sut.EvaluateAsync("context", "answer");
+        var result = await _sut.EvaluateAsync("context", "answer", cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Score.Should().Be(0.0);
@@ -142,7 +142,7 @@ public sealed class FaithfulnessEvaluatorTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.EvaluateAsync("context", "answer with claims");
+        var result = await _sut.EvaluateAsync("context", "answer with claims", cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Details.Should().ContainKey("claims");
@@ -168,7 +168,7 @@ public sealed class FaithfulnessEvaluatorTests
                 @"{""score"": 0.7, ""reasoning"": ""Fair""}");
 
         // Act
-        var results = await _sut.EvaluateBatchAsync(pairs);
+        var results = await _sut.EvaluateBatchAsync(pairs, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         results.Should().HaveCount(2);

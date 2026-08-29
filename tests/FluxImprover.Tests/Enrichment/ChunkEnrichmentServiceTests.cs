@@ -44,7 +44,7 @@ public sealed class ChunkEnrichmentServiceTests
             .Returns(new List<string> { "test", "chunk", "information" });
 
         // Act
-        var result = await _sut.EnrichAsync(chunk);
+        var result = await _sut.EnrichAsync(chunk, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -79,7 +79,7 @@ public sealed class ChunkEnrichmentServiceTests
             .Returns(new List<string>());
 
         // Act
-        await _sut.EnrichAsync(chunk, options);
+        await _sut.EnrichAsync(chunk, options, TestContext.Current.CancellationToken);
 
         // Assert
         await _summarizationService.Received(1).SummarizeAsync(
@@ -115,7 +115,7 @@ public sealed class ChunkEnrichmentServiceTests
             .Returns(new List<string>());
 
         // Act
-        var result = await _sut.EnrichAsync(chunk);
+        var result = await _sut.EnrichAsync(chunk, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Metadata.Should().ContainKey("source");
@@ -138,7 +138,7 @@ public sealed class ChunkEnrichmentServiceTests
             .Returns(new List<string> { "keyword" });
 
         // Act
-        var results = await _sut.EnrichBatchAsync(chunks);
+        var results = await _sut.EnrichBatchAsync(chunks, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         results.Should().HaveCount(2);
@@ -167,7 +167,7 @@ public sealed class ChunkEnrichmentServiceTests
         };
 
         // Act
-        var result = await _sut.EnrichAsync(chunk, options);
+        var result = await _sut.EnrichAsync(chunk, options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -202,7 +202,7 @@ public sealed class ChunkEnrichmentServiceTests
             .Returns(new List<string> { "keyword" });
 
         // Act
-        var result = await _sut.EnrichAsync(chunk, options);
+        var result = await _sut.EnrichAsync(chunk, options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Summary.Should().NotBeNull();
@@ -237,7 +237,7 @@ public sealed class ChunkEnrichmentServiceTests
             .Returns(new List<string>());
 
         // Act
-        var result = await _sut.EnrichAsync(chunk, options);
+        var result = await _sut.EnrichAsync(chunk, options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Metadata.Should().ContainKey(EnrichmentMetadataKeys.QualityScore);
@@ -268,7 +268,7 @@ public sealed class ChunkEnrichmentServiceTests
             .Returns(new List<string> { "keyword" });
 
         // Act
-        var result = await _sut.EnrichAsync(chunk, options);
+        var result = await _sut.EnrichAsync(chunk, options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Summary.Should().BeNull();
@@ -290,7 +290,7 @@ public sealed class ChunkEnrichmentServiceTests
             .Returns(new List<string> { "test" });
 
         // Act
-        var result = await _sut.EnrichAsync(chunk);
+        var result = await _sut.EnrichAsync(chunk, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert - Both services should be called
         await _summarizationService.Received(1).SummarizeAsync(
@@ -347,7 +347,7 @@ public sealed class ChunkEnrichmentServiceTests
         var chunk = new Chunk { Id = "empty", Content = "" };
 
         // Act
-        var result = await _sut.EnrichAsync(chunk);
+        var result = await _sut.EnrichAsync(chunk, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Summary.Should().BeNull();
@@ -370,7 +370,7 @@ public sealed class ChunkEnrichmentServiceTests
             .Returns(new List<string>());
 
         // Act
-        var result = await _sut.EnrichAsync(chunk);
+        var result = await _sut.EnrichAsync(chunk, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.SourceId.Should().Be("chunk-123");
@@ -406,7 +406,7 @@ public sealed class ChunkEnrichmentServiceTests
             .Returns(expectedKeywords);
 
         // Act
-        var result = await _sut.EnrichAsync(chunk);
+        var result = await _sut.EnrichAsync(chunk, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -447,7 +447,7 @@ public sealed class ChunkEnrichmentServiceTests
             .Returns(new List<string> { "핫빗", "페일오버", "DRBD" });
 
         // Act
-        var result = await _sut.EnrichAsync(chunk);
+        var result = await _sut.EnrichAsync(chunk, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -479,7 +479,7 @@ public sealed class ChunkEnrichmentServiceTests
             .Returns(new List<string> { "Kubernetes", "Pod", "liveness probe", "readiness probe", "헬스체크" });
 
         // Act
-        var result = await _sut.EnrichAsync(chunk);
+        var result = await _sut.EnrichAsync(chunk, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();

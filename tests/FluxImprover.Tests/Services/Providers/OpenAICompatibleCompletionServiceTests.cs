@@ -116,7 +116,7 @@ public class OpenAICompatibleCompletionServiceTests : IDisposable
         _sut = new OpenAICompatibleCompletionService(httpClient, "gpt-4o-mini", _logger);
 
         // Act
-        var result = await _sut.CompleteAsync("Say hello");
+        var result = await _sut.CompleteAsync("Say hello", cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().Be("Hello, world!");
@@ -148,7 +148,7 @@ public class OpenAICompatibleCompletionServiceTests : IDisposable
         };
 
         // Act
-        await _sut.CompleteAsync("New prompt", options);
+        await _sut.CompleteAsync("New prompt", options, TestContext.Current.CancellationToken);
 
         // Assert
         capturedBody.Should().NotBeNull();
@@ -178,7 +178,7 @@ public class OpenAICompatibleCompletionServiceTests : IDisposable
         var options = new CompletionOptions { JsonMode = true };
 
         // Act
-        await _sut.CompleteAsync("Return JSON", options);
+        await _sut.CompleteAsync("Return JSON", options, TestContext.Current.CancellationToken);
 
         // Assert
         capturedBody.Should().Contain("json_object");
@@ -195,7 +195,7 @@ public class OpenAICompatibleCompletionServiceTests : IDisposable
         _sut = new OpenAICompatibleCompletionService(httpClient, "gpt-4o-mini", _logger);
 
         // Act
-        var result = await _sut.CompleteAsync("Test");
+        var result = await _sut.CompleteAsync("Test", cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeEmpty();
@@ -235,7 +235,7 @@ public class OpenAICompatibleCompletionServiceTests : IDisposable
 
         // Act
         var tokens = new List<string>();
-        await foreach (var token in _sut.CompleteStreamingAsync("Test"))
+        await foreach (var token in _sut.CompleteStreamingAsync("Test", cancellationToken: TestContext.Current.CancellationToken))
         {
             tokens.Add(token);
         }
@@ -262,7 +262,7 @@ public class OpenAICompatibleCompletionServiceTests : IDisposable
 
         // Act
         var tokens = new List<string>();
-        await foreach (var token in _sut.CompleteStreamingAsync("Test"))
+        await foreach (var token in _sut.CompleteStreamingAsync("Test", cancellationToken: TestContext.Current.CancellationToken))
         {
             tokens.Add(token);
         }
@@ -364,7 +364,7 @@ public class OpenAICompatibleCompletionServiceTests : IDisposable
         _sut = new OpenAICompatibleCompletionService(httpClient, "gpt-4o-mini", _logger);
 
         // Act
-        await _sut.CompleteAsync("Test");
+        await _sut.CompleteAsync("Test", cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         capturedUri.Should().NotBeNull();
@@ -389,7 +389,7 @@ public class OpenAICompatibleCompletionServiceTests : IDisposable
         _sut = new OpenAICompatibleCompletionService(httpClient, "gpt-4o-mini", _logger);
 
         // Act
-        await _sut.CompleteAsync("Hello");
+        await _sut.CompleteAsync("Hello", cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         capturedBody.Should().NotBeNull();

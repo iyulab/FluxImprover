@@ -39,6 +39,8 @@ jobs:
       - name: Test
         # Category=Integration drives real local models via LMSupply.Generator (multi-GB download,
         # CPU-bound inference) — excluded here the same way FileFlux/memory-indexer exclude it; run
-        # locally with `dotnet test --filter "Category=Integration"` to exercise it.
-        run: dotnet test --no-build --configuration Release --verbosity normal --logger trx --results-directory ./test-results --filter "Category!=Integration" --blame-hang --blame-hang-timeout 5m
+        # locally with `dotnet test --filter-trait "Category=Integration"` to exercise it.
+        # xUnit v3/MTP has no VSTest-style single-expression filter; see plan doc's compound-filter
+        # translation (repeated filter-not-trait flags, ANDed).
+        run: dotnet test --no-build --configuration Release --verbosity normal --report-trx --results-directory ./test-results --filter-not-trait "Category=Integration" --hangdump --hangdump-timeout 5m
 

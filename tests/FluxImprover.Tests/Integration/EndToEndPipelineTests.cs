@@ -50,7 +50,7 @@ public sealed class EndToEndPipelineTests
             .Returns(@"{""keywords"": [{""keyword"": ""Paris"", ""score"": 0.95}, {""keyword"": ""France"", ""score"": 0.9}, {""keyword"": ""Eiffel Tower"", ""score"": 0.85}]}");
 
         // Act
-        var enriched = await _services.ChunkEnrichment.EnrichAsync(chunk);
+        var enriched = await _services.ChunkEnrichment.EnrichAsync(chunk, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         enriched.Should().NotBeNull();
@@ -90,7 +90,7 @@ public sealed class EndToEndPipelineTests
             .Returns(@"{""score"": 0.88, ""explanation"": ""Answerable from context""}");
 
         // Act
-        var qaPairs = await _services.QAGenerator.GenerateAsync(context);
+        var qaPairs = await _services.QAGenerator.GenerateAsync(context, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         qaPairs.Should().NotBeEmpty();
@@ -113,7 +113,7 @@ public sealed class EndToEndPipelineTests
             .Returns(@"{""suggestions"": [{""text"": ""What are the types of machine learning?"", ""category"": ""DeepDive"", ""relevance"": 0.9}]}");
 
         // Act
-        var suggestions = await _services.QuestionSuggestion.SuggestFromConversationAsync(history);
+        var suggestions = await _services.QuestionSuggestion.SuggestFromConversationAsync(history, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         suggestions.Should().NotBeEmpty();
@@ -135,9 +135,9 @@ public sealed class EndToEndPipelineTests
             .Returns(@"{""score"": 0.9, ""explanation"": ""Good evaluation""}");
 
         // Act
-        var faithfulness = await _services.Faithfulness.EvaluateAsync(context, answer);
-        var relevancy = await _services.Relevancy.EvaluateAsync(question, answer, context: context);
-        var answerability = await _services.Answerability.EvaluateAsync(context, question);
+        var faithfulness = await _services.Faithfulness.EvaluateAsync(context, answer, cancellationToken: TestContext.Current.CancellationToken);
+        var relevancy = await _services.Relevancy.EvaluateAsync(question, answer, context: context, cancellationToken: TestContext.Current.CancellationToken);
+        var answerability = await _services.Answerability.EvaluateAsync(context, question, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         faithfulness.Score.Should().BeGreaterThan(0);
@@ -177,8 +177,8 @@ public sealed class EndToEndPipelineTests
             .Returns(@"{""qa_pairs"": [{""question"": ""What does AI enable?"", ""answer"": ""Predictive analytics through machine learning"", ""context"": ""Machine learning enables predictive analytics.""}]}");
 
         // Act
-        var enriched = await _services.ChunkEnrichment.EnrichAsync(chunk);
-        var qaPairs = await _services.QAGenerator.GenerateAsync(chunk.Content);
+        var enriched = await _services.ChunkEnrichment.EnrichAsync(chunk, cancellationToken: TestContext.Current.CancellationToken);
+        var qaPairs = await _services.QAGenerator.GenerateAsync(chunk.Content, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         enriched.Should().NotBeNull();

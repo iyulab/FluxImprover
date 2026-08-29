@@ -33,7 +33,7 @@ public sealed class QuestionSuggestionServiceTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.SuggestAsync(context);
+        var result = await _sut.SuggestAsync(context, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeEmpty();
@@ -61,7 +61,7 @@ public sealed class QuestionSuggestionServiceTests
             .Returns(expectedResponse);
 
         // Act
-        await _sut.SuggestAsync(context, options);
+        await _sut.SuggestAsync(context, options, TestContext.Current.CancellationToken);
 
         // Assert
         await _completionService.Received(1).CompleteAsync(
@@ -74,7 +74,7 @@ public sealed class QuestionSuggestionServiceTests
     public async Task SuggestAsync_WithEmptyContext_ReturnsEmptyList()
     {
         // Arrange & Act
-        var result = await _sut.SuggestAsync(string.Empty);
+        var result = await _sut.SuggestAsync(string.Empty, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeEmpty();
@@ -95,7 +95,7 @@ public sealed class QuestionSuggestionServiceTests
             .Returns("invalid json");
 
         // Act
-        var result = await _sut.SuggestAsync("Some context");
+        var result = await _sut.SuggestAsync("Some context", cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().BeEmpty();
@@ -118,7 +118,7 @@ public sealed class QuestionSuggestionServiceTests
             .Returns(expectedResponse);
 
         // Act
-        await _sut.SuggestAsync("Context", options);
+        await _sut.SuggestAsync("Context", options, TestContext.Current.CancellationToken);
 
         // Assert
         await _completionService.Received(1).CompleteAsync(
@@ -141,7 +141,7 @@ public sealed class QuestionSuggestionServiceTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.SuggestAsync("Paris is the capital of France", options);
+        var result = await _sut.SuggestAsync("Paris is the capital of France", options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().ContainSingle();
@@ -167,7 +167,7 @@ public sealed class QuestionSuggestionServiceTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.SuggestFromQAAsync(qaPair);
+        var result = await _sut.SuggestFromQAAsync(qaPair, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeEmpty();
@@ -195,7 +195,7 @@ public sealed class QuestionSuggestionServiceTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.SuggestFromConversationAsync(history);
+        var result = await _sut.SuggestFromConversationAsync(history, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeEmpty();
@@ -219,7 +219,7 @@ public sealed class QuestionSuggestionServiceTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.SuggestAsync("Context", options);
+        var result = await _sut.SuggestAsync("Context", options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().ContainSingle();
@@ -240,7 +240,7 @@ public sealed class QuestionSuggestionServiceTests
             .Returns(expectedResponse);
 
         // Act
-        var result = await _sut.SuggestAsync("Context", options);
+        var result = await _sut.SuggestAsync("Context", options, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().HaveCount(2);

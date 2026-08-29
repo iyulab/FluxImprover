@@ -20,7 +20,7 @@ public class IEmbeddingServiceTests
             .Returns(new ReadOnlyMemory<float>(expectedEmbedding));
 
         // Act
-        var result = await service.EmbedAsync("Test text");
+        var result = await service.EmbedAsync("Test text", TestContext.Current.CancellationToken);
 
         // Assert
         result.Length.Should().Be(3);
@@ -39,7 +39,7 @@ public class IEmbeddingServiceTests
             .Returns(embeddings);
 
         // Act
-        var result = await service.EmbedBatchAsync(texts);
+        var result = await service.EmbedBatchAsync(texts, TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().HaveCount(3);
@@ -55,7 +55,7 @@ public class IEmbeddingServiceTests
             .Returns(new ReadOnlyMemory<float>(SingleElementEmbedding));
 
         // Act
-        var result = await service.EmbedAsync("");
+        var result = await service.EmbedAsync("", TestContext.Current.CancellationToken);
 
         // Assert
         result.Length.Should().BeGreaterThan(0);
