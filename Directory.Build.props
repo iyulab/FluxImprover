@@ -9,7 +9,7 @@
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <!-- CA*: all resolved — no suppressions needed -->
-    <Version>0.11.7</Version>
+    <Version>0.11.8</Version>
   </PropertyGroup>
 
   <PropertyGroup>
