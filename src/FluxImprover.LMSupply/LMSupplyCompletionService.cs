@@ -20,6 +20,7 @@ public sealed partial class LMSupplyCompletionService : ITextGenerationService, 
     private readonly ILogger<LMSupplyCompletionService> _logger;
     private readonly float _defaultTemperature;
     private readonly int _defaultMaxTokens;
+    private readonly bool _ownsModel;
 
     /// <summary>
     /// Creates a new LMSupply completion service.
@@ -28,11 +29,13 @@ public sealed partial class LMSupplyCompletionService : ITextGenerationService, 
     /// <param name="logger">Logger instance.</param>
     /// <param name="defaultTemperature">Default temperature when not specified in options. Defaults to 0.3.</param>
     /// <param name="defaultMaxTokens">Default max tokens when not specified in options. Defaults to 512.</param>
+    /// <param name="ownsModel">Whether <see cref="DisposeAsync"/> disposes <paramref name="model"/>. Default false: the model's creator owns it; pass true only when this instance is the sole owner.</param>
     public LMSupplyCompletionService(
         IGeneratorModel model,
         ILogger<LMSupplyCompletionService> logger,
         float defaultTemperature = 0.3f,
-        int defaultMaxTokens = 512)
+        int defaultMaxTokens = 512,
+        bool ownsModel = false)
     {
         ArgumentNullException.ThrowIfNull(model);
         ArgumentNullException.ThrowIfNull(logger);
@@ -41,6 +44,11 @@ public sealed partial class LMSupplyCompletionService : ITextGenerationService, 
         _logger = logger;
         _defaultTemperature = defaultTemperature;
         _defaultMaxTokens = defaultMaxTokens;
+        // Default false: a loaded model is one shared, expensive instance and this adapter is scoped by
+        // default — an adapter that disposed a model it was merely handed killed the shared model at the
+        // end of the first scope (ObjectDisposedException for every later caller; ecosystem E2E 2026-09-09).
+        // Whoever created the model disposes it; pass true only when this instance is the sole owner.
+        _ownsModel = ownsModel;
     }
 
     /// <inheritdoc />
@@ -143,7 +151,10 @@ public sealed partial class LMSupplyCompletionService : ITextGenerationService, 
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
-        await _model.DisposeAsync();
+        if (_ownsModel)
+        {
+            await _model.DisposeAsync();
+        }
     }
 
     #region LoggerMessage

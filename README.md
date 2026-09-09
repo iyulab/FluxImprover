@@ -110,6 +110,13 @@ services.AddFluxImprover(sp => new MyCompletionService(sp.GetRequiredService<...
 > `FluxImproverServices`'s constructor-injected member services. Two consequences: `sp.GetRequiredService<ITextGenerationService>()`
 > now resolves directly, and if your implementation is `IAsyncDisposable`/`IDisposable`, the
 > container disposes it automatically when its scope/provider is disposed — no manual cleanup
+>
+> **Model ownership (v0.12.0+)**: `LMSupplyCompletionService` no longer disposes the `IGeneratorModel` it was
+> given unless told to (`ownsModel` / `disposeModel: true`). With the default *scoped* lifetime the adapter is
+> created and disposed per scope, while a loaded model is one shared, expensive instance — the old behaviour
+> disposed that shared model at the end of the first scope and every later caller got `ObjectDisposedException`.
+> Whoever created the model disposes it: the container for the shorthand overload, you for a factory that returns
+> a shared instance. Pass `disposeModel: true` only when the factory creates a fresh model per call.
 > needed. The parameterless overload (`AddFluxImprover()`) does not re-register it: you already
 > registered `ITextGenerationService` yourself, and its lifetime remains yours to manage.
 

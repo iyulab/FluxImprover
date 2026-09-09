@@ -373,15 +373,25 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
     #region DisposeAsync Tests
 
     [Fact]
-    public async Task DisposeAsync_DisposesUnderlyingModel()
+    public async Task DisposeAsync_ByDefault_LeavesTheModelAlone()
     {
-        // Arrange
+        // The adapter is scoped by default while the model is one shared, expensive instance; an adapter
+        // that disposed a model it was merely handed killed the shared model at the end of the first scope
+        // (ecosystem E2E, 2026-09-09). Whoever created the model disposes it.
         _sut = new LMSupplyCompletionService(_model, _logger);
 
-        // Act
         await _sut.DisposeAsync();
 
-        // Assert
+        await _model.DidNotReceive().DisposeAsync();
+    }
+
+    [Fact]
+    public async Task DisposeAsync_WhenItOwnsTheModel_DisposesIt()
+    {
+        _sut = new LMSupplyCompletionService(_model, _logger, ownsModel: true);
+
+        await _sut.DisposeAsync();
+
         await _model.Received(1).DisposeAsync();
     }
 

@@ -1,5 +1,6 @@
 namespace FluxImprover.Tests.Integration;
 
+using global::LMSupply.Generator.Abstractions;
 using AwesomeAssertions;
 using FluxImprover.LMSupply;
 using FluxImprover.Options;
@@ -34,10 +35,10 @@ public sealed class LMSupplyCompletionServiceRealModelTests
     [Fact]
     public async Task CompleteAsync_RealLocalModel_ProducesNonEmptyCompletion()
     {
-        // LMSupplyCompletionService.DisposeAsync() disposes the model it was given (see its
-        // source) — a separate `await using` on `model` here would double-dispose the underlying
-        // ONNX Runtime GenAI native handle.
-        var model = await LocalGenerator.LoadAsync(ModelAlias, cancellationToken: TestContext.Current.CancellationToken);
+        // Since 0.12.0 the adapter does not dispose a model it was merely handed (ownsModel defaults to
+        // false) — the model's creator owns it, so the `await using` on `model` is what releases the
+        // ONNX Runtime GenAI native handle here.
+        await using var model = await LocalGenerator.LoadAsync(ModelAlias, cancellationToken: TestContext.Current.CancellationToken);
         await using var service = new LMSupplyCompletionService(model, NullLogger<LMSupplyCompletionService>.Instance);
 
         var result = await service.CompleteAsync("Reply with exactly one word: the color of the sky on a clear day.", new CompletionOptions { MaxTokens = 16, Temperature = 0.1f }, TestContext.Current.CancellationToken);
@@ -55,12 +56,14 @@ public sealed class LMSupplyCompletionServiceRealModelTests
         // by the caller — and GetRequiredService<ITextGenerationService>() resolves directly
         // instead of throwing. Provable only against a real model: a mock can't detect a leaked
         // ONNX Runtime GenAI native handle (OGA leak diagnostic on process exit), which is what
-        // this test's absence of that diagnostic actually proves. No manual `model.DisposeAsync()`
-        // anywhere below — that used to be required (see git history) and would now double-dispose.
+        // this test's absence of that diagnostic actually proves. Since 0.12.0 the adapter no longer
+        // disposes a model it was handed, so the model is registered through a factory: the container
+        // then owns the IGeneratorModel singleton and disposes it with the provider — still no manual
+        // `model.DisposeAsync()` below, and still no double-dispose.
         var model = await LocalGenerator.LoadAsync(ModelAlias, cancellationToken: TestContext.Current.CancellationToken);
         var services = new ServiceCollection();
         services.AddSingleton<ILogger<LMSupplyCompletionService>>(NullLogger<LMSupplyCompletionService>.Instance);
-        services.AddSingleton(model);
+        services.AddSingleton<IGeneratorModel>(_ => model);
         services.AddFluxImproverWithLMSupply(defaultMaxTokens: 16, lifetime: ServiceLifetime.Singleton);
 
         await using (var provider = services.BuildServiceProvider())
