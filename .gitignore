@@ -371,3 +371,6 @@ claudedocs/
 
 # IDE language server cache
 *.lscache
+
+# dotnet test --results-directory used by ci.yml (trx lands here when the CI command is replayed locally)
+test-results/
