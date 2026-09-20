@@ -14,15 +14,19 @@ public class OptionsReachabilityRosterTests
     private static readonly Assembly[] Libraries =
     [
         Assembly.Load("FluxImprover"),
+        Assembly.Load("FluxImprover.LMSupply"),
     ];
 
     /// <summary>
     /// Options accepted as unread today. Shrink this list; never grow it silently.
     /// <para>
-    /// This is the roster's opening baseline (2026-09-20), recorded as found rather than as judged:
-    /// the first run reported 20 unread public options across 7 types, and none has been
-    /// investigated, so none carries a reason of its own. Recording them is what makes the gate start
-    /// green and makes the *next* unread option a failure instead of silently joining a crowd.
+    /// Opening baseline (2026-09-20): 18 unread public options across 6 types, recorded as found rather than
+    /// as judged - none has been investigated, so none carries a reason of its own. Recording them is what makes
+    /// the gate start green and makes the *next* unread option a failure instead of silently joining a crowd.
+    /// </para>
+    /// <para>
+    /// The assembly list above must cover every assembly this repository ships. Scanning only the main one
+    /// reports options that a sibling assembly reads as unread - that mistake inflated an early baseline elsewhere threefold.
     /// </para>
     /// </summary>
     private static readonly Dictionary<string, string[]> KnownUnread = new()
@@ -45,10 +49,6 @@ public class OptionsReachabilityRosterTests
         ["FluxImprover.Options.QuestionSuggestionOptions"] =
         [
             "UseConversationHistory", "UseDocumentContext",
-        ],
-        ["FluxImprover.Services.CompletionOptions"] =
-        [
-            "ResponseSchema", "Thinking",
         ],
     };
 
