@@ -1,3 +1,4 @@
+using Flux.Abstractions;
 using AwesomeAssertions;
 using FluxImprover.LMSupply;
 using FluxImprover.Services;
@@ -23,6 +24,9 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
         Substitute.For<ILogger<LMSupplyCompletionService>>();
 
     private LMSupplyCompletionService? _sut;
+
+    private static GenerationResult Result(string content, string finishReason = "stop") =>
+        new(content, TokenUsage.Empty, finishReason);
 
     public async ValueTask DisposeAsync()
     {
@@ -77,11 +81,11 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
     {
         // Arrange
         _model.ModelId.Returns("test-model");
-        _model.GenerateChatCompleteAsync(
+        _model.GenerateChatCompleteResultAsync(
                 Arg.Any<IEnumerable<LMChatMessage>>(),
                 Arg.Any<LMGenerationOptions>(),
                 Arg.Any<CancellationToken>())
-            .Returns("Generated response");
+            .Returns(Result("Generated response"));
 
         _sut = new LMSupplyCompletionService(_model, _logger);
 
@@ -98,11 +102,11 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
         // Arrange
         _model.ModelId.Returns("test-model");
         IEnumerable<LMChatMessage>? capturedMessages = null;
-        _model.GenerateChatCompleteAsync(
+        _model.GenerateChatCompleteResultAsync(
                 Arg.Do<IEnumerable<LMChatMessage>>(m => capturedMessages = m.ToList()),
                 Arg.Any<LMGenerationOptions>(),
                 Arg.Any<CancellationToken>())
-            .Returns("OK");
+            .Returns(Result("OK"));
 
         _sut = new LMSupplyCompletionService(_model, _logger);
 
@@ -126,11 +130,11 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
         // Arrange
         _model.ModelId.Returns("test-model");
         IEnumerable<LMChatMessage>? capturedMessages = null;
-        _model.GenerateChatCompleteAsync(
+        _model.GenerateChatCompleteResultAsync(
                 Arg.Do<IEnumerable<LMChatMessage>>(m => capturedMessages = m.ToList()),
                 Arg.Any<LMGenerationOptions>(),
                 Arg.Any<CancellationToken>())
-            .Returns("OK");
+            .Returns(Result("OK"));
 
         _sut = new LMSupplyCompletionService(_model, _logger);
 
@@ -165,11 +169,11 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
         // Arrange
         _model.ModelId.Returns("test-model");
         LMGenerationOptions? capturedOptions = null;
-        _model.GenerateChatCompleteAsync(
+        _model.GenerateChatCompleteResultAsync(
                 Arg.Any<IEnumerable<LMChatMessage>>(),
                 Arg.Do<LMGenerationOptions>(o => capturedOptions = o),
                 Arg.Any<CancellationToken>())
-            .Returns("OK");
+            .Returns(Result("OK"));
 
         _sut = new LMSupplyCompletionService(_model, _logger);
 
@@ -195,11 +199,11 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
         // Arrange
         _model.ModelId.Returns("test-model");
         LMGenerationOptions? capturedOptions = null;
-        _model.GenerateChatCompleteAsync(
+        _model.GenerateChatCompleteResultAsync(
                 Arg.Any<IEnumerable<LMChatMessage>>(),
                 Arg.Do<LMGenerationOptions>(o => capturedOptions = o),
                 Arg.Any<CancellationToken>())
-            .Returns("OK");
+            .Returns(Result("OK"));
 
         _sut = new LMSupplyCompletionService(_model, _logger,
             defaultTemperature: 0.5f, defaultMaxTokens: 256);
@@ -219,11 +223,11 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
         // Arrange
         _model.ModelId.Returns("test-model");
         LMGenerationOptions? capturedOptions = null;
-        _model.GenerateChatCompleteAsync(
+        _model.GenerateChatCompleteResultAsync(
                 Arg.Any<IEnumerable<LMChatMessage>>(),
                 Arg.Do<LMGenerationOptions>(o => capturedOptions = o),
                 Arg.Any<CancellationToken>())
-            .Returns("{\"key\":\"value\"}");
+            .Returns(Result("{\"key\":\"value\"}"));
 
         _sut = new LMSupplyCompletionService(_model, _logger);
 
@@ -248,11 +252,11 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
         // Arrange
         _model.ModelId.Returns("test-model");
         LMGenerationOptions? capturedOptions = null;
-        _model.GenerateChatCompleteAsync(
+        _model.GenerateChatCompleteResultAsync(
                 Arg.Any<IEnumerable<LMChatMessage>>(),
                 Arg.Do<LMGenerationOptions>(o => capturedOptions = o),
                 Arg.Any<CancellationToken>())
-            .Returns("text");
+            .Returns(Result("text"));
 
         _sut = new LMSupplyCompletionService(_model, _logger);
 
@@ -275,11 +279,11 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
         // Arrange
         _model.ModelId.Returns("test-model");
         LMGenerationOptions? capturedOptions = null;
-        _model.GenerateChatCompleteAsync(
+        _model.GenerateChatCompleteResultAsync(
                 Arg.Any<IEnumerable<LMChatMessage>>(),
                 Arg.Do<LMGenerationOptions>(o => capturedOptions = o),
                 Arg.Any<CancellationToken>())
-            .Returns("text");
+            .Returns(Result("text"));
 
         _sut = new LMSupplyCompletionService(_model, _logger);
 
@@ -298,11 +302,11 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
         // Arrange
         _model.ModelId.Returns("test-model");
         LMGenerationOptions? capturedOptions = null;
-        _model.GenerateChatCompleteAsync(
+        _model.GenerateChatCompleteResultAsync(
                 Arg.Any<IEnumerable<LMChatMessage>>(),
                 Arg.Do<LMGenerationOptions>(o => capturedOptions = o),
                 Arg.Any<CancellationToken>())
-            .Returns("text");
+            .Returns(Result("text"));
 
         _sut = new LMSupplyCompletionService(_model, _logger);
 
@@ -413,11 +417,11 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
         // Arrange
         _model.ModelId.Returns("test-model");
         IEnumerable<LMChatMessage>? capturedMessages = null;
-        _model.GenerateChatCompleteAsync(
+        _model.GenerateChatCompleteResultAsync(
                 Arg.Do<IEnumerable<LMChatMessage>>(m => capturedMessages = m.ToList()),
                 Arg.Any<LMGenerationOptions>(),
                 Arg.Any<CancellationToken>())
-            .Returns("OK");
+            .Returns(Result("OK"));
 
         _sut = new LMSupplyCompletionService(_model, _logger);
 
@@ -436,4 +440,41 @@ public class LMSupplyCompletionServiceTests : IAsyncDisposable
     }
 
     #endregion
+
+    [Fact]
+    public async Task CompleteAsync_ThrowOnTruncation_AnswerCutOffAtMaxTokens_Throws()
+    {
+        _model.ModelId.Returns("test-model");
+        _model.GenerateChatCompleteResultAsync(
+                Arg.Any<IEnumerable<LMChatMessage>>(),
+                Arg.Any<LMGenerationOptions>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Result("partial answ", "length"));
+        _sut = new LMSupplyCompletionService(_model, _logger);
+
+        var act = () => _sut.CompleteAsync(
+            "prompt", new CompletionOptions { MaxTokens = 16, ThrowOnTruncation = true }, TestContext.Current.CancellationToken);
+
+        (await act.Should().ThrowAsync<TextCompletionTruncatedException>()).Which.MaxTokens.Should().Be(16);
+    }
+
+    [Theory]
+    [InlineData(false, "length")]
+    [InlineData(true, "stop")]
+    [InlineData(true, null)]
+    public async Task CompleteAsync_ReturnsTheText_WhenNotAskedToThrow_OrTheAnswerFinished(bool throwOnTruncation, string? finishReason)
+    {
+        _model.ModelId.Returns("test-model");
+        _model.GenerateChatCompleteResultAsync(
+                Arg.Any<IEnumerable<LMChatMessage>>(),
+                Arg.Any<LMGenerationOptions>(),
+                Arg.Any<CancellationToken>())
+            .Returns(new GenerationResult("answer", TokenUsage.Empty, finishReason));
+        _sut = new LMSupplyCompletionService(_model, _logger);
+
+        var result = await _sut.CompleteAsync(
+            "prompt", new CompletionOptions { ThrowOnTruncation = throwOnTruncation }, TestContext.Current.CancellationToken);
+
+        result.Should().Be("answer");
+    }
 }

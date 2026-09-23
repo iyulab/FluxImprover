@@ -1,3 +1,4 @@
+using Flux.Abstractions;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -442,4 +443,35 @@ public class OpenAICompatibleCompletionServiceTests : IDisposable
     }
 
     #endregion
+
+    [Theory]
+    [InlineData(true, "length", true)]
+    [InlineData(false, "length", false)]
+    [InlineData(true, "stop", false)]
+    [InlineData(true, null, false)]
+    public async Task CompleteAsync_ThrowOnTruncation_ThrowsOnlyWhenAskedAndCutOff(bool throwOnTruncation, string? finishReason, bool expectThrow)
+    {
+        var responseJson = JsonSerializer.Serialize(new
+        {
+            choices = new[]
+            {
+                new { message = new { role = "assistant", content = "partial" }, finish_reason = finishReason }
+            }
+        });
+        using var handler = new MockHttpMessageHandler(responseJson, HttpStatusCode.OK);
+        using var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.openai.com/v1/") };
+        _sut = new OpenAICompatibleCompletionService(httpClient, "gpt-4o-mini", _logger);
+
+        var act = () => _sut.CompleteAsync(
+            "prompt", new CompletionOptions { MaxTokens = 32, ThrowOnTruncation = throwOnTruncation }, TestContext.Current.CancellationToken);
+
+        if (expectThrow)
+        {
+            (await act.Should().ThrowAsync<TextCompletionTruncatedException>()).Which.MaxTokens.Should().Be(32);
+        }
+        else
+        {
+            (await act()).Should().Be("partial");
+        }
+    }
 }

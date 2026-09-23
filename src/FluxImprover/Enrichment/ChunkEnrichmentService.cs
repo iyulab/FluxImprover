@@ -1,5 +1,6 @@
 ﻿namespace FluxImprover.Enrichment;
 
+using Flux.Abstractions;
 using FluxImprover.Models;
 using FluxImprover.Options;
 using FluxImprover.Utilities;
@@ -64,12 +65,12 @@ public sealed class ChunkEnrichmentService
 
             // Execute selected enrichments in parallel
             var tasks = new List<Task>();
-            Task<string>? summarizeTask = null;
+            Task<string?>? summarizeTask = null;
             Task<IReadOnlyList<string>>? keywordsTask = null;
 
             if (shouldSummarize)
             {
-                summarizeTask = _summarizationService.SummarizeAsync(chunk.Content, options, cancellationToken);
+                summarizeTask = SummarizeOrNullAsync(chunk.Content, options, cancellationToken);
                 tasks.Add(summarizeTask);
             }
 
@@ -88,6 +89,21 @@ public sealed class ChunkEnrichmentService
         }
 
         return CreateEnrichedChunk(chunk, summary, keywords, qualityResult, conditionalOptions, wasSkipped: false);
+    }
+
+    /// <summary>
+    /// A summary cut off at <see cref="EnrichmentOptions.MaxTokens"/> is left out rather than stored.
+    /// </summary>
+    private async Task<string?> SummarizeOrNullAsync(string content, EnrichmentOptions? options, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await _summarizationService.SummarizeAsync(content, options, cancellationToken);
+        }
+        catch (TextCompletionTruncatedException)
+        {
+            return null;
+        }
     }
 
     /// <summary>

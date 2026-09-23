@@ -429,8 +429,17 @@ public sealed record CompletionOptions
     public string? ResponseSchema { get; init; }
     public IReadOnlyList<ChatMessage>? Messages { get; init; }
     public ThinkingMode? Thinking { get; init; }
+    public bool ThrowOnTruncation { get; init; } = false;
 }
 ```
+
+`ThrowOnTruncation` asks the service to throw `Flux.Abstractions.TextCompletionTruncatedException` instead of returning
+an answer cut off at `MaxTokens` (same meaning and exception as the shared `TextCompletionOptions.ThrowOnTruncation`,
+so one `catch` covers both contracts). The built-in services honour it on `CompleteAsync`: the OpenAI-compatible one
+reads `finish_reason`, the LMSupply one the generator's finish reason. A custom implementation decides for itself.
+FluxImprover turns it on where a cut-off answer is worse than none: `SummarizeAsync` throws it, chunk enrichment then
+stores no summary, and contextual enrichment stores no context. Size `EnrichmentOptions.MaxTokens` for
+`MaxSummaryLength`, which is in **words**.
 
 `Thinking` is a budget-independent reasoning toggle (`Auto` / `On` / `Off`, default `null` = follow
 the model's own default). Implementations of `ITextGenerationService` read it and map it onto their

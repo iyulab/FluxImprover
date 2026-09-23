@@ -1,3 +1,4 @@
+using Flux.Abstractions;
 ﻿namespace FluxImprover.Tests.Enrichment;
 
 using AwesomeAssertions;
@@ -488,4 +489,25 @@ public sealed class ChunkEnrichmentServiceTests
     }
 
     #endregion
+
+    [Fact]
+    public async Task EnrichAsync_SummaryCutOffAtMaxTokens_IsLeftOut_AndKeywordsStay()
+    {
+        _summarizationService.SummarizeAsync(
+                Arg.Any<string>(),
+                Arg.Any<EnrichmentOptions>(),
+                Arg.Any<CancellationToken>())
+            .Returns<string>(_ => throw new TextCompletionTruncatedException(512));
+        _keywordService.ExtractKeywordsAsync(
+                Arg.Any<string>(),
+                Arg.Any<EnrichmentOptions>(),
+                Arg.Any<CancellationToken>())
+            .Returns(new List<string> { "k1" });
+        var chunk = new Chunk { Id = "c1", Content = "Some content to enrich." };
+
+        var result = await _sut.EnrichAsync(chunk, cancellationToken: TestContext.Current.CancellationToken);
+
+        result.Summary.Should().BeNull();
+        result.Keywords.Should().Equal("k1");
+    }
 }

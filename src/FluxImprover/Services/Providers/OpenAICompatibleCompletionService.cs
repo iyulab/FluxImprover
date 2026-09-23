@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Flux.Abstractions;
 using Microsoft.Extensions.Logging;
 
 namespace FluxImprover.Services.Providers;
@@ -98,7 +99,15 @@ public sealed partial class OpenAICompatibleCompletionService : ITextGenerationS
         var result = await response.Content.ReadFromJsonAsync<ChatCompletionResponse>(
             JsonOptions, cancellationToken);
 
-        var content = result?.Choices?.FirstOrDefault()?.Message?.Content ?? string.Empty;
+        var choice = result?.Choices?.FirstOrDefault();
+        var content = choice?.Message?.Content ?? string.Empty;
+
+        if (options?.ThrowOnTruncation == true && choice?.FinishReason == "length")
+        {
+            throw request.MaxTokens is { } maxTokens
+                ? new TextCompletionTruncatedException(maxTokens)
+                : new TextCompletionTruncatedException();
+        }
 
         LogCompletionDone(_logger, _model, content.Length);
         return content;
@@ -235,6 +244,9 @@ public sealed partial class OpenAICompatibleCompletionService : ITextGenerationS
     internal sealed class ChoiceDto
     {
         public MessageDto? Message { get; init; }
+
+        [JsonPropertyName("finish_reason")]
+        public string? FinishReason { get; init; }
     }
 
     internal sealed class ChatCompletionStreamResponse

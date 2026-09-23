@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using Flux.Abstractions;
 using FluxImprover.Services;
 using LMSupply.Generator.Abstractions;
 using Microsoft.Extensions.Logging;
@@ -62,10 +63,15 @@ public sealed partial class LMSupplyCompletionService : ITextGenerationService, 
 
         LogCompletion(_logger, _model.ModelId, prompt.Length);
 
-        var result = await _model.GenerateChatCompleteAsync(messages, genOptions, cancellationToken);
+        var result = await _model.GenerateChatCompleteResultAsync(messages, genOptions, cancellationToken);
 
-        LogCompletionDone(_logger, _model.ModelId, result.Length);
-        return result;
+        if (options?.ThrowOnTruncation == true && result.FinishReason == "length")
+        {
+            throw new TextCompletionTruncatedException(genOptions.MaxTokens);
+        }
+
+        LogCompletionDone(_logger, _model.ModelId, result.Content.Length);
+        return result.Content;
     }
 
     /// <inheritdoc />

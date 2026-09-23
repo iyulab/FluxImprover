@@ -1,3 +1,4 @@
+using Flux.Abstractions;
 namespace FluxImprover.Tests.ContextualRetrieval;
 
 using AwesomeAssertions;
@@ -348,4 +349,22 @@ public sealed class ContextualEnrichmentServiceTests
     }
 
     #endregion
+
+    [Fact]
+    public async Task EnrichAsync_ContextCutOffAtMaxTokens_LeavesTheChunkWithoutContext()
+    {
+        CompletionOptions? sent = null;
+        _completionService.CompleteAsync(
+                Arg.Any<string>(),
+                Arg.Do<CompletionOptions>(o => sent = o),
+                Arg.Any<CancellationToken>())
+            .Returns<string>(_ => throw new TextCompletionTruncatedException(512));
+        var chunk = new Chunk { Id = "c1", Content = "Some content." };
+
+        var result = await _sut.EnrichAsync(chunk, "Full document. Some content.", cancellationToken: TestContext.Current.CancellationToken);
+
+        sent!.ThrowOnTruncation.Should().BeTrue("a cut-off context sentence prepended to the chunk is worse than none");
+        result.ContextSummary.Should().BeNull();
+        result.Text.Should().Be("Some content.");
+    }
 }

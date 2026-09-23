@@ -1,3 +1,4 @@
+using Flux.Abstractions;
 using FluxImprover.Models;
 using FluxImprover.Options;
 using FluxImprover.Services;
@@ -38,11 +39,21 @@ public sealed class ContextualEnrichmentService : IContextualEnrichmentService
             {
                 SystemPrompt = GetSystemPrompt(),
                 Temperature = options.Temperature,
-                MaxTokens = options.MaxTokens
+                MaxTokens = options.MaxTokens,
+                // The summary is prepended to the chunk for retrieval; a cut-off sentence there is worse than none.
+                ThrowOnTruncation = true
             };
 
-            contextSummary = await _completionService.CompleteAsync(prompt, completionOptions, cancellationToken);
-            contextSummary = contextSummary?.Trim();
+            try
+            {
+                contextSummary = await _completionService.CompleteAsync(prompt, completionOptions, cancellationToken);
+                contextSummary = contextSummary?.Trim();
+            }
+            catch (TextCompletionTruncatedException)
+            {
+                // The chunk stays without context, exactly as a chunk with no content does.
+                contextSummary = null;
+            }
         }
 
         return new ContextualChunk

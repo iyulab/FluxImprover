@@ -13,6 +13,10 @@ public interface ITextGenerationService
     /// <param name="options">완성 옵션 (선택)</param>
     /// <param name="cancellationToken">취소 토큰</param>
     /// <returns>생성된 텍스트</returns>
+    /// <exception cref="Flux.Abstractions.TextCompletionTruncatedException">
+    /// <see cref="CompletionOptions.ThrowOnTruncation"/> 가 켜져 있고 모델이 출력 토큰 한도에서 멈췄을 때 — 완료 사유를
+    /// 관찰할 수 있는 구현체가 잘린 텍스트를 돌려주는 대신 던진다.
+    /// </exception>
     Task<string> CompleteAsync(
         string prompt,
         CompletionOptions? options = null,
@@ -71,6 +75,16 @@ public sealed record CompletionOptions
     /// Reasoning/thinking 활성화 여부. null(기본)이면 모델 기본 동작을 따른다.
     /// </summary>
     public ThinkingMode? Thinking { get; init; }
+
+    /// <summary>
+    /// 모델이 출력 토큰 한도(<see cref="MaxTokens"/>)에서 멈췄을 때 잘린 텍스트를 돌려주는 대신
+    /// <see cref="Flux.Abstractions.TextCompletionTruncatedException"/> 을 던진다(기본 false — 잘린 텍스트를 그대로 돌려준다).
+    /// 잘린 답이 없는 답보다 나쁜 호출자(저장되는 요약·컨텍스트 등)가 켠다. 완료 사유를 관찰할 수 있는 구현체만 지킨다 —
+    /// 내장 <c>OpenAICompatibleCompletionService</c>(<c>finish_reason</c>)·<c>LMSupplyCompletionService</c> 는 비스트리밍
+    /// <see cref="ITextGenerationService.CompleteAsync"/> 에서 지키고, 직접 구현한 서비스는 스스로 정한다.
+    /// 의미와 예외 타입은 <c>Flux.Abstractions.TextCompletionOptions.ThrowOnTruncation</c> 과 같다.
+    /// </summary>
+    public bool ThrowOnTruncation { get; init; }
 }
 
 /// <summary>

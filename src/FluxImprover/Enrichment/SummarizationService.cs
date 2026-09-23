@@ -33,7 +33,9 @@ public sealed class SummarizationService : ISummarizationService
         {
             SystemPrompt = GetSystemPrompt(),
             Temperature = options.Temperature,
-            MaxTokens = options.MaxTokens
+            MaxTokens = options.MaxTokens,
+            // A summary is stored; one cut off at MaxTokens is reported instead of returned.
+            ThrowOnTruncation = true
         };
 
         return await _completionService.CompleteAsync(prompt, completionOptions, cancellationToken);

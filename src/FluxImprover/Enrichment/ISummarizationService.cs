@@ -14,6 +14,10 @@ public interface ISummarizationService
     /// <param name="options">요약 옵션</param>
     /// <param name="cancellationToken">취소 토큰</param>
     /// <returns>요약된 텍스트</returns>
+    /// <exception cref="Flux.Abstractions.TextCompletionTruncatedException">
+    /// 요약이 <see cref="Options.EnrichmentOptions.MaxTokens"/> 에서 잘렸을 때(완료 사유를 관찰할 수 있는 생성 서비스에서) —
+    /// 잘린 요약을 돌려주는 대신 던진다.
+    /// </exception>
     Task<string> SummarizeAsync(
         string text,
         EnrichmentOptions? options = null,

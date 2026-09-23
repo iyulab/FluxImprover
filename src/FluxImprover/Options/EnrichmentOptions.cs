@@ -70,7 +70,9 @@ public sealed class EnrichmentOptions
     }
 
     /// <summary>
-    /// 최대 요약 길이 (문자 수, 기본값: 200)
+    /// 최대 요약 길이 (**단어** 수, 기본값: 200) — 요약 프롬프트에 «approximately N words or less» 로 전달된다.
+    /// <see cref="MaxTokens"/> 는 이 길이를 담을 만큼 커야 한다: 출력 한도에서 잘린 요약은 반환되지 않고
+    /// <see cref="Flux.Abstractions.TextCompletionTruncatedException"/> 으로 보고된다(완료 사유를 관찰하는 생성 서비스에서).
     /// </summary>
     public int MaxSummaryLength
     {

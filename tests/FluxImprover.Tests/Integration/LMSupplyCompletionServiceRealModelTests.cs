@@ -32,6 +32,10 @@ public sealed class LMSupplyCompletionServiceRealModelTests
 {
     private const string ModelAlias = "phi-4-mini";
 
+    // The ONNX backend ships as LMSupply.Generator.Onnx and registers itself explicitly; without this every
+    // load here failed with NotSupportedException (the tests are Integration, so no CI run noticed).
+    public LMSupplyCompletionServiceRealModelTests() => global::LMSupply.Generator.Onnx.OnnxGeneratorBackend.Register();
+
     [Fact]
     public async Task CompleteAsync_RealLocalModel_ProducesNonEmptyCompletion()
     {
@@ -44,6 +48,21 @@ public sealed class LMSupplyCompletionServiceRealModelTests
         var result = await service.CompleteAsync("Reply with exactly one word: the color of the sky on a clear day.", new CompletionOptions { MaxTokens = 16, Temperature = 0.1f }, TestContext.Current.CancellationToken);
 
         result.Should().NotBeNullOrWhiteSpace();
+    }
+
+    [Fact]
+    public async Task CompleteAsync_RealLocalModel_ThrowOnTruncation_ReportsACutOffAnswer()
+    {
+        await using var model = await LocalGenerator.LoadAsync(ModelAlias, cancellationToken: TestContext.Current.CancellationToken);
+        await using var service = new LMSupplyCompletionService(model, NullLogger<LMSupplyCompletionService>.Instance);
+        const string prompt = "Count from one to fifty in words, separated by commas.";
+
+        var act = () => service.CompleteAsync(prompt, new CompletionOptions { MaxTokens = 4, Temperature = 0.1f, ThrowOnTruncation = true }, TestContext.Current.CancellationToken);
+        (await act.Should().ThrowAsync<global::Flux.Abstractions.TextCompletionTruncatedException>()).Which.MaxTokens.Should().Be(4);
+
+        // Without the flag the same cut-off answer comes back as text, as before.
+        var text = await service.CompleteAsync(prompt, new CompletionOptions { MaxTokens = 4, Temperature = 0.1f }, TestContext.Current.CancellationToken);
+        text.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
@@ -74,7 +93,9 @@ public sealed class LMSupplyCompletionServiceRealModelTests
             completionService.Should().BeOfType<LMSupplyCompletionService>();
 
             var fluxImprover = provider.GetRequiredService<FluxImproverServices>();
-            var summary = await fluxImprover.Summarization.SummarizeAsync("Paris is the capital of France. It is well known for the Eiffel Tower and the Louvre museum.", new EnrichmentOptions { MaxTokens = 16, Temperature = 0.1f }, TestContext.Current.CancellationToken);
+            // Enough room to finish: a summary cut off at MaxTokens is now reported, not returned. MaxSummaryLength is in
+            // words (the prompt asks for "approximately N words"), so the default 200 cannot fit in 96 tokens.
+            var summary = await fluxImprover.Summarization.SummarizeAsync("Paris is the capital of France. It is well known for the Eiffel Tower and the Louvre museum.", new EnrichmentOptions { MaxTokens = 96, MaxSummaryLength = 20, Temperature = 0.1f }, TestContext.Current.CancellationToken);
 
             summary.Should().NotBeNullOrWhiteSpace();
         }

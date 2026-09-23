@@ -119,4 +119,19 @@ public sealed class SummarizationServiceTests
         results.Should().HaveCount(3);
         results.Should().BeEquivalentTo(summaries);
     }
+
+    [Fact]
+    public async Task SummarizeAsync_AsksTheGeneratorToReportACutOffSummary()
+    {
+        CompletionOptions? sent = null;
+        _completionService.CompleteAsync(
+                Arg.Any<string>(),
+                Arg.Do<CompletionOptions>(o => sent = o),
+                Arg.Any<CancellationToken>())
+            .Returns("summary");
+
+        await _sut.SummarizeAsync("Some text to summarize.", cancellationToken: TestContext.Current.CancellationToken);
+
+        sent!.ThrowOnTruncation.Should().BeTrue();
+    }
 }
