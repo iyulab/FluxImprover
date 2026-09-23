@@ -18,7 +18,8 @@ breaking changes, and each one is marked **Breaking** with a migration note.
   for the signal and throws `TextCompletionTruncatedException`. `ChunkEnrichmentService` then leaves the chunk's
   summary empty and keeps its keywords, and `ContextualEnrichmentService` leaves `ContextSummary` empty. Before, the
   cut-off text was stored as if it were complete. **Breaking** for a direct caller of `SummarizeAsync` whose
-  `MaxTokens` is too small for its `MaxSummaryLength`: catch the exception or raise `MaxTokens`.
+  `MaxTokens` is too small for its `MaxSummaryLength`: catch the exception or raise `MaxTokens`. `SummarizeBatchAsync`
+  calls it per text and does not catch, so one cut-off summary fails the batch.
 - `LMSupplyCompletionService.CompleteAsync` uses `IGeneratorModel.GenerateChatCompleteResultAsync` (LMSupply.Generator
   0.73.0). It returns the same text, and it reports the finish reason.
 
