@@ -27,6 +27,11 @@ breaking changes, and each one is marked **Breaking** with a migration note.
 - `EnrichmentOptions.MaxSummaryLength` is documented as a number of **words**: the prompt asks for "approximately N
   words". The docs said characters.
 
+## [0.13.1] - 2026-09-24
+
+### Changed
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.73.0 -> 0.74.0, `LMSupply.Generator.Onnx` 0.73.0 -> 0.74.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+
 ## [0.12.20] - 2026-09-23
 
 ### Changed
