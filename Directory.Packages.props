@@ -9,8 +9,8 @@
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12" />
     <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.12" />
     <!-- LMSupply Integration -->
-    <PackageVersion Include="LMSupply.Generator" Version="0.74.0" />
-    <PackageVersion Include="LMSupply.Generator.Onnx" Version="0.74.0" />
+    <PackageVersion Include="LMSupply.Generator" Version="0.75.0" />
+    <PackageVersion Include="LMSupply.Generator.Onnx" Version="0.75.0" />
     <!-- Optional Dependencies -->
     <PackageVersion Include="Polly.Core" Version="8.6.6" />
     <!-- Sample/Demo Dependencies -->
