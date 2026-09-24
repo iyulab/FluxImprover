@@ -4,6 +4,16 @@ All notable changes to this project are documented in this file. Versions follow
 [Semantic Versioning](https://semver.org/); while the major version is 0, a minor release may contain
 breaking changes, and each one is marked **Breaking** with a migration note.
 
+## [0.13.2] - 2026-09-24
+
+### Changed
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.74.0 -> 0.75.0, `LMSupply.Generator.Onnx` 0.74.0 -> 0.75.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+
+## [0.13.1] - 2026-09-24
+
+### Changed
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.73.0 -> 0.74.0, `LMSupply.Generator.Onnx` 0.73.0 -> 0.74.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+
 ## [0.13.0] - 2026-09-23
 
 ### Added
@@ -26,16 +36,6 @@ breaking changes, and each one is marked **Breaking** with a migration note.
 ### Fixed
 - `EnrichmentOptions.MaxSummaryLength` is documented as a number of **words**: the prompt asks for "approximately N
   words". The docs said characters.
-
-## [0.13.2] - 2026-09-24
-
-### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.74.0 -> 0.75.0, `LMSupply.Generator.Onnx` 0.74.0 -> 0.75.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
-
-## [0.13.1] - 2026-09-24
-
-### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.73.0 -> 0.74.0, `LMSupply.Generator.Onnx` 0.73.0 -> 0.74.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
 
 ## [0.12.20] - 2026-09-23
 
