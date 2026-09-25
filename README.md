@@ -393,7 +393,7 @@ var enriched = await services.ChunkEnrichment.EnrichAsync(chunk);
 | `QAFilter` | Filters QA pairs by quality thresholds |
 | `QAPipeline` | End-to-end QA generation with quality filtering |
 | `QuestionSuggestion` | Suggests contextual follow-up questions |
-| `ContextualEnrichment` | Document-level contextual retrieval (Anthropic pattern) |
+| `ContextualEnrichment` | Document-level contextual retrieval (Anthropic pattern). Asks the model not to reason by default (`ContextualEnrichmentOptions.Thinking = Off`); a context cut off at `MaxTokens` is dropped, not stored |
 | `ChunkRelationship` | Discovers relationships between chunks |
 
 ---

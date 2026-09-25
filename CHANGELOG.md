@@ -4,6 +4,11 @@ All notable changes to this project are documented in this file. Versions follow
 [Semantic Versioning](https://semver.org/); while the major version is 0, a minor release may contain
 breaking changes, and each one is marked **Breaking** with a migration note.
 
+## [0.14.0] - Unreleased
+
+### Added
+- **Contextual enrichment no longer lets the model reason by default.** `ContextualEnrichmentOptions.Thinking` (default `Off`) is sent with every context request. A reasoning model left on its template default spent most of the 512-token budget thinking about a one-sentence summary, and roughly one generation in ten was cut off and discarded, leaving that chunk without context. Set `Thinking = ThinkingMode.Auto` to restore the previous behaviour.
+
 ## [0.13.3] - 2026-09-25
 
 ### Changed

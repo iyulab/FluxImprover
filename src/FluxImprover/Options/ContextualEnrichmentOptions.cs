@@ -1,5 +1,7 @@
 ﻿namespace FluxImprover.Options;
 
+using FluxImprover.Services;
+
 /// <summary>
 /// Options for contextual enrichment of chunks.
 /// Based on Anthropic's Contextual Retrieval pattern (Sep 2024).
@@ -40,6 +42,17 @@ public sealed class ContextualEnrichmentOptions
             _maxTokens = value;
         }
     }
+
+    /// <summary>
+    /// Whether the model may reason before answering (default: <see cref="ThinkingMode.Off"/>).
+    /// </summary>
+    /// <remarks>
+    /// The answer is a one-to-three-sentence summary generated once per chunk at ingestion, so reasoning buys no
+    /// quality and multiplies the cost. It also shares <see cref="MaxTokens"/> with the answer: a reasoning model left
+    /// on its template default can spend the whole budget thinking, and the cut-off summary is then discarded. Set
+    /// <see cref="ThinkingMode.Auto"/> to leave the choice to the model's chat template.
+    /// </remarks>
+    public ThinkingMode Thinking { get; init; } = ThinkingMode.Off;
 
     /// <summary>
     /// Maximum context summary length in characters (default: 300).

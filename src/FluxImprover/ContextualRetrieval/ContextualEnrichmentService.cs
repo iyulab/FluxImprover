@@ -40,6 +40,7 @@ public sealed class ContextualEnrichmentService : IContextualEnrichmentService
                 SystemPrompt = GetSystemPrompt(),
                 Temperature = options.Temperature,
                 MaxTokens = options.MaxTokens,
+                Thinking = options.Thinking,
                 // The summary is prepended to the chunk for retrieval; a cut-off sentence there is worse than none.
                 ThrowOnTruncation = true
             };

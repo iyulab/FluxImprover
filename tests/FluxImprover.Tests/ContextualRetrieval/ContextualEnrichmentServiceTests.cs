@@ -367,4 +367,34 @@ public sealed class ContextualEnrichmentServiceTests
         result.ContextSummary.Should().BeNull();
         result.Text.Should().Be("Some content.");
     }
+
+    [Fact]
+    public async Task EnrichAsync_ByDefault_AsksForNoThinking()
+    {
+        // A reasoning model left on its template default spends the output budget on hidden reasoning: gemma4 used
+        // ~400-500 of 512 tokens thinking about a one-sentence summary, and one generation in ten was cut off.
+        CompletionOptions? sent = null;
+        _completionService.CompleteAsync(Arg.Any<string>(), Arg.Do<CompletionOptions>(o => sent = o), Arg.Any<CancellationToken>())
+            .Returns("context");
+
+        await _sut.EnrichAsync(new Chunk { Id = "c1", Content = "Some content." }, "Full document. Some content.",
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        sent!.Thinking.Should().Be(ThinkingMode.Off);
+    }
+
+    [Theory]
+    [InlineData(ThinkingMode.On)]
+    [InlineData(ThinkingMode.Auto)]
+    public async Task EnrichAsync_WithThinkingOption_SendsIt(ThinkingMode mode)
+    {
+        CompletionOptions? sent = null;
+        _completionService.CompleteAsync(Arg.Any<string>(), Arg.Do<CompletionOptions>(o => sent = o), Arg.Any<CancellationToken>())
+            .Returns("context");
+
+        await _sut.EnrichAsync(new Chunk { Id = "c1", Content = "Some content." }, "Full document. Some content.",
+            new ContextualEnrichmentOptions { Thinking = mode }, TestContext.Current.CancellationToken);
+
+        sent!.Thinking.Should().Be(mode);
+    }
 }
