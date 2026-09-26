@@ -15,7 +15,7 @@ namespace FluxImprover.LMSupply;
 /// Adapts LMSupply.Generator's IGeneratorModel to FluxImprover's ITextGenerationService.
 /// Enables fully offline LLM text completion using local GGUF/ONNX models.
 /// </summary>
-public sealed partial class LMSupplyCompletionService : ITextGenerationService, IAsyncDisposable
+public sealed partial class LMSupplyCompletionService : ITextGenerationService, IAsyncDisposable, IDisposable
 {
     private readonly IGeneratorModel _model;
     private readonly ILogger<LMSupplyCompletionService> _logger;
@@ -153,6 +153,12 @@ public sealed partial class LMSupplyCompletionService : ITextGenerationService, 
         ThinkingMode.Off => LMThinkingMode.Off,
         _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, "Unknown ThinkingMode value.")
     };
+
+    /// <summary>
+    /// Disposes synchronously, for a container or scope disposed with <c>Dispose()</c> (which throws on a service that is
+    /// only <see cref="IAsyncDisposable"/>). Blocks on <see cref="DisposeAsync"/>.
+    /// </summary>
+    public void Dispose() => DisposeAsync().AsTask().GetAwaiter().GetResult();
 
     /// <inheritdoc />
     public async ValueTask DisposeAsync()

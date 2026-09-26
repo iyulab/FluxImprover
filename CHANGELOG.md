@@ -4,6 +4,11 @@ All notable changes to this project are documented in this file. Versions follow
 [Semantic Versioning](https://semver.org/); while the major version is 0, a minor release may contain
 breaking changes, and each one is marked **Breaking** with a migration note.
 
+## [0.14.4] - Unreleased
+
+### Fixed
+- **`using var scope = provider.CreateScope()` no longer throws on dispose with `AddFluxImproverWithLMSupply`.** The completion service is registered Scoped by default and implemented only `IAsyncDisposable`, and a container or scope disposed with `Dispose()` throws on such a service ("type only implements IAsyncDisposable"); it now implements `IDisposable` too.
+
 ## [0.14.3] - 2026-09-26
 
 ### Changed
