@@ -6,6 +6,9 @@ breaking changes, and each one is marked **Breaking** with a migration note.
 
 ## [0.14.4] - Unreleased
 
+### Changed
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.79.0 -> 0.79.1, `LMSupply.Generator.Onnx` 0.79.0 -> 0.79.1 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`.
+
 ### Fixed
 - **`using var scope = provider.CreateScope()` no longer throws on dispose with `AddFluxImproverWithLMSupply`.** The completion service is registered Scoped by default and implemented only `IAsyncDisposable`, and a container or scope disposed with `Dispose()` throws on such a service ("type only implements IAsyncDisposable"); it now implements `IDisposable` too.
 
