@@ -4,6 +4,11 @@ All notable changes to this project are documented in this file. Versions follow
 [Semantic Versioning](https://semver.org/); while the major version is 0, a minor release may contain
 breaking changes, and each one is marked **Breaking** with a migration note.
 
+## [0.14.19] - 2026-09-30
+
+### Changed
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.93.0 -> 0.93.1, `LMSupply.Generator.Onnx` 0.93.0 -> 0.93.1 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+
 ## [0.14.18] - 2026-09-29
 
 ### Changed
