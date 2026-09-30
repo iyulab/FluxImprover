@@ -67,7 +67,7 @@ using var completionService = new OpenAICompatibleCompletionService(
     model: "gpt-4o-mini",
     logger: loggerFactory.CreateLogger<OpenAICompatibleCompletionService>());
 
-var services = new FluxImproverBuilder()
+var improver = new FluxImproverBuilder()
     .WithCompletionService(completionService)
     .Build();
 ```
@@ -101,7 +101,7 @@ services.AddSingleton<ITextGenerationService, MyCompletionService>();
 services.AddFluxImprover();
 
 // Or pass a factory directly
-services.AddFluxImprover(sp => new MyCompletionService(sp.GetRequiredService<...>()));
+services.AddFluxImprover(sp => new MyCompletionService(sp.GetRequiredService<HttpClient>()));
 ```
 
 > **Disposal (v0.11.0+)**: The factory overload (`AddFluxImprover(factory, lifetime)` and anything
@@ -110,6 +110,8 @@ services.AddFluxImprover(sp => new MyCompletionService(sp.GetRequiredService<...
 > `FluxImproverServices`'s constructor-injected member services. Two consequences: `sp.GetRequiredService<ITextGenerationService>()`
 > now resolves directly, and if your implementation is `IAsyncDisposable`/`IDisposable`, the
 > container disposes it automatically when its scope/provider is disposed — no manual cleanup
+> needed. The parameterless overload (`AddFluxImprover()`) does not re-register it: you already
+> registered `ITextGenerationService` yourself, and its lifetime remains yours to manage.
 >
 > **Model ownership (v0.12.0+)**: `LMSupplyCompletionService` no longer disposes the `IGeneratorModel` it was
 > given unless told to (`ownsModel` / `disposeModel: true`). With the default *scoped* lifetime the adapter is
@@ -117,8 +119,6 @@ services.AddFluxImprover(sp => new MyCompletionService(sp.GetRequiredService<...
 > disposed that shared model at the end of the first scope and every later caller got `ObjectDisposedException`.
 > Whoever created the model disposes it: the container for the shorthand overload, you for a factory that returns
 > a shared instance. Pass `disposeModel: true` only when the factory creates a fresh model per call.
-> needed. The parameterless overload (`AddFluxImprover()`) does not re-register it: you already
-> registered `ITextGenerationService` yourself, and its lifetime remains yours to manage.
 
 #### Service Lifetime
 
@@ -139,6 +139,9 @@ services.AddFluxImprover(_ => new MyCompletionService(apiKey), ServiceLifetime.S
 
 ### 2. Enrich Chunks
 
+The examples from here on use `improver`, the `FluxImproverServices` the builder returns. With dependency injection,
+resolve it from a scope: `var improver = scope.ServiceProvider.GetRequiredService<FluxImproverServices>();`
+
 Add summaries and keywords to your document chunks:
 
 ```csharp
@@ -151,7 +154,7 @@ var chunk = new Chunk
 };
 
 // Enrich with summary and keywords
-var enrichedChunk = await services.ChunkEnrichment.EnrichAsync(chunk);
+var enrichedChunk = await improver.ChunkEnrichment.EnrichAsync(chunk);
 
 Console.WriteLine($"Summary: {enrichedChunk.Summary}");
 Console.WriteLine($"Keywords: {string.Join(", ", enrichedChunk.Keywords ?? [])}");
@@ -172,7 +175,7 @@ var options = new QAGenerationOptions
     QuestionTypes = [QuestionType.Factual, QuestionType.Reasoning]
 };
 
-var qaPairs = await services.QAGenerator.GenerateAsync(context, options);
+var qaPairs = await improver.QAGenerator.GenerateAsync(context, options);
 
 foreach (var qa in qaPairs)
 {
@@ -191,13 +194,13 @@ var question = "What is the capital of France?";
 var answer = "Paris is the capital of France.";
 
 // Faithfulness: Is the answer grounded in the context?
-var faithfulness = await services.Faithfulness.EvaluateAsync(context, answer);
+var faithfulness = await improver.Faithfulness.EvaluateAsync(context, answer);
 
 // Relevancy: Does the answer address the question?
-var relevancy = await services.Relevancy.EvaluateAsync(question, answer, context: context);
+var relevancy = await improver.Relevancy.EvaluateAsync(question, answer, context: context);
 
 // Answerability: Can the question be answered from the context?
-var answerability = await services.Answerability.EvaluateAsync(context, question);
+var answerability = await improver.Answerability.EvaluateAsync(context, question);
 
 Console.WriteLine($"Faithfulness: {faithfulness.Score:P0}");
 Console.WriteLine($"Relevancy: {relevancy.Score:P0}");
@@ -234,7 +237,7 @@ var pipelineOptions = new QAPipelineOptions
     }
 };
 
-var results = await services.QAPipeline.ExecuteFromChunksBatchAsync(chunks, pipelineOptions);
+var results = await improver.QAPipeline.ExecuteFromChunksBatchAsync(chunks, pipelineOptions);
 
 var totalGenerated = results.Sum(r => r.GeneratedCount);
 var totalFiltered = results.Sum(r => r.FilteredCount);
@@ -259,19 +262,26 @@ var chunk = new Chunk
 
 var filterOptions = new ChunkFilteringOptions
 {
-    MinimumScore = 0.6,
-    EnableSelfReflection = true,
-    EnableCriticValidation = true
+    MinRelevanceScore = 0.6,
+    UseSelfReflection = true,
+    UseCriticValidation = true
 };
 
-// Assess chunk quality with 3-stage evaluation
-var assessment = await services.ChunkFiltering.AssessAsync(chunk, filterOptions);
+// Assess one chunk against a query with the 3-stage evaluation
+var assessment = await improver.ChunkFiltering.AssessAsync(chunk, "machine learning algorithms", filterOptions);
 
 Console.WriteLine($"Initial Score: {assessment.InitialScore:P0}");
-Console.WriteLine($"Reflected Score: {assessment.ReflectedScore:P0}");
-Console.WriteLine($"Final Score: {assessment.FinalScore:P0}");
-Console.WriteLine($"Should Include: {assessment.ShouldInclude}");
-Console.WriteLine($"Reasoning: {assessment.Reasoning}");
+Console.WriteLine($"Reflection Score: {assessment.ReflectionScore:P0}");
+Console.WriteLine($"Critic Score: {assessment.CriticScore:P0}");
+Console.WriteLine($"Final Score: {assessment.FinalScore:P0} (confidence {assessment.Confidence:P0})");
+foreach (var (stage, reason) in assessment.Reasoning)
+{
+    Console.WriteLine($"{stage}: {reason}");
+}
+
+// Or filter a set of chunks: chunks scoring below MinRelevanceScore are dropped
+var kept = await improver.ChunkFiltering.FilterAsync([chunk], "machine learning algorithms", filterOptions);
+Console.WriteLine($"Kept: {kept.Count}");
 ```
 
 The 3-stage assessment process:
@@ -296,7 +306,7 @@ var options = new QueryPreprocessingOptions
     MaxSynonymsPerKeyword = 3
 };
 
-var result = await services.QueryPreprocessing.PreprocessAsync(query, options);
+var result = await improver.QueryPreprocessing.PreprocessAsync(query, options);
 
 Console.WriteLine($"Original: {result.OriginalQuery}");
 Console.WriteLine($"Normalized: {result.NormalizedQuery}");
@@ -335,7 +345,7 @@ var options = new QuestionSuggestionOptions
     Categories = [QuestionCategory.DeepDive, QuestionCategory.Related]
 };
 
-var suggestions = await services.QuestionSuggestion.SuggestFromConversationAsync(history, options);
+var suggestions = await improver.QuestionSuggestion.SuggestFromConversationAsync(history, options);
 
 foreach (var suggestion in suggestions)
 {
@@ -371,7 +381,7 @@ var chunk = new Chunk
     Content = "ClusterPlex는 고가용성(HA) 솔루션으로, 핫빗 기반의 페일오버 메커니즘을 제공합니다."
 };
 
-var enriched = await services.ChunkEnrichment.EnrichAsync(chunk);
+var enriched = await improver.ChunkEnrichment.EnrichAsync(chunk);
 // Summary and keywords will be generated in Korean
 ```
 
