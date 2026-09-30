@@ -47,7 +47,7 @@ public sealed partial class LMSupplyCompletionService : ITextGenerationService, 
         _defaultMaxTokens = defaultMaxTokens;
         // Default false: a loaded model is one shared, expensive instance and this adapter is scoped by
         // default — an adapter that disposed a model it was merely handed killed the shared model at the
-        // end of the first scope (ObjectDisposedException for every later caller; ecosystem E2E 2026-09-09).
+        // end of the first scope (ObjectDisposedException for every later caller).
         // Whoever created the model disposes it; pass true only when this instance is the sole owner.
         _ownsModel = ownsModel;
     }

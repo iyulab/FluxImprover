@@ -23,9 +23,8 @@ using Xunit;
 /// </summary>
 /// <remarks>
 /// Uses the "phi-4-mini" alias (ONNX Runtime GenAI, CPU-only in this environment) with a small
-/// <see cref="CompletionOptions.MaxTokens"/> — a prior local-model integration test elsewhere in
-/// this umbrella measured ~6.4s/token for this model family on CPU, so token count is kept low to
-/// keep this test's wall-clock bounded rather than proving throughput.
+/// <see cref="CompletionOptions.MaxTokens"/> — this model family can run at several seconds per token on
+/// CPU, so token count is kept low to keep this test's wall-clock bounded rather than proving throughput.
 /// </remarks>
 [Trait("Category", "Integration")]
 public sealed class LMSupplyCompletionServiceRealModelTests
@@ -68,7 +67,7 @@ public sealed class LMSupplyCompletionServiceRealModelTests
     [Fact]
     public async Task AddFluxImproverWithLMSupply_RealLocalModel_ContainerDisposesCompletionServiceAutomatically()
     {
-        // ISSUE-FluxImprover-20260824-030000, AC1+AC2, resolved in v0.11.0: AddFluxImprover now
+        // Since v0.11.0 AddFluxImprover
         // registers the completion service the factory creates as its own ITextGenerationService
         // service, so the container tracks and disposes it (and, transitively, the
         // LMSupplyCompletionService's underlying native model handle) without any manual cleanup

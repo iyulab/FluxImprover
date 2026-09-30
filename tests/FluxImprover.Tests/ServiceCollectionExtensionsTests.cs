@@ -371,7 +371,7 @@ public sealed class ServiceCollectionExtensionsTests
         s1.Should().NotBeSameAs(s2);
     }
 
-    // ISSUE-FluxImprover-20260824-030000 (AC1+AC2, resolved v0.11.0): the factory overload now
+    // Since v0.11.0 the factory overload
     // registers the completion service it creates as its own ITextGenerationService service, so
     // the container can resolve and dispose it directly — previously it existed only as a
     // constructor-injected dependency buried inside FluxImproverServices's member services, which
