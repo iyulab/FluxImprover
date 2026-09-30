@@ -12,82 +12,82 @@ breaking changes, and each one is marked **Breaking** with a migration note.
 ## [0.14.19] - 2026-09-30
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.93.0 -> 0.93.1, `LMSupply.Generator.Onnx` 0.93.0 -> 0.93.1 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.93.0 -> 0.93.1, `LMSupply.Generator.Onnx` 0.93.0 -> 0.93.1 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.14.18] - 2026-09-29
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.92.1 -> 0.93.0, `LMSupply.Generator.Onnx` 0.92.1 -> 0.93.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.92.1 -> 0.93.0, `LMSupply.Generator.Onnx` 0.92.1 -> 0.93.0 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.14.17] - 2026-09-29
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.92.0 -> 0.92.1, `LMSupply.Generator.Onnx` 0.92.0 -> 0.92.1 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.92.0 -> 0.92.1, `LMSupply.Generator.Onnx` 0.92.0 -> 0.92.1 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.14.16] - 2026-09-29
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.91.0 -> 0.92.0, `LMSupply.Generator.Onnx` 0.91.0 -> 0.92.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.91.0 -> 0.92.0, `LMSupply.Generator.Onnx` 0.91.0 -> 0.92.0 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.14.15] - 2026-09-29
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.90.0 -> 0.91.0, `LMSupply.Generator.Onnx` 0.90.0 -> 0.91.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.90.0 -> 0.91.0, `LMSupply.Generator.Onnx` 0.90.0 -> 0.91.0 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.14.14] - 2026-09-29
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.89.0 -> 0.90.0, `LMSupply.Generator.Onnx` 0.89.0 -> 0.90.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.89.0 -> 0.90.0, `LMSupply.Generator.Onnx` 0.89.0 -> 0.90.0 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.14.13] - 2026-09-28
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.88.0 -> 0.89.0, `LMSupply.Generator.Onnx` 0.88.0 -> 0.89.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.88.0 -> 0.89.0, `LMSupply.Generator.Onnx` 0.88.0 -> 0.89.0 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.14.12] - 2026-09-28
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.87.0 -> 0.88.0, `LMSupply.Generator.Onnx` 0.87.0 -> 0.88.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.87.0 -> 0.88.0, `LMSupply.Generator.Onnx` 0.87.0 -> 0.88.0 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.14.11] - 2026-09-28
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.86.0 -> 0.87.0, `LMSupply.Generator.Onnx` 0.86.0 -> 0.87.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.86.0 -> 0.87.0, `LMSupply.Generator.Onnx` 0.86.0 -> 0.87.0 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.14.10] - 2026-09-27
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.85.0 -> 0.86.0, `LMSupply.Generator.Onnx` 0.85.0 -> 0.86.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.85.0 -> 0.86.0, `LMSupply.Generator.Onnx` 0.85.0 -> 0.86.0 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.14.9] - 2026-09-27
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.84.0 -> 0.85.0, `LMSupply.Generator.Onnx` 0.84.0 -> 0.85.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.84.0 -> 0.85.0, `LMSupply.Generator.Onnx` 0.84.0 -> 0.85.0 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.14.8] - 2026-09-27
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.83.0 -> 0.84.0, `LMSupply.Generator.Onnx` 0.83.0 -> 0.84.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.83.0 -> 0.84.0, `LMSupply.Generator.Onnx` 0.83.0 -> 0.84.0 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.14.7] - 2026-09-27
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.81.1 -> 0.83.0, `LMSupply.Generator.Onnx` 0.81.1 -> 0.83.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.81.1 -> 0.83.0, `LMSupply.Generator.Onnx` 0.81.1 -> 0.83.0 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.14.6] - 2026-09-27
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.80.0 -> 0.81.1, `LMSupply.Generator.Onnx` 0.80.0 -> 0.81.1 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.80.0 -> 0.81.1, `LMSupply.Generator.Onnx` 0.80.0 -> 0.81.1 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.14.5] - 2026-09-26
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.79.1 -> 0.80.0, `LMSupply.Generator.Onnx` 0.79.1 -> 0.80.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.79.1 -> 0.80.0, `LMSupply.Generator.Onnx` 0.79.1 -> 0.80.0 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.14.4] - 2026-09-26
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.79.0 -> 0.79.1, `LMSupply.Generator.Onnx` 0.79.0 -> 0.79.1 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.79.0 -> 0.79.1, `LMSupply.Generator.Onnx` 0.79.0 -> 0.79.1 — re-consumption of already-consumed iyulab packages.
 
 ### Fixed
 - **`using var scope = provider.CreateScope()` no longer throws on dispose with `AddFluxImproverWithLMSupply`.** The completion service is registered Scoped by default and implemented only `IAsyncDisposable`, and a container or scope disposed with `Dispose()` throws on such a service ("type only implements IAsyncDisposable"); it now implements `IDisposable` too.
@@ -95,17 +95,17 @@ breaking changes, and each one is marked **Breaking** with a migration note.
 ## [0.14.3] - 2026-09-26
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.78.0 -> 0.79.0, `LMSupply.Generator.Onnx` 0.78.0 -> 0.79.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.78.0 -> 0.79.0, `LMSupply.Generator.Onnx` 0.78.0 -> 0.79.0 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.14.2] - 2026-09-26
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.77.0 -> 0.78.0, `LMSupply.Generator.Onnx` 0.77.0 -> 0.78.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.77.0 -> 0.78.0, `LMSupply.Generator.Onnx` 0.77.0 -> 0.78.0 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.14.1] - 2026-09-26
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.76.0 -> 0.77.0, `LMSupply.Generator.Onnx` 0.76.0 -> 0.77.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.76.0 -> 0.77.0, `LMSupply.Generator.Onnx` 0.76.0 -> 0.77.0 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.14.0] - 2026-09-26
 
@@ -115,17 +115,17 @@ breaking changes, and each one is marked **Breaking** with a migration note.
 ## [0.13.3] - 2026-09-25
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.75.0 -> 0.76.0, `LMSupply.Generator.Onnx` 0.75.0 -> 0.76.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.75.0 -> 0.76.0, `LMSupply.Generator.Onnx` 0.75.0 -> 0.76.0 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.13.2] - 2026-09-24
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.74.0 -> 0.75.0, `LMSupply.Generator.Onnx` 0.74.0 -> 0.75.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.74.0 -> 0.75.0, `LMSupply.Generator.Onnx` 0.74.0 -> 0.75.0 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.13.1] - 2026-09-24
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.73.0 -> 0.74.0, `LMSupply.Generator.Onnx` 0.73.0 -> 0.74.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.73.0 -> 0.74.0, `LMSupply.Generator.Onnx` 0.73.0 -> 0.74.0 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.13.0] - 2026-09-23
 
@@ -153,32 +153,32 @@ breaking changes, and each one is marked **Breaking** with a migration note.
 ## [0.12.20] - 2026-09-23
 
 ### Changed
-- Re-pinned sibling package(s) `Flux.Abstractions` 0.25.0 -> 0.26.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `Flux.Abstractions` 0.25.0 -> 0.26.0 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.12.19] - 2026-09-23
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.72.0 -> 0.72.1 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.72.0 -> 0.72.1 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.12.18] - 2026-09-23
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.71.0 -> 0.72.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.71.0 -> 0.72.0 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.12.17] - 2026-09-22
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.70.0 -> 0.71.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.70.0 -> 0.71.0 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.12.16] - 2026-09-21
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.69.0 -> 0.70.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.69.0 -> 0.70.0 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.12.15] - 2026-09-21
 
 ### Changed
-- Re-pinned sibling package(s) `LMSupply.Generator` 0.68.3 -> 0.69.0 — re-consumption of already-consumed iyulab packages via `check-pin-drift.ps1 -Fix`. No source changes.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.68.3 -> 0.69.0 — re-consumption of already-consumed iyulab packages. No source changes.
 
 ## [0.12.14] - 2026-09-19
 
