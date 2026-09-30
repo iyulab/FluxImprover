@@ -8,6 +8,7 @@ breaking changes, and each one is marked **Breaking** with a migration note.
 
 ### Changed
 - **Documentation comments describe behaviour only.** Code comments and test descriptions no longer carry internal references.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.94.0 -> 0.95.0, `LMSupply.Generator.Onnx` 0.94.0 -> 0.95.0.
 
 ## [0.14.20] - 2026-09-30
 
