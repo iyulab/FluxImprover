@@ -11,6 +11,17 @@ public sealed class EnrichmentOptions
     private int _maxSummaryLength = 200;
 
     /// <summary>
+    /// 요약·키워드 호출의 추론(thinking) 모드 (기본값: <see cref="Services.ThinkingMode.Off"/>).
+    /// </summary>
+    /// <remarks>
+    /// 추론 모델은 <see cref="Services.ThinkingMode.Auto"/> 에서 <see cref="MaxTokens"/> 예산의 대부분을 추론에 쓰고, 출력 한도에서 잘린 요약은
+    /// 버려진다(<see cref="Flux.Abstractions.TextCompletionTruncatedException"/>) — 요약이 조용히 빠진 청크가 된다. 짧은 추출 작업에는
+    /// 추론이 필요 없어 기본을 끈다(<see cref="ContextualEnrichmentOptions.Thinking"/> 과 같은 판단). 추론을 원하면 <c>Auto</c>/<c>On</c> 과
+    /// 함께 <see cref="MaxTokens"/> 를 늘린다. 이 값을 전달하지 못하는 생성 서비스는 모델 기본을 쓴다.
+    /// </remarks>
+    public Services.ThinkingMode Thinking { get; init; } = Services.ThinkingMode.Off;
+
+    /// <summary>
     /// 요약 생성 활성화 여부 (기본값: true)
     /// </summary>
     public bool EnableSummarization { get; init; } = true;

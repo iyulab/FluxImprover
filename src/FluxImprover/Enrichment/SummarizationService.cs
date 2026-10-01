@@ -34,6 +34,7 @@ public sealed class SummarizationService : ISummarizationService
             SystemPrompt = GetSystemPrompt(),
             Temperature = options.Temperature,
             MaxTokens = options.MaxTokens,
+            Thinking = options.Thinking,
             // A summary is stored; one cut off at MaxTokens is reported instead of returned.
             ThrowOnTruncation = true
         };

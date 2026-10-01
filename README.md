@@ -455,6 +455,10 @@ stores no summary, and contextual enrichment stores no context. Size `Enrichment
 the model's own default). Implementations of `ITextGenerationService` read it and map it onto their
 backend's own reasoning knob. See [docs/API.md](docs/API.md#thinkingmode) for details.
 
+Chunk enrichment asks for no reasoning by default: `EnrichmentOptions.Thinking` (default `Off`) goes to the summary and
+keyword calls, because a reasoning model on its default can spend the whole `MaxTokens` budget thinking and the
+cut-off summary is then dropped. Set it to `Auto` (and raise `MaxTokens`) to let the model reason.
+
 ---
 
 ## Architecture

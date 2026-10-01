@@ -4,6 +4,15 @@ All notable changes to this project are documented in this file. Versions follow
 [Semantic Versioning](https://semver.org/); while the major version is 0, a minor release may contain
 breaking changes, and each one is marked **Breaking** with a migration note.
 
+## [0.15.0] - Unreleased
+
+### Changed
+- **Chunk summaries and keywords ask the model not to reason** — `EnrichmentOptions.Thinking` (new, default `Off`) is sent
+  with the summary and keyword calls. A reasoning model on its template default could spend the whole `MaxTokens` budget
+  (512) thinking; the cut-off summary was then dropped and the chunk stored no summary. Set `Thinking = Auto` (and raise
+  `MaxTokens`) to let it reason. Same choice as `ContextualEnrichmentOptions.Thinking` (0.14.0).
+- Every package now carries the `LICENSE` text, not only the MIT expression.
+
 ## [0.14.24] - 2026-10-01
 
 ### Changed

@@ -9,7 +9,7 @@
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <!-- CA*: all resolved — no suppressions needed -->
-    <Version>0.14.24</Version>
+    <Version>0.15.0</Version>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -36,6 +36,8 @@
 
   <ItemGroup Condition="'$(IsPackable)' == 'true'">
     <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" />
+    <!-- MIT asks that the copyright and permission notice travel with every copy: ship the text, not only the SPDX id -->
+    <None Include="$(MSBuildThisFileDirectory)LICENSE" Pack="true" PackagePath="\" Visible="false" Condition="Exists('$(MSBuildThisFileDirectory)LICENSE')" />
     <None Include="$(MSBuildThisFileDirectory)icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
   <PropertyGroup Condition="Exists('$(MSBuildThisFileDirectory)../../local-packages')">
