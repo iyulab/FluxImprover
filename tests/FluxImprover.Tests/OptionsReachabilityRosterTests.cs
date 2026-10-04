@@ -11,7 +11,7 @@ namespace FluxImprover.Tests;
 /// </summary>
 public class OptionsReachabilityRosterTests
 {
-    private static readonly Assembly[] Libraries =
+    internal static readonly Assembly[] Libraries =
     [
         Assembly.Load("FluxImprover"),
         Assembly.Load("FluxImprover.LMSupply"),
