@@ -220,7 +220,7 @@ public sealed partial class QueryPreprocessingService : IQueryPreprocessingServi
         {
             return await ClassifyIntentWithLlmAsync(query, options, cancellationToken).ConfigureAwait(false);
         }
-        catch
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             // Fallback to heuristic on LLM failure
             return (heuristicIntent, heuristicConfidence);
@@ -258,7 +258,7 @@ public sealed partial class QueryPreprocessingService : IQueryPreprocessingServi
             var response = await _completionService.CompleteAsync(prompt, completionOptions, cancellationToken).ConfigureAwait(false);
             return ParseStringArray(response);
         }
-        catch
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             // Fallback to simple word extraction
             return ExtractWords(query).Take(options.MaxKeywords).ToList();
@@ -324,7 +324,7 @@ public sealed partial class QueryPreprocessingService : IQueryPreprocessingServi
             var response = await _completionService.CompleteAsync(prompt, completionOptions, cancellationToken).ConfigureAwait(false);
             return ParseEntityDictionary(response);
         }
-        catch
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             return new Dictionary<string, IReadOnlyList<string>>();
         }
@@ -363,7 +363,7 @@ public sealed partial class QueryPreprocessingService : IQueryPreprocessingServi
             var response = await _completionService.CompleteAsync(prompt, completionOptions, cancellationToken).ConfigureAwait(false);
             return ParseStringArray(response);
         }
-        catch
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             return [];
         }

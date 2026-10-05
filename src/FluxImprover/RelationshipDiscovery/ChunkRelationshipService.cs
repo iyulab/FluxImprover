@@ -95,7 +95,7 @@ public sealed class ChunkRelationshipService : IChunkRelationshipService
                 Success = true
             };
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             return new ChunkRelationshipAnalysis
             {

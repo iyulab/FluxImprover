@@ -368,7 +368,7 @@ public sealed class ChunkFilteringService : IChunkFilteringService
                 return Clamp(score);
             }
         }
-        catch
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             // Fallback on LLM failure
         }
