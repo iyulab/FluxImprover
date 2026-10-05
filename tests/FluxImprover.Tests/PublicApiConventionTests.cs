@@ -15,11 +15,7 @@ namespace FluxImprover.Tests;
 /// </remarks>
 public class PublicApiConventionTests
 {
-    private static readonly string[] KnownUncancellable =
-    [
-        "FluxImprover.Utilities.CollectionExtensions.ForEachAsync(IEnumerable<T>, Func<T, Task>, Int32)",
-        "FluxImprover.Utilities.CollectionExtensions.SelectAsync(IEnumerable<TSource>, Func<TSource, Task<TResult>>, Int32)",
-    ];
+    private static readonly string[] KnownUncancellable = [];
 
     private static readonly string[] KnownResultReturns =
     [

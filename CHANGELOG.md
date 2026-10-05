@@ -4,6 +4,14 @@ All notable changes to this project are documented in this file. Versions follow
 [Semantic Versioning](https://semver.org/); while the major version is 0, a minor release may contain
 breaking changes, and each one is marked **Breaking** with a migration note.
 
+## [0.16.0] - Unreleased
+
+### Removed
+- **Breaking: `FluxImprover.Utilities.CollectionExtensions`** (`Batch`, `Shuffle`, `ForEachAsync`, `SelectAsync`,
+  `TakeRandom`, `SafeGet`, `IsNullOrEmpty`). Nothing in FluxImprover used them, and two of them started asynchronous
+  work a caller could not cancel. Migration: `Enumerable.Chunk` for `Batch`, `Parallel.ForEachAsync` (which takes a
+  `CancellationToken`) for `ForEachAsync`/`SelectAsync`, and plain LINQ for the rest.
+
 ## [0.15.12] - 2026-10-05
 
 ### Changed
