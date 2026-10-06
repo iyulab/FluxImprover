@@ -29,12 +29,21 @@ public sealed class ContextualEnrichmentService : IContextualEnrichmentService
         ArgumentException.ThrowIfNullOrWhiteSpace(fullDocumentText);
 
         options ??= new ContextualEnrichmentOptions();
+        return await EnrichAsync(chunk, DocumentContext.Prepare(fullDocumentText, options.MaxDocumentContextLength), options, cancellationToken)
+            .ConfigureAwait(false);
+    }
 
+    private async Task<ContextualChunk> EnrichAsync(
+        Chunk chunk,
+        DocumentContext.Prepared document,
+        ContextualEnrichmentOptions options,
+        CancellationToken cancellationToken)
+    {
         string? contextSummary = null;
 
         if (!string.IsNullOrWhiteSpace(chunk.Content))
         {
-            var prompt = BuildPrompt(chunk, fullDocumentText, options);
+            var prompt = BuildPrompt(chunk, document, options);
             var completionOptions = new CompletionOptions
             {
                 SystemPrompt = GetSystemPrompt(),
@@ -57,7 +66,11 @@ public sealed class ContextualEnrichmentService : IContextualEnrichmentService
             }
         }
 
-        return new ContextualChunk
+        return ToContextualChunk(chunk, contextSummary);
+    }
+
+    private static ContextualChunk ToContextualChunk(Chunk chunk, string? contextSummary) =>
+        new()
         {
             Id = chunk.Id,
             Text = chunk.Content,
@@ -70,7 +83,6 @@ public sealed class ContextualEnrichmentService : IContextualEnrichmentService
                 ? new Dictionary<string, object>(chunk.Metadata)
                 : null
         };
-    }
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<ContextualChunk>> EnrichBatchAsync(
@@ -106,36 +118,21 @@ public sealed class ContextualEnrichmentService : IContextualEnrichmentService
             }
         }
 
-        if (options.EnableParallelProcessing && chunkList.Count > 1)
-        {
-            return await EnrichBatchParallelAsync(chunkList, fullDocumentText, totalChunks, options, cancellationToken);
-        }
+        // The document's profile is the same for every chunk: computed once here, not once per chunk.
+        var document = DocumentContext.Prepare(fullDocumentText, options.MaxDocumentContextLength);
 
-        var results = new List<ContextualChunk>(chunkList.Count);
-        foreach (var chunk in chunkList)
+        // Windows of adjacent chunks, each one model call (ChunksPerCall = 1: one chunk per call, as before).
+        var windows = chunkList.Chunk(options.ChunksPerCall).ToList();
+        var parallelism = options.EnableParallelProcessing ? options.MaxDegreeOfParallelism : 1;
+        using var semaphore = new SemaphoreSlim(Math.Max(1, parallelism));
+        var tasks = windows.Select(async window =>
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            var enriched = await EnrichAsync(chunk, fullDocumentText, options, cancellationToken);
-            results.Add(enriched);
-        }
-
-        return results;
-    }
-
-    private async Task<IReadOnlyList<ContextualChunk>> EnrichBatchParallelAsync(
-        List<Chunk> chunks,
-        string fullDocumentText,
-        int totalChunks,
-        ContextualEnrichmentOptions options,
-        CancellationToken cancellationToken)
-    {
-        var semaphore = new SemaphoreSlim(options.MaxDegreeOfParallelism);
-        var tasks = chunks.Select(async chunk =>
-        {
-            await semaphore.WaitAsync(cancellationToken);
+            await semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
             try
             {
-                return await EnrichAsync(chunk, fullDocumentText, options, cancellationToken);
+                return window.Length == 1
+                    ? [await EnrichAsync(window[0], document, options, cancellationToken).ConfigureAwait(false)]
+                    : await EnrichWindowAsync(window, document, options, cancellationToken).ConfigureAwait(false);
             }
             finally
             {
@@ -143,18 +140,113 @@ public sealed class ContextualEnrichmentService : IContextualEnrichmentService
             }
         });
 
-        var results = await Task.WhenAll(tasks);
-        return results;
+        return (await Task.WhenAll(tasks).ConfigureAwait(false)).SelectMany(r => r).ToList();
+    }
+
+    /// <summary>
+    /// One call for a window of adjacent chunks: the document context once, the chunks numbered, one summary per chunk back
+    /// as a JSON array. Anything but exactly one usable summary per chunk — no array, the wrong count, an answer cut off —
+    /// asks again chunk by chunk.
+    /// </summary>
+    private async Task<IReadOnlyList<ContextualChunk>> EnrichWindowAsync(
+        Chunk[] window,
+        DocumentContext.Prepared document,
+        ContextualEnrichmentOptions options,
+        CancellationToken cancellationToken)
+    {
+        var completionOptions = new CompletionOptions
+        {
+            SystemPrompt = GetSystemPrompt(),
+            Temperature = options.Temperature,
+            MaxTokens = options.MaxTokens * window.Length,
+            Thinking = options.Thinking,
+            ThrowOnTruncation = true
+        };
+
+        string? answer;
+        try
+        {
+            answer = await _completionService.CompleteAsync(BuildWindowPrompt(window, document, options), completionOptions, cancellationToken)
+                .ConfigureAwait(false);
+        }
+        catch (TextCompletionTruncatedException)
+        {
+            answer = null;
+        }
+
+        if (ParseSummaries(answer, window.Length) is { } summaries)
+        {
+            return window.Select((chunk, i) => ToContextualChunk(chunk, string.IsNullOrWhiteSpace(summaries[i]) ? null : summaries[i].Trim())).ToList();
+        }
+
+        var fallback = new List<ContextualChunk>(window.Length);
+        foreach (var chunk in window)
+        {
+            fallback.Add(await EnrichAsync(chunk, document, options, cancellationToken).ConfigureAwait(false));
+        }
+
+        return fallback;
+    }
+
+    /// <summary>The JSON array of strings in <paramref name="answer"/>, when it has exactly <paramref name="count"/> of them.</summary>
+    internal static IReadOnlyList<string>? ParseSummaries(string? answer, int count)
+    {
+        if (string.IsNullOrWhiteSpace(answer))
+            return null;
+
+        var start = answer.IndexOf('[', StringComparison.Ordinal);
+        var end = answer.LastIndexOf(']');
+        if (start < 0 || end <= start)
+            return null;
+
+        try
+        {
+            var parsed = System.Text.Json.JsonSerializer.Deserialize<string?[]>(answer[start..(end + 1)]);
+            return parsed is { Length: var n } && n == count ? parsed.Select(p => p ?? string.Empty).ToList() : null;
+        }
+        catch (System.Text.Json.JsonException)
+        {
+            return null;
+        }
     }
 
     private static string GetSystemPrompt() =>
         "You are an expert at providing context for document chunks to improve search and retrieval. " +
         "Generate concise, informative context summaries that explain the chunk's role within its source document.";
 
-    private static string BuildPrompt(Chunk chunk, string fullDocumentText, ContextualEnrichmentOptions options)
+    private static string BuildWindowPrompt(Chunk[] window, DocumentContext.Prepared document, ContextualEnrichmentOptions options)
     {
-        var (heading, documentText) = DocumentContext.For(
-            fullDocumentText, chunk.Content, GetPosition(chunk), GetTotalChunks(chunk), options.MaxDocumentContextLength);
+        // Centred on the middle of the window, so the excerpt (for a long document) covers its chunks.
+        var middle = window[window.Length / 2];
+        var (heading, documentText) = document.For(middle.Content, GetPosition(middle), GetTotalChunks(middle));
+        var parts = new List<string> { heading, documentText, "", "## Chunks to Contextualize" };
+        for (var i = 0; i < window.Length; i++)
+        {
+            parts.Add("");
+            var position = GetPosition(window[i]);
+            var total = GetTotalChunks(window[i]);
+            parts.Add(options.IncludePositionInfo && position.HasValue && total.HasValue
+                ? $"### Chunk {i + 1} (position {position.Value + 1} of {total.Value})"
+                : $"### Chunk {i + 1}");
+            if (options.IncludeStructureInfo && GetHeadingPath(window[i]) is { Length: > 0 } section)
+                parts.Add($"Section: {section}");
+            parts.Add(window[i].Content);
+        }
+
+        parts.Add("");
+        parts.Add("## Instructions");
+        parts.Add($"For each of the {window.Length} chunks above, write a brief contextual summary (1-3 sentences) that explains");
+        parts.Add("what document it comes from, where it fits in the document's structure, and what topic it addresses.");
+        parts.Add($"Maximum length per summary: {options.MaxContextLength} characters.");
+        parts.Add("");
+        parts.Add($"Answer with only a JSON array of exactly {window.Length} strings, one summary per chunk, in chunk order.");
+
+        return string.Join("\n", parts);
+    }
+
+    private static string BuildPrompt(Chunk chunk, DocumentContext.Prepared document, ContextualEnrichmentOptions options)
+    {
+        var (heading, documentText) = document.For(chunk.Content, GetPosition(chunk), GetTotalChunks(chunk));
         var parts = new List<string>
         {
             heading,

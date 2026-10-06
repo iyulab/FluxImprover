@@ -24,19 +24,33 @@ internal static class DocumentContext
     /// <param name="total">Chunk count, with <paramref name="position"/>.</param>
     /// <param name="budget">Maximum characters; 0 means no limit.</param>
     /// <returns>The heading the prompt shows and the text under it.</returns>
-    internal static (string Heading, string Text) For(string document, string chunk, int? position, int? total, int budget)
+    internal static (string Heading, string Text) For(string document, string chunk, int? position, int? total, int budget) =>
+        Prepare(document, budget).For(chunk, position, total);
+
+    /// <summary>
+    /// The part of the context that is the same for every chunk of <paramref name="document"/> — whether it fits whole, and
+    /// otherwise its profile — computed once for a document and reused for each of its chunks.
+    /// </summary>
+    internal static Prepared Prepare(string document, int budget) =>
+        budget <= 0 || document.Length <= budget
+            ? new Prepared(document, budget, Profile: null)
+            : new Prepared(document, budget, Profile(document, (int)(budget * ProfileShare)));
+
+    /// <summary>A document's context with its profile computed (see <see cref="Prepare"/>).</summary>
+    internal sealed record Prepared(string Document, int Budget, string? Profile)
     {
-        if (budget <= 0 || document.Length <= budget)
-            return ("## Full Document", document);
+        /// <summary>The context block for <paramref name="chunk"/>: the whole document, or the profile and the text around the chunk.</summary>
+        public (string Heading, string Text) For(string chunk, int? position, int? total)
+        {
+            if (Profile is null)
+                return ("## Full Document", Document);
 
-        var profile = Profile(document, (int)(budget * ProfileShare));
-        var windowBudget = Math.Max(0, budget - profile.Length);
-        var window = Window(document, chunk, position, total, windowBudget);
-
-        var sb = new StringBuilder();
-        sb.Append("### Document profile (opening and outline)\n").Append(profile);
-        sb.Append("\n\n### Text around the chunk\n").Append(window);
-        return ("## Document Context (excerpt — the document is longer)", sb.ToString());
+            var window = Window(Document, chunk, position, total, Math.Max(0, Budget - Profile.Length));
+            var sb = new StringBuilder();
+            sb.Append("### Document profile (opening and outline)\n").Append(Profile);
+            sb.Append("\n\n### Text around the chunk\n").Append(window);
+            return ("## Document Context (excerpt — the document is longer)", sb.ToString());
+        }
     }
 
     /// <summary>

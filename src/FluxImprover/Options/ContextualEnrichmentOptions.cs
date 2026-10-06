@@ -106,4 +106,24 @@ public sealed class ContextualEnrichmentOptions
     /// Maximum degree of parallelism for batch operations (default: 4).
     /// </summary>
     public int MaxDegreeOfParallelism { get; init; } = 4;
+
+    /// <summary>
+    /// How many adjacent chunks <see cref="ContextualRetrieval.IContextualEnrichmentService.EnrichBatchAsync"/> asks about in
+    /// one model call (default: 1 — one call per chunk). With more, one prompt carries the document context once and the
+    /// chunks of a window, and the model answers with one summary per chunk (a JSON array); the document text is sent once
+    /// per window instead of once per chunk. A window whose answer does not parse, has the wrong number of summaries or is
+    /// cut off is asked again chunk by chunk, so a window never loses a context it could have had. <see cref="MaxTokens"/>
+    /// applies per chunk: a window's call may use that many times its chunk count.
+    /// </summary>
+    public int ChunksPerCall
+    {
+        get => _chunksPerCall;
+        init
+        {
+            ArgumentOutOfRangeException.ThrowIfLessThan(value, 1);
+            _chunksPerCall = value;
+        }
+    }
+
+    private readonly int _chunksPerCall = 1;
 }

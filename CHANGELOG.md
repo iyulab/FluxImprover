@@ -4,6 +4,18 @@ All notable changes to this project are documented in this file. Versions follow
 [Semantic Versioning](https://semver.org/); while the major version is 0, a minor release may contain
 breaking changes, and each one is marked **Breaking** with a migration note.
 
+## [0.18.0] - Unreleased
+
+### Added
+- **Contextual enrichment can ask about several chunks in one call.** `ContextualEnrichmentOptions.ChunksPerCall` (default
+  1, as before) groups adjacent chunks into windows: one prompt carries the document context once and the window's chunks,
+  and the model answers with a JSON array of one summary per chunk. A window whose answer is not such an array, has the
+  wrong count or is cut off is asked again chunk by chunk. `MaxTokens` applies per chunk.
+
+### Changed
+- **The document profile is built once per document** in `EnrichBatchAsync` instead of once per chunk. Prompts are the
+  same.
+
 ## [0.17.0] - 2026-10-06
 
 ### Changed
