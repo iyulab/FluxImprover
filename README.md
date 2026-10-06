@@ -403,7 +403,7 @@ var enriched = await improver.ChunkEnrichment.EnrichAsync(chunk);
 | `QAFilter` | Filters QA pairs by quality thresholds |
 | `QAPipeline` | End-to-end QA generation with quality filtering |
 | `QuestionSuggestion` | Suggests contextual follow-up questions |
-| `ContextualEnrichment` | Document-level contextual retrieval (Anthropic pattern). Asks the model not to reason by default (`ContextualEnrichmentOptions.Thinking = Off`); a context cut off at `MaxTokens` is dropped, not stored |
+| `ContextualEnrichment` | Document-level contextual retrieval (Anthropic pattern). Asks the model not to reason by default (`ContextualEnrichmentOptions.Thinking = Off`); a context cut off at `MaxTokens` is dropped, not stored. A document longer than `MaxDocumentContextLength` (6000 characters) goes to the model as a profile (opening + heading outline) and the text around the chunk, so any document fits a small context; 0 sends it whole |
 | `ChunkRelationship` | Discovers relationships between chunks |
 
 ---

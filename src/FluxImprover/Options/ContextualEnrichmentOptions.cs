@@ -68,6 +68,24 @@ public sealed class ContextualEnrichmentOptions
     }
 
     /// <summary>
+    /// The most document text, in characters, sent with each chunk (default: 6000). A longer document is not sent whole:
+    /// each prompt carries a document profile (its opening and its heading outline, the same for every chunk) and the
+    /// text around the chunk, so a document of any length fits a small serving context and the cost per chunk stays
+    /// bounded. 0 sends the whole document with every chunk — for models whose context holds your longest documents.
+    /// </summary>
+    public int MaxDocumentContextLength
+    {
+        get => _maxDocumentContextLength;
+        init
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(value);
+            _maxDocumentContextLength = value;
+        }
+    }
+
+    private readonly int _maxDocumentContextLength = 6000;
+
+    /// <summary>
     /// Include document structure information (heading path) in context generation.
     /// Default: true.
     /// </summary>

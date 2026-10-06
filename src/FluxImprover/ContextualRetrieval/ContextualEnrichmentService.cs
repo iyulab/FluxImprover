@@ -153,10 +153,12 @@ public sealed class ContextualEnrichmentService : IContextualEnrichmentService
 
     private static string BuildPrompt(Chunk chunk, string fullDocumentText, ContextualEnrichmentOptions options)
     {
+        var (heading, documentText) = DocumentContext.For(
+            fullDocumentText, chunk.Content, GetPosition(chunk), GetTotalChunks(chunk), options.MaxDocumentContextLength);
         var parts = new List<string>
         {
-            "## Full Document",
-            fullDocumentText,
+            heading,
+            documentText,
             "",
             "## Chunk to Contextualize",
             chunk.Content

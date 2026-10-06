@@ -4,6 +4,15 @@ All notable changes to this project are documented in this file. Versions follow
 [Semantic Versioning](https://semver.org/); while the major version is 0, a minor release may contain
 breaking changes, and each one is marked **Breaking** with a migration note.
 
+## [0.17.0] - Unreleased
+
+### Changed
+- **Contextual enrichment no longer sends the whole document with every chunk.** A document longer than
+  `ContextualEnrichmentOptions.MaxDocumentContextLength` (new, default 6000 characters) goes to the model as a profile —
+  its opening and heading outline, the same for every chunk — plus the text around the chunk. A long document used to
+  overflow a small serving context on every chunk, and the cost grew as chunks times document length. Set it to 0 to
+  send the whole document, as before (models whose context holds your longest documents).
+
 ## [0.16.3] - 2026-10-06
 
 ### Changed
