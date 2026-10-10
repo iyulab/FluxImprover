@@ -12,19 +12,15 @@ public sealed class ParentChunkContextTests
         // Arrange & Act
         var context = new ParentChunkContext
         {
-            ParentId = "parent-1",
             ParentSummary = "This is the parent summary",
             ParentKeywords = ["keyword1", "keyword2"],
-            ParentHeadingPath = "Chapter 1 > Section 1.1",
-            HierarchyLevel = 1
+            ParentHeadingPath = "Chapter 1 > Section 1.1"
         };
 
         // Assert
-        context.ParentId.Should().Be("parent-1");
         context.ParentSummary.Should().Be("This is the parent summary");
         context.ParentKeywords.Should().HaveCount(2);
         context.ParentHeadingPath.Should().Be("Chapter 1 > Section 1.1");
-        context.HierarchyLevel.Should().Be(1);
     }
 
     [Fact]
@@ -33,7 +29,6 @@ public sealed class ParentChunkContextTests
         // Arrange
         var parentContext = new ParentChunkContext
         {
-            ParentId = "parent-1",
             ParentSummary = "Parent content summary"
         };
 
@@ -45,8 +40,7 @@ public sealed class ParentChunkContextTests
 
         // Assert
         options.ParentContext.Should().NotBeNull();
-        options.ParentContext!.ParentId.Should().Be("parent-1");
-        options.ParentContext.ParentSummary.Should().Be("Parent content summary");
+        options.ParentContext!.ParentSummary.Should().Be("Parent content summary");
     }
 
     [Fact]

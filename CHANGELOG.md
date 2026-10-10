@@ -4,6 +4,12 @@ All notable changes to this project are documented in this file. Versions follow
 [Semantic Versioning](https://semver.org/); while the major version is 0, a minor release may contain
 breaking changes, and each one is marked **Breaking** with a migration note.
 
+## [Unreleased]
+
+### Removed
+- **Breaking: `ParentChunkContext.ParentId` and `HierarchyLevel`** — enrichment reads the parent's summary, keywords and
+  heading path; nothing read these two. Migration: delete the assignments.
+
 ## [0.19.0] - 2026-10-10
 
 ### Changed

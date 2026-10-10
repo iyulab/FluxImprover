@@ -121,11 +121,6 @@ public sealed class EnrichmentOptions
 public sealed class ParentChunkContext
 {
     /// <summary>
-    /// Parent chunk identifier.
-    /// </summary>
-    public string? ParentId { get; init; }
-
-    /// <summary>
     /// Summary of the parent chunk.
     /// </summary>
     public string? ParentSummary { get; init; }
@@ -139,11 +134,6 @@ public sealed class ParentChunkContext
     /// Document structure path of the parent (e.g., "Chapter 1").
     /// </summary>
     public string? ParentHeadingPath { get; init; }
-
-    /// <summary>
-    /// Hierarchy level (0 = root, 1 = first child level, etc.).
-    /// </summary>
-    public int HierarchyLevel { get; init; }
 }
 
 
