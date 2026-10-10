@@ -4,7 +4,7 @@ All notable changes to this project are documented in this file. Versions follow
 [Semantic Versioning](https://semver.org/); while the major version is 0, a minor release may contain
 breaking changes, and each one is marked **Breaking** with a migration note.
 
-## [0.19.0] - Unreleased
+## [0.19.0] - 2026-10-10
 
 ### Changed
 - **Options that were declared but never read now take effect, with their documented defaults.** Old → new for a caller
