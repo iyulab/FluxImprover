@@ -28,29 +28,14 @@ public class OptionsReachabilityRosterTests
     /// The assembly list above must cover every assembly this repository ships. Scanning only the main one
     /// reports options that a sibling assembly reads as unread - that mistake inflated an early baseline elsewhere threefold.
     /// </para>
+    /// <para>
+    /// 2026-10-10: emptied. Of the 19 then listed, 14 were wired (evaluation switches, pass threshold, details, batch
+    /// parallelism, domain glossary, intent confidence, keyword language, difficulty mix) and 5 removed because nothing
+    /// could honour them (entity extraction and its types in chunk enrichment, evaluation retries, and the two suggestion
+    /// input switches - the method called already chooses the input).
+    /// </para>
     /// </summary>
-    private static readonly Dictionary<string, string[]> KnownUnread = new()
-    {
-        ["FluxImprover.Options.ConditionalEnrichmentOptions"] = ["DomainGlossary"],
-        ["FluxImprover.Options.EnrichmentOptions"] =
-        [
-            "EnableEntityExtraction", "EnableParallelProcessing", "EntityTypes", "MaxDegreeOfParallelism",
-        ],
-        ["FluxImprover.Options.EvaluationOptions"] =
-        [
-            "EnableAnswerability", "EnableFaithfulness", "EnableParallelProcessing", "EnableRelevancy",
-            "IncludeDetails", "MaxDegreeOfParallelism", "MaxRetries", "PassThreshold",
-        ],
-        ["FluxImprover.Options.QAGenerationOptions"] = ["DifficultyDistribution"],
-        ["FluxImprover.Options.QueryPreprocessingOptions"] =
-        [
-            "Language", "MinIntentConfidence",
-        ],
-        ["FluxImprover.Options.QuestionSuggestionOptions"] =
-        [
-            "UseConversationHistory", "UseDocumentContext",
-        ],
-    };
+    private static readonly Dictionary<string, string[]> KnownUnread = new();
 
     [Fact]
     public void EveryPublicOption_IsRead() =>

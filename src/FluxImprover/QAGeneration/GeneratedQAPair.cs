@@ -81,17 +81,29 @@ public sealed record QAPairEvaluation
     public double? Answerability { get; init; }
 
     /// <summary>
-    /// 종합 점수 (평균)
+    /// 종합 점수 — 평가된(null 이 아닌) 메트릭의 평균. 평가된 메트릭이 없으면 null.
     /// </summary>
-    public double? OverallScore => (Faithfulness + Relevancy + Answerability) / 3.0;
+    public double? OverallScore
+    {
+        get
+        {
+            double[] scores = [.. new[] { Faithfulness, Relevancy, Answerability }.OfType<double>()];
+            return scores.Length == 0 ? null : scores.Average();
+        }
+    }
 
     /// <summary>
-    /// 모든 기준 통과 여부
+    /// 평가된 모든 기준 통과 여부. 평가되지 않은(null) 메트릭은 기준에서 빠진다 —
+    /// <see cref="Options.EvaluationOptions.EnableFaithfulness"/> 등으로 끈 메트릭이 쌍을 떨어뜨리지 않는다.
+    /// 아무 메트릭도 평가되지 않았으면 통과하지 않는다.
     /// </summary>
     public bool PassesThresholds(double minFaithfulness = 0.5, double minRelevancy = 0.5, double minAnswerability = 0.5)
     {
-        return (Faithfulness ?? 0) >= minFaithfulness &&
-               (Relevancy ?? 0) >= minRelevancy &&
-               (Answerability ?? 0) >= minAnswerability;
+        if (Faithfulness is null && Relevancy is null && Answerability is null)
+            return false;
+
+        return (Faithfulness is not { } f || f >= minFaithfulness) &&
+               (Relevancy is not { } r || r >= minRelevancy) &&
+               (Answerability is not { } a || a >= minAnswerability);
     }
 }

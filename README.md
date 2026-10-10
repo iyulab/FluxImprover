@@ -160,6 +160,11 @@ Console.WriteLine($"Summary: {enrichedChunk.Summary}");
 Console.WriteLine($"Keywords: {string.Join(", ", enrichedChunk.Keywords ?? [])}");
 ```
 
+`EnrichBatchAsync` enriches up to `EnrichmentOptions.MaxDegreeOfParallelism` chunks at once (default 4; set
+`EnableParallelProcessing = false` for one at a time). An `IDomainGlossary` set on
+`EnrichmentOptions.ConditionalOptions.DomainGlossary` expands your acronyms and terms in the text the model reads; the
+enriched chunk keeps the original content.
+
 ### 3. Generate QA Pairs
 
 Create question-answer pairs for RAG testing:
@@ -211,7 +216,15 @@ foreach (var detail in faithfulness.Details)
 {
     Console.WriteLine($"  {detail.Key}: {detail.Value}");
 }
+
+// Pass/fail against your own bar, score only (no reasoning payload)
+var strict = new EvaluationOptions { PassThreshold = 0.8f, IncludeDetails = false };
+var checkedAnswer = await improver.Faithfulness.EvaluateAsync(context, answer, strict);
+Console.WriteLine($"Passed: {checkedAnswer.IsPassed} (score {checkedAnswer.Score:P0}, bar {checkedAnswer.PassThreshold:P0})");
 ```
+
+`EvaluationOptions` also bounds the batch methods (`EvaluateBatchAsync`): `EnableParallelProcessing` (default on) runs up to
+`MaxDegreeOfParallelism` items (default 4) at once, results in input order.
 
 ### 5. Filter QA Pairs by Quality
 
@@ -233,7 +246,9 @@ var pipelineOptions = new QAPipelineOptions
     {
         MinFaithfulness = 0.7,
         MinRelevancy = 0.7,
-        MinAnswerability = 0.6
+        MinAnswerability = 0.6,
+        // Which metrics the filter requests, the model settings, and how many pairs it evaluates at once
+        Evaluation = new EvaluationOptions { EnableAnswerability = false, MaxDegreeOfParallelism = 2 }
     }
 };
 
@@ -245,6 +260,10 @@ var allQAPairs = results.SelectMany(r => r.QAPairs).ToList();
 
 Console.WriteLine($"Generated: {totalGenerated}, Passed Filter: {totalFiltered}");
 ```
+
+A metric switched off in `QAFilterOptions.Evaluation` is never requested; its score stays `null` and its minimum does not
+apply. `QAGenerationOptions.DifficultyDistribution` asks the generator for an easy/medium/hard mix (a prompt instruction —
+the pairs do not record a difficulty).
 
 ### 6. Filter Chunks with 3-Stage Assessment
 
@@ -320,7 +339,9 @@ Console.WriteLine($"Expanded Keywords: {string.Join(", ", result.ExpandedKeyword
 Features:
 - **Query Normalization**: Lowercase, trim, remove extra whitespace
 - **Synonym Expansion**: LLM-based and built-in technical term expansion (e.g., "auth" -> "authentication")
-- **Intent Classification**: Classifies queries into types (HowTo, Definition, Code, Search, etc.)
+- **Intent Classification**: Classifies queries into types (HowTo, Definition, Code, Search, etc.); a classification below
+  `MinIntentConfidence` (default 0.5) is reported as `General`
+- **Term Language**: `Language` (default unset) asks the model to write extracted keywords and synonyms in that language
 - **Entity Extraction**: Identifies file names, class names, method names in queries
 - **Search Strategy**: Recommends optimal search strategy (Semantic, Keyword, Hybrid, MultiQuery)
 

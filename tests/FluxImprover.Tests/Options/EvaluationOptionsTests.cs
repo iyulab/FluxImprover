@@ -18,8 +18,10 @@ public sealed class EvaluationOptionsTests
         options.EnableAnswerability.Should().BeTrue();
         options.Temperature.Should().BeNull();
         options.MaxTokens.Should().Be(1024);
-        options.PassThreshold.Should().Be(0.7f);
+        options.PassThreshold.Should().Be(0.5f);
         options.IncludeDetails.Should().BeTrue();
+        options.EnableParallelProcessing.Should().BeTrue();
+        options.MaxDegreeOfParallelism.Should().Be(4);
     }
 
     [Theory]
@@ -112,29 +114,5 @@ public sealed class EvaluationOptionsTests
         options.EnableFaithfulness.Should().BeFalse();
         options.EnableRelevancy.Should().BeFalse();
         options.EnableAnswerability.Should().BeFalse();
-    }
-
-    [Theory]
-    [InlineData(1)]
-    [InlineData(3)]
-    [InlineData(5)]
-    public void MaxRetries_ValidValues_ShouldBeAccepted(int value)
-    {
-        // Arrange & Act
-        var options = new EvaluationOptions { MaxRetries = value };
-
-        // Assert
-        options.MaxRetries.Should().Be(value);
-    }
-
-    [Theory]
-    [InlineData(-1)]
-    public void MaxRetries_InvalidValues_ShouldThrow(int value)
-    {
-        // Arrange & Act
-        var act = () => new EvaluationOptions { MaxRetries = value };
-
-        // Assert
-        act.Should().Throw<ArgumentOutOfRangeException>();
     }
 }

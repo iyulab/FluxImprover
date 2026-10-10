@@ -48,7 +48,7 @@ public sealed class AnswerabilityEvaluator
         };
 
         var response = await _completionService.CompleteAsync(prompt, completionOptions, cancellationToken);
-        return ParseResponse(response);
+        return ParseResponse(response, options);
     }
 
     /// <summary>
@@ -65,23 +65,21 @@ public sealed class AnswerabilityEvaluator
     }
 
     /// <summary>
-    /// 여러 쌍의 컨텍스트-질문을 일괄 평가합니다.
+    /// 여러 쌍의 컨텍스트-질문을 일괄 평가합니다. <see cref="EvaluationOptions.EnableParallelProcessing"/> 가 켜져 있으면
+    /// <see cref="EvaluationOptions.MaxDegreeOfParallelism"/> 개까지 동시에 평가하며, 결과 순서는 입력 순서를 따른다.
     /// </summary>
     public async Task<IReadOnlyList<MetricResult>> EvaluateBatchAsync(
         IEnumerable<(string Context, string Question)> pairs,
         EvaluationOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        var results = new List<MetricResult>();
+        options ??= new EvaluationOptions();
 
-        foreach (var (context, question) in pairs)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            var result = await EvaluateAsync(context, question, options, cancellationToken);
-            results.Add(result);
-        }
-
-        return results;
+        return await BoundedBatch.RunAsync(
+            pairs,
+            BoundedBatch.Parallelism(options.EnableParallelProcessing, options.MaxDegreeOfParallelism),
+            (pair, ct) => EvaluateAsync(pair.Context, pair.Question, options, ct),
+            cancellationToken).ConfigureAwait(false);
     }
 
     private static string GetSystemPrompt()
@@ -121,7 +119,7 @@ public sealed class AnswerabilityEvaluator
             """;
     }
 
-    private static MetricResult ParseResponse(string response)
+    private static MetricResult ParseResponse(string response, EvaluationOptions options)
     {
         try
         {
@@ -133,21 +131,20 @@ public sealed class AnswerabilityEvaluator
             var root = doc.RootElement;
 
             var score = root.TryGetProperty("score", out var s) ? s.GetDouble() : 0.0;
-            var reasoning = root.TryGetProperty("reasoning", out var r) ? r.GetString() : null;
-            var answerable = root.TryGetProperty("answerable", out var a) && a.GetBoolean();
-            var evidence = root.TryGetProperty("evidence", out var e) ? e.GetString() : null;
+            var details = new Dictionary<string, object?>();
 
-            var details = new Dictionary<string, object?>
+            if (options.IncludeDetails)
             {
-                ["reasoning"] = reasoning,
-                ["answerable"] = answerable,
-                ["evidence"] = evidence
-            };
+                details["reasoning"] = root.TryGetProperty("reasoning", out var r) ? r.GetString() : null;
+                details["answerable"] = root.TryGetProperty("answerable", out var a) && a.GetBoolean();
+                details["evidence"] = root.TryGetProperty("evidence", out var e) ? e.GetString() : null;
+            }
 
             return new MetricResult
             {
                 MetricName = MetricName,
                 Score = Math.Clamp(score, 0.0, 1.0),
+                PassThreshold = options.PassThreshold,
                 Details = details
             };
         }

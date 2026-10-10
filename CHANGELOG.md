@@ -4,7 +4,42 @@ All notable changes to this project are documented in this file. Versions follow
 [Semantic Versioning](https://semver.org/); while the major version is 0, a minor release may contain
 breaking changes, and each one is marked **Breaking** with a migration note.
 
-## [Unreleased]
+## [0.19.0] - Unreleased
+
+### Changed
+- **Options that were declared but never read now take effect, with their documented defaults.** Old → new for a caller
+  that sets nothing:
+  - **Batches run up to 4 items at once** (`EnableParallelProcessing = true`, `MaxDegreeOfParallelism = 4`, as documented):
+    the three evaluators' `EvaluateBatchAsync`, `QAFilterService.FilterAsync`/`EvaluateBatchAsync`,
+    `ChunkEnrichmentService.EnrichBatchAsync`, `SummarizeBatchAsync`, `ExtractKeywordsBatchAsync`. They ran one at a time.
+    Results keep input order. In a parallel batch the remaining items finish before the first exception is thrown;
+    sequential batches still stop at the first failure. `QAFilterService` asks for three metrics per pair, so it can reach
+    12 concurrent model calls. To restore one at a time, set `EnableParallelProcessing = false`.
+  - **QA generation prompts carry the difficulty mix** (`DifficultyDistribution`, default about 30 % easy, 50 % medium,
+    20 % hard). The line is omitted when all shares are 0.
+  - **A model intent classification below `MinIntentConfidence` (default 0.5) is reported as `General`**, keeping the
+    measured confidence. Heuristic classifications are never below 0.5.
+  - **`EvaluationOptions.PassThreshold` decides `MetricResult.IsPassed`.** The default is now 0.5, which keeps
+    `IsPassed` where it was: it always compared against 0.5, and the declared 0.7 was never read.
+- **Opt-in options now work:**
+  - `EvaluationOptions.EnableFaithfulness`/`EnableRelevancy`/`EnableAnswerability` through the new
+    `QAFilterOptions.Evaluation`: a disabled metric is never requested, and its minimum no longer filters the pair.
+  - `IncludeDetails = false` returns scores without `Details`.
+  - `ConditionalEnrichmentOptions.DomainGlossary` expands terms in the text sent to summarization and keyword
+    extraction.
+  - `QueryPreprocessingOptions.Language` asks for keywords and synonyms in that language.
+- **Breaking** — **`QAPairEvaluation` treats a missing score as missing:** `OverallScore` is the mean of the scores
+  present (it was null if any was null), and `PassesThresholds` ignores a null score (it counted as 0). It is false when
+  every score is null.
+- **Breaking** — **`QAFilterService.EvaluateAsync` and `EvaluateBatchAsync` take `EvaluationOptions? options` before the
+  cancellation token.** Migration: pass the token by name, or pass `null` for the options.
+
+### Removed
+- **Breaking** — **options with nothing behind them:** `EnrichmentOptions.EnableEntityExtraction` and `EntityTypes` (there
+  is no entity extraction step), `EvaluationOptions.MaxRetries` (nothing in FluxImprover retries; the completion service
+  does), `QuestionSuggestionOptions.UseConversationHistory` and `UseDocumentContext` (the method you call already
+  decides the input). `QueryPreprocessingOptions.Language` is now `string?` (default null: no language line) instead of
+  `"en"`. Migration: delete the assignments.
 
 ### Dependencies
 - Re-pinned sibling package(s) `LMSupply.Generator` 0.111.0 -> 0.113.0, `LMSupply.Generator.Onnx` 0.111.0 -> 0.113.0.

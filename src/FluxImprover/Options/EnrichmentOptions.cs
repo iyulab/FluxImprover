@@ -32,11 +32,6 @@ public sealed class EnrichmentOptions
     public bool EnableKeywordExtraction { get; init; } = true;
 
     /// <summary>
-    /// 개체 추출 활성화 여부 (기본값: false)
-    /// </summary>
-    public bool EnableEntityExtraction { get; init; }
-
-    /// <summary>
     /// LLM 온도 (0.0 ~ 2.0).
     /// null이면 모델 기본값 사용 (일부 모델은 기본값 외 temperature를 지원하지 않음).
     /// </summary>
@@ -96,18 +91,13 @@ public sealed class EnrichmentOptions
     }
 
     /// <summary>
-    /// 추출할 개체 유형 목록
-    /// </summary>
-    public IReadOnlyList<string> EntityTypes { get; init; } =
-        ["Person", "Organization", "Location", "Date", "Product"];
-
-    /// <summary>
-    /// 병렬 처리 활성화 여부 (기본값: true)
+    /// 일괄 처리(<c>EnrichBatchAsync</c>, <c>SummarizeBatchAsync</c>, <c>ExtractKeywordsBatchAsync</c>)를 병렬로 처리할지 여부
+    /// (기본값: true). false 이면 항목을 하나씩 처리한다. 결과 순서는 입력 순서를 따른다.
     /// </summary>
     public bool EnableParallelProcessing { get; init; } = true;
 
     /// <summary>
-    /// 병렬 처리 시 최대 동시 작업 수 (기본값: 4)
+    /// 병렬 처리 시 동시에 처리하는 최대 항목 수 (기본값: 4). 1 미만은 1 로 취급한다.
     /// </summary>
     public int MaxDegreeOfParallelism { get; init; } = 4;
 
@@ -229,7 +219,9 @@ public sealed class ConditionalEnrichmentOptions
 
     /// <summary>
     /// Optional domain glossary for term expansion.
-    /// When provided, acronyms and technical terms are expanded using domain knowledge.
+    /// When provided, <see cref="IDomainGlossary.ExpandTerms"/> is applied to the chunk text that is sent to summarization and
+    /// keyword extraction, so acronyms and technical terms reach the model in their expanded form. The enriched chunk keeps
+    /// the original content. Applied whenever set, whether or not <see cref="EnableConditionalEnrichment"/> is on.
     /// Implementation is provided by the consumer.
     /// </summary>
     public IDomainGlossary? DomainGlossary { get; init; }

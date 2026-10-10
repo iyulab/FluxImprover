@@ -99,14 +99,4 @@ public sealed class QuestionSuggestionOptions
             _contextWindowSize = value;
         }
     }
-
-    /// <summary>
-    /// 문서 컨텍스트 사용 여부 (기본값: true)
-    /// </summary>
-    public bool UseDocumentContext { get; init; } = true;
-
-    /// <summary>
-    /// 대화 기록 사용 여부 (기본값: true)
-    /// </summary>
-    public bool UseConversationHistory { get; init; } = true;
 }

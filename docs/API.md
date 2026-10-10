@@ -335,8 +335,11 @@ public class AnswerabilityEvaluator
 ```csharp
 public sealed record MetricResult
 {
+    public required string MetricName { get; init; }
     public required double Score { get; init; }  // 0.0 to 1.0
-    public IReadOnlyDictionary<string, string> Details { get; init; }
+    public IReadOnlyDictionary<string, object?> Details { get; init; }  // empty when EvaluationOptions.IncludeDetails = false
+    public double PassThreshold { get; init; } = 0.5;  // set from EvaluationOptions.PassThreshold
+    public bool IsPassed { get; }  // Score >= PassThreshold
 }
 ```
 
@@ -593,11 +596,31 @@ public sealed record QAGenerationOptions
 ### QAFilterOptions
 
 ```csharp
-public sealed record QAFilterOptions
+public sealed class QAFilterOptions
 {
-    public double MinFaithfulness { get; init; } = 0.7;
-    public double MinRelevancy { get; init; } = 0.7;
-    public double MinAnswerability { get; init; } = 0.6;
+    public double MinFaithfulness { get; init; } = 0.5;
+    public double MinRelevancy { get; init; } = 0.5;
+    public double MinAnswerability { get; init; } = 0.5;
+    public EvaluationOptions? Evaluation { get; init; }  // metrics to request, model settings, pairs evaluated at once
+}
+```
+
+A metric switched off in `Evaluation` is not requested; its score stays `null` and its minimum is not applied.
+
+### EvaluationOptions
+
+```csharp
+public sealed class EvaluationOptions
+{
+    public bool EnableFaithfulness { get; init; } = true;    // read by QAFilterService (a single evaluator is its own switch)
+    public bool EnableRelevancy { get; init; } = true;
+    public bool EnableAnswerability { get; init; } = true;
+    public float? Temperature { get; init; }
+    public int MaxTokens { get; init; } = 1024;
+    public float PassThreshold { get; init; } = 0.5f;       // becomes MetricResult.PassThreshold
+    public bool IncludeDetails { get; init; } = true;       // false: MetricResult.Details stays empty
+    public bool EnableParallelProcessing { get; init; } = true;  // batch methods and QAFilterService.FilterAsync
+    public int MaxDegreeOfParallelism { get; init; } = 4;
 }
 ```
 

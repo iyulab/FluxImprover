@@ -212,20 +212,37 @@ public sealed partial class QueryPreprocessingService : IQueryPreprocessingServi
         // If confidence is high enough or LLM is disabled, use heuristic result
         if (!options.UseLlmIntentClassification || heuristicConfidence >= 0.9)
         {
-            return (heuristicIntent, heuristicConfidence);
+            return ApplyMinIntentConfidence(heuristicIntent, heuristicConfidence, options);
         }
 
         // Use LLM for more accurate classification
         try
         {
-            return await ClassifyIntentWithLlmAsync(query, options, cancellationToken).ConfigureAwait(false);
+            var (intent, confidence) = await ClassifyIntentWithLlmAsync(query, options, cancellationToken).ConfigureAwait(false);
+            return ApplyMinIntentConfidence(intent, confidence, options);
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             // Fallback to heuristic on LLM failure
-            return (heuristicIntent, heuristicConfidence);
+            return ApplyMinIntentConfidence(heuristicIntent, heuristicConfidence, options);
         }
     }
+
+    /// <summary>A classification less confident than <see cref="QueryPreprocessingOptions.MinIntentConfidence"/> is reported as General.</summary>
+    private static (QueryClassification Intent, double Confidence) ApplyMinIntentConfidence(
+        QueryClassification intent,
+        double confidence,
+        QueryPreprocessingOptions options) =>
+        confidence < options.MinIntentConfidence ? (QueryClassification.General, confidence) : (intent, confidence);
+
+    /// <summary>
+    /// A new prompt line that asks for terms in <see cref="QueryPreprocessingOptions.Language"/>, or nothing at all when it is
+    /// unset (the prompt is then exactly what it was before the option was read).
+    /// </summary>
+    private static string LanguageInstruction(QueryPreprocessingOptions options) =>
+        string.IsNullOrWhiteSpace(options.Language)
+            ? string.Empty
+            : $"\nWrite the terms in this language: {options.Language}.";
 
     /// <inheritdoc />
     public async Task<IReadOnlyList<string>> ExtractKeywordsAsync(
@@ -239,7 +256,7 @@ public sealed partial class QueryPreprocessingService : IQueryPreprocessingServi
             Extract the most important keywords from this query for search purposes.
             Return only the keywords as a JSON array of strings.
             Focus on nouns, verbs, and technical terms. Exclude common stop words.
-            Maximum {options.MaxKeywords} keywords.
+            Maximum {options.MaxKeywords} keywords.{LanguageInstruction(options)}
 
             Query: {query}
 
@@ -348,7 +365,7 @@ public sealed partial class QueryPreprocessingService : IQueryPreprocessingServi
             Keywords: {keywordList}
 
             Return up to {options.MaxSynonymsPerKeyword} synonyms per keyword as a flat JSON array.
-            Only include high-quality, relevant synonyms. Example: ["synonym1", "synonym2"]
+            Only include high-quality, relevant synonyms. Example: ["synonym1", "synonym2"]{LanguageInstruction(options)}
             """;
 
         try

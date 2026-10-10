@@ -15,7 +15,6 @@ public sealed class EnrichmentOptionsTests
         // Assert
         options.EnableSummarization.Should().BeTrue();
         options.EnableKeywordExtraction.Should().BeTrue();
-        options.EnableEntityExtraction.Should().BeFalse();
         options.Temperature.Should().BeNull();
         options.MaxTokens.Should().Be(512);
         options.MaxKeywords.Should().Be(10);
@@ -130,24 +129,11 @@ public sealed class EnrichmentOptionsTests
         var options = new EnrichmentOptions
         {
             EnableSummarization = false,
-            EnableKeywordExtraction = false,
-            EnableEntityExtraction = false
+            EnableKeywordExtraction = false
         };
 
         // Assert - Configuration is allowed, runtime validation separate
         options.EnableSummarization.Should().BeFalse();
         options.EnableKeywordExtraction.Should().BeFalse();
-        options.EnableEntityExtraction.Should().BeFalse();
-    }
-
-    [Fact]
-    public void CustomEntityTypes_ShouldBeConfigurable()
-    {
-        // Arrange & Act
-        var entityTypes = new[] { "Person", "Organization", "Location" };
-        var options = new EnrichmentOptions { EntityTypes = entityTypes };
-
-        // Assert
-        options.EntityTypes.Should().BeEquivalentTo(entityTypes);
     }
 }

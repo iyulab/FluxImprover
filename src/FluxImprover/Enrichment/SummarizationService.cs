@@ -2,6 +2,7 @@ namespace FluxImprover.Enrichment;
 
 using FluxImprover.Options;
 using FluxImprover.Services;
+using FluxImprover.Utilities;
 
 /// <summary>
 /// LLM 기반 텍스트 요약 서비스
@@ -48,17 +49,13 @@ public sealed class SummarizationService : ISummarizationService
         EnrichmentOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        var textList = texts.ToList();
-        var results = new List<string>(textList.Count);
+        options ??= new EnrichmentOptions();
 
-        foreach (var text in textList)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            var summary = await SummarizeAsync(text, options, cancellationToken);
-            results.Add(summary);
-        }
-
-        return results;
+        return await BoundedBatch.RunAsync(
+            texts,
+            BoundedBatch.Parallelism(options.EnableParallelProcessing, options.MaxDegreeOfParallelism),
+            (text, ct) => SummarizeAsync(text, options, ct),
+            cancellationToken).ConfigureAwait(false);
     }
 
     private static string GetSystemPrompt()

@@ -49,16 +49,13 @@ public sealed class KeywordExtractionService : IKeywordExtractionService
         EnrichmentOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        var results = new List<IReadOnlyList<string>>();
+        options ??= new EnrichmentOptions();
 
-        foreach (var text in texts)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            var keywords = await ExtractKeywordsAsync(text, options, cancellationToken);
-            results.Add(keywords);
-        }
-
-        return results;
+        return await BoundedBatch.RunAsync(
+            texts,
+            BoundedBatch.Parallelism(options.EnableParallelProcessing, options.MaxDegreeOfParallelism),
+            (text, ct) => ExtractKeywordsAsync(text, options, ct),
+            cancellationToken).ConfigureAwait(false);
     }
 
     private async Task<string> GetKeywordResponseAsync(

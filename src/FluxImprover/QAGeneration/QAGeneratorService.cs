@@ -109,7 +109,7 @@ public class QAGeneratorService
             - Questions should be clear and specific
             - Answers should be directly supported by the context
             - Answer length should be between {{options.MinAnswerLength}} and {{options.MaxAnswerLength}} characters
-            - Question types to include: {{questionTypes}}
+            - Question types to include: {{questionTypes}}{{DifficultyInstruction(options.DifficultyDistribution)}}
             {{multiHopInstruction}}
             {{reasoningInstruction}}
 
@@ -123,6 +123,23 @@ public class QAGeneratorService
                 ]
             }
             """;
+    }
+
+    /// <summary>
+    /// The requirement line for the difficulty mix, the three shares normalised to whole percentages, or nothing when all
+    /// three are zero.
+    /// </summary>
+    private static string DifficultyInstruction(DifficultyDistribution distribution)
+    {
+        var total = distribution.Easy + distribution.Medium + distribution.Hard;
+        if (total <= 0f)
+            return string.Empty;
+
+        static int Percent(float share, float total) => (int)Math.Round(share / total * 100, MidpointRounding.AwayFromZero);
+
+        return string.Create(
+            System.Globalization.CultureInfo.InvariantCulture,
+            $"\n- Difficulty mix: about {Percent(distribution.Easy, total)}% easy, {Percent(distribution.Medium, total)}% medium, {Percent(distribution.Hard, total)}% hard questions");
     }
 
     private static List<GeneratedQAPair> ParseResponse(string response, string context, string? sourceId)

@@ -96,7 +96,8 @@ public sealed class QAGenerationOptions
     }
 
     /// <summary>
-    /// 난이도 분포 설정
+    /// 생성할 질문의 난이도 분포 — 생성 프롬프트에 «쉬움/보통/어려움 비율» 지시로 전달된다(비율은 합으로 정규화).
+    /// 모델에 대한 지시일 뿐 결과 QA 쌍에 난이도가 기록되지는 않는다. 세 비율이 모두 0 이면 지시를 넣지 않는다.
     /// </summary>
     public DifficultyDistribution DifficultyDistribution { get; init; } = new();
 

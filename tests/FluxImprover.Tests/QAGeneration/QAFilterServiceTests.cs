@@ -152,7 +152,7 @@ public sealed class QAFilterServiceTests
                 @"{""score"": 0.5, ""reasoning"": ""Low answerability""}");
 
         // Act
-        var result = await _sut.EvaluateAsync(pair, TestContext.Current.CancellationToken);
+        var result = await _sut.EvaluateAsync(pair, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         result.Should().NotBeNull();

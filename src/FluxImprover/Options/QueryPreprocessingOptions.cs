@@ -86,9 +86,11 @@ public sealed class QueryPreprocessingOptions
     public IReadOnlyDictionary<string, IReadOnlyList<string>>? DomainSynonyms { get; init; }
 
     /// <summary>
-    /// Language for processing. Default is "en" (English).
+    /// Language the model writes extracted keywords and synonyms in (for example "en" or "Korean"). Default is null: no
+    /// language instruction, the model answers in whatever language it chooses (usually the query's).
+    /// Only the model prompts read this; the built-in heuristics (stop words, intent patterns, abbreviation table) are English.
     /// </summary>
-    public string Language { get; init; } = "en";
+    public string? Language { get; init; }
 
     /// <summary>
     /// Whether to include technical term expansions (e.g., "auth" -> "authentication").
@@ -98,6 +100,8 @@ public sealed class QueryPreprocessingOptions
 
     /// <summary>
     /// Minimum confidence threshold for intent classification (0.0 to 1.0). Default is 0.5.
+    /// A classification whose confidence is below this is reported as <see cref="Models.QueryClassification.General"/>
+    /// (with the confidence that was measured), so a weak guess does not steer the recommended search mode.
     /// </summary>
     public float MinIntentConfidence
     {

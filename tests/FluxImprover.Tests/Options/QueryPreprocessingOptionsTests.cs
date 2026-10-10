@@ -20,7 +20,7 @@ public sealed class QueryPreprocessingOptionsTests
         options.MaxKeywords.Should().Be(10);
         options.Temperature.Should().BeApproximately(0.3f, 0.01f);
         options.MaxTokens.Should().Be(500);
-        options.Language.Should().Be("en");
+        options.Language.Should().BeNull();
         options.ExpandTechnicalTerms.Should().BeTrue();
         options.MinIntentConfidence.Should().BeApproximately(0.5f, 0.01f);
         options.DomainSynonyms.Should().BeNull();

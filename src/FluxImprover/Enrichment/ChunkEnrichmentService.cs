@@ -63,6 +63,9 @@ public sealed class ChunkEnrichmentService
             var shouldSummarize = ShouldPerformSummarization(chunk, options, qualityResult, conditionalOptions);
             var shouldExtractKeywords = ShouldPerformKeywordExtraction(options, qualityResult, conditionalOptions);
 
+            // The model reads the text with the consumer's domain terms expanded; the enriched chunk keeps the original.
+            var modelText = conditionalOptions?.DomainGlossary?.ExpandTerms(chunk.Content) ?? chunk.Content;
+
             // Execute selected enrichments in parallel
             var tasks = new List<Task>();
             Task<string?>? summarizeTask = null;
@@ -70,13 +73,13 @@ public sealed class ChunkEnrichmentService
 
             if (shouldSummarize)
             {
-                summarizeTask = SummarizeOrNullAsync(chunk.Content, options, cancellationToken);
+                summarizeTask = SummarizeOrNullAsync(modelText, options, cancellationToken);
                 tasks.Add(summarizeTask);
             }
 
             if (shouldExtractKeywords)
             {
-                keywordsTask = _keywordExtractionService.ExtractKeywordsAsync(chunk.Content, options, cancellationToken);
+                keywordsTask = _keywordExtractionService.ExtractKeywordsAsync(modelText, options, cancellationToken);
                 tasks.Add(keywordsTask);
             }
 
@@ -109,6 +112,8 @@ public sealed class ChunkEnrichmentService
     /// <summary>
     /// Enriches multiple chunks in batch.
     /// When conditional enrichment is enabled, each chunk is independently assessed.
+    /// With <see cref="EnrichmentOptions.EnableParallelProcessing"/> on, up to <see cref="EnrichmentOptions.MaxDegreeOfParallelism"/>
+    /// chunks are enriched at once; the results keep the input order.
     /// </summary>
     /// <param name="chunks">Chunks to enrich.</param>
     /// <param name="options">Enrichment options.</param>
@@ -119,16 +124,13 @@ public sealed class ChunkEnrichmentService
         EnrichmentOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        var results = new List<EnrichedChunk>();
+        options ??= new EnrichmentOptions();
 
-        foreach (var chunk in chunks)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            var enriched = await EnrichAsync(chunk, options, cancellationToken);
-            results.Add(enriched);
-        }
-
-        return results;
+        return await BoundedBatch.RunAsync(
+            chunks,
+            BoundedBatch.Parallelism(options.EnableParallelProcessing, options.MaxDegreeOfParallelism),
+            (chunk, ct) => EnrichAsync(chunk, options, ct),
+            cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
