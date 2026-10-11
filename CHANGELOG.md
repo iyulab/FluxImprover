@@ -15,6 +15,9 @@ breaking changes, and each one is marked **Breaking** with a migration note.
 - **Breaking: `ParentChunkContext.ParentId` and `HierarchyLevel`** — enrichment reads the parent's summary, keywords and
   heading path; nothing read these two. Migration: delete the assignments.
 
+### Dependencies
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.115.1 -> 0.116.0, `LMSupply.Generator.Onnx` 0.115.1 -> 0.116.0.
+
 ## [0.19.0] - 2026-10-10
 
 ### Changed
