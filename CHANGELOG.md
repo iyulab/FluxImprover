@@ -6,6 +6,10 @@ breaking changes, and each one is marked **Breaking** with a migration note.
 
 ## [Unreleased]
 
+### Documentation
+- **`AddFluxImproverWithLMSupply`'s parameter docs read correctly.** The `lifetime` and `disposeModel` descriptions were
+  nested inside each other, so the generated API docs showed them garbled.
+
 ### Changed
 - **The packages from this repository depend on each other at exactly the same version** (`[x.y.z]`), not a floor.
   A consumer that moves one of them while a family member it depends on resolves at an older version now gets restore warning NU1608 naming

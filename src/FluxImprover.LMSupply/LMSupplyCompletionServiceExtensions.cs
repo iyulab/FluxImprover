@@ -18,13 +18,13 @@ public static class LMSupplyCompletionServiceExtensions
     /// <param name="defaultTemperature">Default temperature when not specified in options. Defaults to 0.3.</param>
     /// <param name="defaultMaxTokens">Default max tokens when not specified in options. Defaults to 512.</param>
     /// <param name="lifetime">
+    /// The service lifetime for all FluxImprover services. Defaults to <see cref="ServiceLifetime.Scoped"/>.
+    /// </param>
     /// <param name="disposeModel">
     /// Whether the adapter disposes the model the factory returned when the adapter itself is disposed. Default
     /// <c>false</c>: with the default scoped lifetime the adapter is created and disposed per scope, while a loaded
     /// model is normally one shared instance — disposing it from the first scope broke every later scope. Set
     /// <c>true</c> only when the factory creates a fresh model per call and nothing else holds it.
-    /// </param>
-    /// The service lifetime for all FluxImprover services. Defaults to <see cref="ServiceLifetime.Scoped"/>.
     /// </param>
     /// <returns>The service collection for chaining.</returns>
     public static IServiceCollection AddFluxImproverWithLMSupply(
