@@ -74,31 +74,6 @@ public sealed record ClaimVerification(
     bool IsSupported,
     string? Reasoning = null);
 
-/// <summary>
-/// 평가 입력
-/// </summary>
-public sealed record EvaluationInput
-{
-    /// <summary>
-    /// 질문
-    /// </summary>
-    public required string Question { get; init; }
-
-    /// <summary>
-    /// RAG 시스템이 생성한 답변
-    /// </summary>
-    public required string Answer { get; init; }
-
-    /// <summary>
-    /// 검색된 컨텍스트 목록
-    /// </summary>
-    public IReadOnlyList<ContextReference> Contexts { get; init; } = [];
-
-    /// <summary>
-    /// 정답 (Ground Truth). 선택적.
-    /// </summary>
-    public string? GroundTruth { get; init; }
-}
 
 /// <summary>
 /// 답변 가능성 등급 (NVIDIA A-D 체계)

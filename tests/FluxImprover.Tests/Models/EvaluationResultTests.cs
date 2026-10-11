@@ -123,28 +123,3 @@ public class ClaimVerificationTests
         claim.Reasoning.Should().Be("Found in paragraph 2");
     }
 }
-
-public class EvaluationInputTests
-{
-    [Fact]
-    public void EvaluationInput_StoresAllProperties()
-    {
-        // Act
-        var input = new EvaluationInput
-        {
-            Question = "What is RAG?",
-            Answer = "RAG is Retrieval Augmented Generation",
-            Contexts =
-            [
-                new ContextReference("chunk-1", "RAG combines...", true)
-            ],
-            GroundTruth = "RAG stands for Retrieval Augmented Generation"
-        };
-
-        // Assert
-        input.Question.Should().Be("What is RAG?");
-        input.Answer.Should().Be("RAG is Retrieval Augmented Generation");
-        input.Contexts.Should().HaveCount(1);
-        input.GroundTruth.Should().NotBeNull();
-    }
-}

@@ -158,34 +158,3 @@ public sealed class AnswerabilityGradeTests
         values.Should().Contain(AnswerabilityGrade.D);
     }
 }
-
-public sealed class DatasetMetadataAdditionalTests
-{
-    [Fact]
-    public void DatasetMetadata_DefaultValues_AreNull()
-    {
-        var metadata = new DatasetMetadata();
-
-        metadata.CreatedAt.Should().BeNull();
-        metadata.Generator.Should().BeNull();
-        metadata.SourceDocuments.Should().BeNull();
-        metadata.TotalSamples.Should().BeNull();
-        metadata.Configuration.Should().BeNull();
-    }
-
-    [Fact]
-    public void DatasetMetadata_IsImmutableRecord()
-    {
-        var metadata = new DatasetMetadata
-        {
-            Generator = "original",
-            TotalSamples = 10
-        };
-
-        var modified = metadata with { TotalSamples = 50 };
-
-        metadata.TotalSamples.Should().Be(10);
-        modified.TotalSamples.Should().Be(50);
-        modified.Generator.Should().Be("original");
-    }
-}

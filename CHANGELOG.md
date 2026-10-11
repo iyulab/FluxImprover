@@ -6,6 +6,10 @@ breaking changes, and each one is marked **Breaking** with a migration note.
 
 ## [Unreleased]
 
+### Removed
+- **Breaking: `QADataset`, `DatasetMetadata` and `EvaluationInput` are gone.** Nothing produced or accepted them: the
+  evaluators take strings, and a QA set is the `QAPair` list. Migration: serialize the `QAPair` list yourself.
+
 ### Documentation
 - **`AddFluxImproverWithLMSupply`'s parameter docs read correctly.** The `lifetime` and `disposeModel` descriptions were
   nested inside each other, so the generated API docs showed them garbled.
