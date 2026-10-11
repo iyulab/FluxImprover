@@ -27,6 +27,15 @@ It acts as the **quality assurance and value-add layer**, leveraging Large Langu
 
 ---
 
+## Packages
+
+| Package | Purpose |
+|---------|---------|
+| `FluxImprover` | All services (enrichment, filtering, query preprocessing, QA generation, evaluation, suggestions, contextual enrichment, relationship discovery), `FluxImproverBuilder`, the `AddFluxImprover*` DI extensions, and the built-in OpenAI-compatible provider (`OpenAICompatibleCompletionService`, `AddFluxImproverWithOpenAI`) |
+| `FluxImprover.LMSupply` | Local-model provider: `LMSupplyCompletionService` adapts an LMSupply `IGeneratorModel` to `ITextGenerationService`; registered with `AddFluxImproverWithLMSupply` |
+
+---
+
 ## Installation
 
 Install the main package via NuGet:
@@ -384,7 +393,7 @@ FluxImprover is designed to be **language-agnostic**. The underlying LLM automat
 
 Any language supported by your LLM provider works with FluxImprover:
 - **English** - Primary development and testing language
-- **Korean** - Tested with technical documentation (e.g., ClusterPlex HA solution manuals)
+- **Korean** - Tested with technical documentation (e.g., high-availability product manuals)
 - **Other languages** - Japanese, Chinese, German, French, etc. (depends on LLM capability)
 
 ### Best Practices for Non-English Documents
@@ -399,7 +408,7 @@ Any language supported by your LLM provider works with FluxImprover:
 var chunk = new Chunk
 {
     Id = "korean-1",
-    Content = "ClusterPlex는 고가용성(HA) 솔루션으로, 핫빗 기반의 페일오버 메커니즘을 제공합니다."
+    Content = "이 클러스터는 고가용성(HA) 솔루션으로, 하트비트 기반의 페일오버 메커니즘을 제공합니다."
 };
 
 var enriched = await improver.ChunkEnrichment.EnrichAsync(chunk);
@@ -408,24 +417,35 @@ var enriched = await improver.ChunkEnrichment.EnrichAsync(chunk);
 
 ---
 
-## Available Services
+## Features
 
-| Service | Description |
-|---------|-------------|
-| `Summarization` | Generates concise summaries from text |
-| `KeywordExtraction` | Extracts relevant keywords |
-| `ChunkEnrichment` | Combines summarization and keyword extraction |
-| `ChunkFiltering` | 3-stage LLM-based chunk assessment with self-reflection and critic validation |
-| `QueryPreprocessing` | Normalizes, expands, and classifies queries for optimal retrieval |
-| `Faithfulness` | Evaluates if answers are grounded in context |
-| `Relevancy` | Evaluates if answers address the question |
-| `Answerability` | Evaluates if questions can be answered from context |
-| `QAGenerator` | Generates question-answer pairs from content |
-| `QAFilter` | Filters QA pairs by quality thresholds |
-| `QAPipeline` | End-to-end QA generation with quality filtering |
-| `QuestionSuggestion` | Suggests contextual follow-up questions |
-| `ContextualEnrichment` | Document-level contextual retrieval (Anthropic pattern). Asks the model not to reason by default (`ContextualEnrichmentOptions.Thinking = Off`); a context cut off at `MaxTokens` is dropped, not stored. A document longer than `MaxDocumentContextLength` (6000 characters) goes to the model as a profile (opening + heading outline) and the text around the chunk, so any document fits a small context; 0 sends it whole. `ChunksPerCall` (default 1) asks about that many adjacent chunks in one call (one JSON array of summaries back; an unusable answer is asked again chunk by chunk), so the document text goes once per window |
-| `ChunkRelationship` | Discovers relationships between chunks |
+Every service below is registered by any `AddFluxImprover*` call (each as its own injectable type, plus the
+`FluxImproverServices` aggregate) and is a property of the `FluxImproverServices` that `FluxImproverBuilder.Build()`
+returns. Nothing needs to be switched on beyond choosing a provider; behaviour is tuned per call through the options
+object each method takes.
+
+| Feature (`FluxImproverServices` property) | Injectable type | Entry points | Notes |
+|---------|-----------------|--------------|-------|
+| `Summarization` | `SummarizationService` / `ISummarizationService` | `SummarizeAsync`, `SummarizeBatchAsync` | Concise summaries from text |
+| `KeywordExtraction` | `KeywordExtractionService` / `IKeywordExtractionService` | `ExtractKeywordsAsync`, `ExtractKeywordsWithScoresAsync`, `ExtractKeywordsBatchAsync` | Relevant keywords |
+| `ChunkEnrichment` | `ChunkEnrichmentService` | `EnrichAsync`, `EnrichBatchAsync` (`EnrichmentOptions`) | Summary + keywords per chunk |
+| `ChunkFiltering` | `IChunkFilteringService` | `AssessAsync`, `FilterAsync` (`ChunkFilteringOptions`) | 3-stage assessment; `UseSelfReflection` / `UseCriticValidation` default on, `MinRelevanceScore` default 0.7 |
+| `QueryPreprocessing` | `IQueryPreprocessingService` | `PreprocessAsync`, `PreprocessBatchAsync`, `ExpandWithSynonymsAsync`, `ClassifyIntentAsync`, `ExtractKeywordsAsync`, `ExtractEntitiesAsync` (`QueryPreprocessingOptions`) | Normalizes, expands, and classifies queries |
+| `Faithfulness` | `FaithfulnessEvaluator` | `EvaluateAsync(context, answer)`, `EvaluateBatchAsync` (`EvaluationOptions`) | Is the answer grounded in the context? |
+| `Relevancy` | `RelevancyEvaluator` | `EvaluateAsync(question, answer, context)`, `EvaluateBatchAsync` | Does the answer address the question? |
+| `Answerability` | `AnswerabilityEvaluator` | `EvaluateAsync(context, question)`, `EvaluateWithMultipleContextsAsync`, `EvaluateBatchAsync` | Can the question be answered from the context? |
+| `QAGenerator` | `QAGeneratorService` | `GenerateAsync`, `GenerateFromChunkAsync`, `GenerateBatchAsync` (`QAGenerationOptions`) | Question-answer pairs from content |
+| `QAFilter` | `QAFilterService` | `FilterAsync`, `EvaluateAsync`, `EvaluateBatchAsync` (`QAFilterOptions`) | Filters QA pairs by quality thresholds |
+| `QAPipeline` | `QAPipeline` | `ExecuteAsync`, `ExecuteFromChunkAsync`, `ExecuteBatchAsync`, `ExecuteFromChunksBatchAsync` (`QAPipelineOptions`) | End-to-end QA generation with quality filtering |
+| `QuestionSuggestion` | `QuestionSuggestionService` | `SuggestAsync`, `SuggestFromQAAsync`, `SuggestFromConversationAsync` (`QuestionSuggestionOptions`) | Contextual follow-up questions |
+| `ContextualEnrichment` | `IContextualEnrichmentService` | `EnrichAsync(chunk, fullDocumentText)`, `EnrichBatchAsync(chunks, fullDocumentText)` (`ContextualEnrichmentOptions`) | Document-level contextual retrieval (Anthropic pattern) — see below |
+| `ChunkRelationship` | `IChunkRelationshipService` | `AnalyzePairAsync`, `AnalyzeRelationshipsAsync`, `DiscoverAllRelationshipsAsync` (`ChunkRelationshipOptions`) | Discovers relationships between chunks |
+
+**Contextual enrichment** asks the model not to reason by default (`ContextualEnrichmentOptions.Thinking = Off`); a
+context cut off at `MaxTokens` is dropped, not stored. A document longer than `MaxDocumentContextLength` (default 6000
+characters) goes to the model as a profile (opening + heading outline) and the text around the chunk, so any document fits
+a small context; 0 sends it whole. `ChunksPerCall` (default 1) asks about that many adjacent chunks in one call (one JSON
+array of summaries back; an unusable answer is asked again chunk by chunk), so the document text goes once per window.
 
 ---
 
