@@ -10,6 +10,7 @@ breaking changes, and each one is marked **Breaking** with a migration note.
 - Re-pinned sibling package(s) `LMSupply.Generator` 0.116.0 -> 0.117.0, `LMSupply.Generator.Onnx` 0.116.0 -> 0.117.0.
 - Re-pinned sibling package(s) `LMSupply.Generator` 0.117.0 -> 0.117.1, `LMSupply.Generator.Onnx` 0.117.0 -> 0.117.1.
 - Re-pinned sibling package(s) `LMSupply.Generator` 0.117.1 -> 0.118.0, `LMSupply.Generator.Onnx` 0.117.1 -> 0.118.0.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.118.0 -> 0.119.0, `LMSupply.Generator.Onnx` 0.118.0 -> 0.119.0.
 
 ## [0.20.0] - 2026-10-11
 
