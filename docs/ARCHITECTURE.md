@@ -99,9 +99,6 @@ FluxImprover/
 │       │
 │       ├── Services/                       # Core abstractions
 │       │   ├── ITextGenerationService.cs
-│       │   ├── IEmbeddingService.cs
-│       │   ├── IRerankService.cs
-│       │   ├── ITokenizer.cs
 │       │   └── Providers/
 │       │       ├── OpenAICompatibleCompletionService.cs
 │       │       └── OpenAICompletionServiceExtensions.cs

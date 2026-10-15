@@ -6,6 +6,11 @@ breaking changes, and each one is marked **Breaking** with a migration note.
 
 ## [Unreleased]
 
+### Removed
+- **Breaking** — `IEmbeddingService`, `IRerankService` and `ITokenizer` (`FluxImprover.Services`). Nothing in FluxImprover
+  called or accepted them: no enrichment, filtering or QA path embeds, reranks or counts tokens through them, so an
+  implementation registered for them was never used. Migration: delete your implementations and registrations.
+
 ### Dependencies
 - Re-pinned sibling package(s) `LMSupply.Generator` 0.116.0 -> 0.117.0, `LMSupply.Generator.Onnx` 0.116.0 -> 0.117.0.
 - Re-pinned sibling package(s) `LMSupply.Generator` 0.117.0 -> 0.117.1, `LMSupply.Generator.Onnx` 0.117.0 -> 0.117.1.
