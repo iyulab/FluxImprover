@@ -18,6 +18,7 @@ breaking changes, and each one is marked **Breaking** with a migration note.
 - Re-pinned sibling package(s) `LMSupply.Generator` 0.118.0 -> 0.119.0, `LMSupply.Generator.Onnx` 0.118.0 -> 0.119.0.
 - Re-pinned sibling package(s) `Iyu.Conventions.Testing` 0.9.0 -> 0.10.0, `LMSupply.Generator` 0.119.0 -> 0.120.0, `LMSupply.Generator.Onnx` 0.119.0 -> 0.120.0.
 - Re-pinned sibling package(s) `LMSupply.Generator` 0.120.0 -> 0.121.0, `LMSupply.Generator.Onnx` 0.120.0 -> 0.121.0.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.121.0 -> 0.122.0, `LMSupply.Generator.Onnx` 0.121.0 -> 0.122.0.
 
 ## [0.20.0] - 2026-10-11
 
