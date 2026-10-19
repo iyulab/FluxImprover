@@ -25,6 +25,7 @@ breaking changes, and each one is marked **Breaking** with a migration note.
 - Re-pinned sibling package(s) `LMSupply.Generator` 0.125.0 -> 0.126.0, `LMSupply.Generator.Onnx` 0.125.0 -> 0.126.0.
 - Re-pinned sibling package(s) `LMSupply.Generator` 0.126.0 -> 0.127.0, `LMSupply.Generator.Onnx` 0.126.0 -> 0.127.0.
 - Re-pinned sibling package(s) `LMSupply.Generator` 0.127.0 -> 0.128.0, `LMSupply.Generator.Onnx` 0.127.0 -> 0.128.0.
+- .NET runtime packages 10.0.12 -> 10.0.13 (the 10.0 servicing band; `Microsoft.Extensions.*` and their siblings move together).
 
 ## [0.20.0] - 2026-10-11
 
