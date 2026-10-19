@@ -158,6 +158,9 @@ public static class ServiceCollectionExtensions
 
         TryAddService(services,
             sp => sp.GetRequiredService<FluxImproverServices>().Answerability, lifetime);
+
+        TryAddService(services,
+            sp => sp.GetRequiredService<FluxImproverServices>().AnswerCoverage, lifetime);
     }
 
     private static void RegisterQAServices(IServiceCollection services, ServiceLifetime lifetime)

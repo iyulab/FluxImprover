@@ -6,6 +6,21 @@ breaking changes, and each one is marked **Breaking** with a migration note.
 
 ## [Unreleased]
 
+### Added
+- **`AnswerCoverageEvaluator` — how much of a reference answer an answer states** (`improver.AnswerCoverage`, also
+  registered by `AddFluxImprover*`). It splits the reference answer into atomic facts, or takes a fact list, judges each
+  `supported` / `partial` / `missing`, and scores (supported + 0.5 × partial) ÷ facts — the nugget evaluation of the TREC
+  2024 RAG Track. For evaluation sets that carry an expected answer, which the existing evaluators never used.
+
+### Changed
+- **Breaking** — **the Faithfulness score is the share of supported claims, not the model's own number.** The model still
+  lists the claims and marks each supported or not; the score is now computed from those verdicts, so the same verdicts
+  always give the same score (before, verdicts of one supported claim in four could come back as 0.9). An answer with no
+  claims keeps the model's score. `Details` gains `scoreSource` (`claims` / `model`), `supportedClaims` and `totalClaims`
+  when `IncludeDetails` is on. Migration: none in code; expect different (lower, where the model was generous) scores and
+  re-check thresholds tuned on old scores. `FluxImproverServices` gains a trailing `AnswerCoverage` parameter — code that
+  constructs the record itself adds it.
+
 ### Removed
 - **Breaking** — `IEmbeddingService`, `IRerankService` and `ITokenizer` (`FluxImprover.Services`). Nothing in FluxImprover
   called or accepted them: no enrichment, filtering or QA path embeds, reranks or counts tokens through them, so an

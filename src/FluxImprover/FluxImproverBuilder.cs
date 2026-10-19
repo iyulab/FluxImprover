@@ -48,6 +48,7 @@ public sealed class FluxImproverBuilder
         var faithfulnessEvaluator = new FaithfulnessEvaluator(completionService);
         var relevancyEvaluator = new RelevancyEvaluator(completionService);
         var answerabilityEvaluator = new AnswerabilityEvaluator(completionService);
+        var answerCoverageEvaluator = new AnswerCoverageEvaluator(completionService);
 
         // QA Generation Services
         var qaGenerator = new QAGeneratorService(completionService);
@@ -83,7 +84,8 @@ public sealed class FluxImproverBuilder
             ChunkFiltering: chunkFiltering,
             QueryPreprocessing: queryPreprocessing,
             ContextualEnrichment: contextualEnrichment,
-            ChunkRelationship: chunkRelationship
+            ChunkRelationship: chunkRelationship,
+            AnswerCoverage: answerCoverageEvaluator
         );
     }
 }
@@ -105,6 +107,7 @@ public sealed class FluxImproverBuilder
 /// <param name="QueryPreprocessing">쿼리 전처리 서비스</param>
 /// <param name="ContextualEnrichment">Contextual Retrieval 서비스 (Anthropic pattern)</param>
 /// <param name="ChunkRelationship">청크 관계 발견 서비스</param>
+/// <param name="AnswerCoverage">정답 대비 커버리지 평가기</param>
 public sealed record FluxImproverServices(
     SummarizationService Summarization,
     KeywordExtractionService KeywordExtraction,
@@ -119,5 +122,6 @@ public sealed record FluxImproverServices(
     IChunkFilteringService ChunkFiltering,
     IQueryPreprocessingService QueryPreprocessing,
     IContextualEnrichmentService ContextualEnrichment,
-    IChunkRelationshipService ChunkRelationship
+    IChunkRelationshipService ChunkRelationship,
+    AnswerCoverageEvaluator AnswerCoverage
 );

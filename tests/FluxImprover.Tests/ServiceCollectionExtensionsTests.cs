@@ -71,6 +71,7 @@ public sealed class ServiceCollectionExtensionsTests
         sp.GetService<FaithfulnessEvaluator>().Should().NotBeNull();
         sp.GetService<RelevancyEvaluator>().Should().NotBeNull();
         sp.GetService<AnswerabilityEvaluator>().Should().NotBeNull();
+        sp.GetService<AnswerCoverageEvaluator>().Should().NotBeNull();
     }
 
     [Fact]
@@ -320,6 +321,7 @@ public sealed class ServiceCollectionExtensionsTests
             _ = sp.GetRequiredService<FaithfulnessEvaluator>();
             _ = sp.GetRequiredService<RelevancyEvaluator>();
             _ = sp.GetRequiredService<AnswerabilityEvaluator>();
+            _ = sp.GetRequiredService<AnswerCoverageEvaluator>();
             _ = sp.GetRequiredService<QAGeneratorService>();
             _ = sp.GetRequiredService<QAFilterService>();
             _ = sp.GetRequiredService<QAPipeline>();

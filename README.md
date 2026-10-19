@@ -21,7 +21,7 @@ It acts as the **quality assurance and value-add layer**, leveraging Large Langu
 * **Chunk Filtering**: 3-stage LLM-based assessment with **self-reflection** and **critic validation** for intelligent retrieval filtering
 * **Query Preprocessing**: Normalizes, expands, and classifies queries with **synonym expansion** and **intent classification** for optimal retrieval
 * **QA Pair Generation**: Automatically generates **Golden QA datasets** from document chunks for RAG benchmarking
-* **Quality Assessment**: Provides **Faithfulness**, **Relevancy**, and **Answerability** evaluators
+* **Quality Assessment**: Provides **Faithfulness**, **Relevancy**, and **Answerability** evaluators, and **AnswerCoverage** — how much of a reference answer's facts an answer states
 * **Question Suggestion**: Generates contextual follow-up questions from content or conversations
 * **Decoupled Design**: Works with any LLM through the `ITextGenerationService` abstraction
 
@@ -216,9 +216,13 @@ var relevancy = await improver.Relevancy.EvaluateAsync(question, answer, context
 // Answerability: Can the question be answered from the context?
 var answerability = await improver.Answerability.EvaluateAsync(context, question);
 
+// AnswerCoverage: How much of the reference answer does the answer state? (needs a reference answer or a fact list)
+var coverage = await improver.AnswerCoverage.EvaluateAsync(answer, "Paris is the capital of France. It is in Europe.");
+
 Console.WriteLine($"Faithfulness: {faithfulness.Score:P0}");
 Console.WriteLine($"Relevancy: {relevancy.Score:P0}");
 Console.WriteLine($"Answerability: {answerability.Score:P0}");
+Console.WriteLine($"Coverage: {coverage.Score:P0}");
 
 // Access detailed information
 foreach (var detail in faithfulness.Details)
@@ -231,6 +235,11 @@ var strict = new EvaluationOptions { PassThreshold = 0.8f, IncludeDetails = fals
 var checkedAnswer = await improver.Faithfulness.EvaluateAsync(context, answer, strict);
 Console.WriteLine($"Passed: {checkedAnswer.IsPassed} (score {checkedAnswer.Score:P0}, bar {checkedAnswer.PassThreshold:P0})");
 ```
+
+Faithfulness is computed from the model's claim verdicts — supported claims ÷ all claims (`Details["scoreSource"]` is
+`claims`); only an answer with no claims falls back to the model's own score (`model`). AnswerCoverage splits the reference
+answer into atomic facts (or takes your `IReadOnlyList<string>` of facts) and judges each `supported` / `partial` /
+`missing`: score = (supported + 0.5 × partial) ÷ facts, with each verdict in `Details["facts"]`.
 
 `EvaluationOptions` also bounds the batch methods (`EvaluateBatchAsync`): `EnableParallelProcessing` (default on) runs up to
 `MaxDegreeOfParallelism` items (default 4) at once, results in input order.

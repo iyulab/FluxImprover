@@ -18,7 +18,7 @@ using Xunit;
 /// </summary>
 public sealed class OptionsWiringTests
 {
-    private const string Score = @"{""score"": 0.6, ""reasoning"": ""because"", ""answerable"": true, ""evidence"": ""e"", ""claims"": [{""claim"": ""c"", ""supported"": true}]}";
+    private const string Score = @"{""score"": 0.6, ""reasoning"": ""because"", ""answerable"": true, ""evidence"": ""e"", ""claims"": [{""claim"": ""c1"", ""supported"": true}, {""claim"": ""c2"", ""supported"": true}, {""claim"": ""c3"", ""supported"": true}, {""claim"": ""c4"", ""supported"": false}, {""claim"": ""c5"", ""supported"": false}]}";
 
     private static CancellationToken Ct => TestContext.Current.CancellationToken;
 

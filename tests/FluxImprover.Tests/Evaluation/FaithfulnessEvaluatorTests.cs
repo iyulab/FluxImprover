@@ -173,4 +173,30 @@ public sealed class FaithfulnessEvaluatorTests
         // Assert
         results.Should().HaveCount(2);
     }
+    [Fact]
+    public async Task EvaluateAsync_ScoreIsTheShareOfSupportedClaims_NotTheModelsOwnNumber()
+    {
+        // The model writes 0.9 next to verdicts of one supported claim in four: the score follows the verdicts.
+        _completionService.CompleteAsync(Arg.Any<string>(), Arg.Any<CompletionOptions>(), Arg.Any<CancellationToken>())
+            .Returns(@"{""score"": 0.9, ""claims"": [{""claim"": ""a"", ""supported"": true}, {""claim"": ""b"", ""supported"": false}, {""claim"": ""c"", ""supported"": false}, {""claim"": ""d"", ""supported"": false}]}");
+
+        var result = await _sut.EvaluateAsync("context", "answer", cancellationToken: TestContext.Current.CancellationToken);
+
+        result.Score.Should().BeApproximately(0.25, 1e-9);
+        result.Details["scoreSource"].Should().Be("claims");
+        result.Details["supportedClaims"].Should().Be(1);
+        result.Details["totalClaims"].Should().Be(4);
+    }
+
+    [Fact]
+    public async Task EvaluateAsync_WithoutClaims_UsesTheModelsScore_AndSaysSo()
+    {
+        _completionService.CompleteAsync(Arg.Any<string>(), Arg.Any<CompletionOptions>(), Arg.Any<CancellationToken>())
+            .Returns(@"{""score"": 0.7, ""claims"": []}");
+
+        var result = await _sut.EvaluateAsync("context", "answer", cancellationToken: TestContext.Current.CancellationToken);
+
+        result.Score.Should().BeApproximately(0.7, 1e-9);
+        result.Details["scoreSource"].Should().Be("model");
+    }
 }
