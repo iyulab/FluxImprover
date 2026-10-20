@@ -9,6 +9,11 @@ breaking changes, and each one is marked **Breaking** with a migration note.
 ### Added
 - **`EvaluationOptions.Thinking` — the reasoning mode of every evaluator's verdict call** (Faithfulness, Relevancy,
   Answerability, AnswerCoverage), passed to `CompletionOptions.Thinking`.
+- **`OpenAICompatibleCompletionService.ReasoningSwitch` — how `CompletionOptions.Thinking` reaches an OpenAI-compatible server.**
+  The service ignored `Thinking`, so the `Off` that chunk enrichment and (now) the evaluators ask for never reached a reasoning
+  model on such a server. `OpenAICompatibleReasoningSwitch.ChatTemplateKwargs` sends `chat_template_kwargs`
+  (`enable_thinking` / `thinking`) for `On` / `Off` — vLLM, SGLang, llama.cpp (GPUStack included); `None` (the default) sends
+  nothing, which keeps OpenAI itself working. Also `AddFluxImproverWithOpenAI(…, reasoningSwitch, …)`.
 
 ### Changed
 - **Breaking** — **evaluators ask for no reasoning by default (`ThinkingMode.Off`).** They sent no thinking mode, so a grader

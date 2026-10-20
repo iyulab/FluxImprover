@@ -81,6 +81,14 @@ public sealed partial class OpenAICompatibleCompletionService : ITextGenerationS
         _ownsHttpClient = false;
     }
 
+    /// <summary>
+    /// How <see cref="CompletionOptions.Thinking"/> reaches the server (default <see cref="OpenAICompatibleReasoningSwitch.None"/>:
+    /// not sent — the model's default applies). Set <see cref="OpenAICompatibleReasoningSwitch.ChatTemplateKwargs"/> for a vLLM,
+    /// SGLang or llama.cpp server (GPUStack included) serving a hybrid-reasoning model, so <c>Thinking = Off</c> (the default of
+    /// the evaluators and chunk enrichment) actually turns its reasoning off.
+    /// </summary>
+    public OpenAICompatibleReasoningSwitch ReasoningSwitch { get; init; }
+
     /// <inheritdoc />
     public async Task<string> CompleteAsync(
         string prompt,
@@ -187,7 +195,15 @@ public sealed partial class OpenAICompatibleCompletionService : ITextGenerationS
             Stream = stream,
             ResponseFormat = options?.JsonMode == true
                 ? new ResponseFormatDto { Type = "json_object" }
-                : null
+                : null,
+            ChatTemplateKwargs = ReasoningSwitch == OpenAICompatibleReasoningSwitch.ChatTemplateKwargs
+                && options?.Thinking is ThinkingMode.On or ThinkingMode.Off
+                    ? new Dictionary<string, bool>
+                    {
+                        ["enable_thinking"] = options.Thinking == ThinkingMode.On,   // Qwen
+                        ["thinking"] = options.Thinking == ThinkingMode.On,          // DeepSeek, IBM Granite
+                    }
+                    : null
         };
     }
 
@@ -223,6 +239,7 @@ public sealed partial class OpenAICompatibleCompletionService : ITextGenerationS
         public int? MaxTokens { get; init; }
         public bool? Stream { get; init; }
         public ResponseFormatDto? ResponseFormat { get; init; }
+        public Dictionary<string, bool>? ChatTemplateKwargs { get; init; }
     }
 
     internal sealed class MessageDto

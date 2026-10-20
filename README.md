@@ -513,6 +513,12 @@ Chunk enrichment asks for no reasoning by default: `EnrichmentOptions.Thinking` 
 keyword calls, because a reasoning model on its default can spend the whole `MaxTokens` budget thinking and the
 cut-off summary is then dropped. Set it to `Auto` (and raise `MaxTokens`) to let the model reason.
 
+The built-in `OpenAICompatibleCompletionService` sends the switch only in the dialect you name, because an OpenAI-compatible
+server's reasoning switch is its own and OpenAI itself refuses fields it does not know: `ReasoningSwitch =
+OpenAICompatibleReasoningSwitch.ChatTemplateKwargs` (or `AddFluxImproverWithOpenAI(endpoint, apiKey, model,
+OpenAICompatibleReasoningSwitch.ChatTemplateKwargs)`) sends `chat_template_kwargs` (`enable_thinking` / `thinking`) for a vLLM, SGLang
+or llama.cpp server (GPUStack included); the default `None` sends nothing, so `Off` does not reach such a server's model.
+
 ---
 
 ## Architecture

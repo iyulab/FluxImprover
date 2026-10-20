@@ -185,6 +185,37 @@ public class OpenAICompatibleCompletionServiceTests : IDisposable
         capturedBody.Should().Contain("json_object");
     }
 
+    // The reasoning switch is the server's dialect: OpenAI refuses fields it does not know, a vLLM / llama.cpp server reads
+    // chat_template_kwargs. Nothing is sent unless the service is told the dialect, and Auto never sends anything.
+    [Theory]
+    [InlineData(OpenAICompatibleReasoningSwitch.None, ThinkingMode.Off, null)]
+    [InlineData(OpenAICompatibleReasoningSwitch.ChatTemplateKwargs, ThinkingMode.Off, false)]
+    [InlineData(OpenAICompatibleReasoningSwitch.ChatTemplateKwargs, ThinkingMode.On, true)]
+    [InlineData(OpenAICompatibleReasoningSwitch.ChatTemplateKwargs, ThinkingMode.Auto, null)]
+    public async Task CompleteAsync_SendsTheThinkingSwitch_OnlyInTheDialectItWasGiven(
+        OpenAICompatibleReasoningSwitch reasoningSwitch, ThinkingMode thinking, bool? expected)
+    {
+        var responseJson = JsonSerializer.Serialize(new { choices = new[] { new { message = new { role = "assistant", content = "ok" } } } });
+        string? capturedBody = null;
+        using var handler = new MockHttpMessageHandler(responseJson, HttpStatusCode.OK, body => capturedBody = body);
+        using var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://llm.example/v1/") };
+        _sut = new OpenAICompatibleCompletionService(httpClient, "qwen3", _logger) { ReasoningSwitch = reasoningSwitch };
+
+        await _sut.CompleteAsync("judge", new CompletionOptions { Thinking = thinking }, TestContext.Current.CancellationToken);
+
+        using var body = JsonDocument.Parse(capturedBody!);
+        if (expected is null)
+        {
+            body.RootElement.TryGetProperty("chat_template_kwargs", out _).Should().BeFalse();
+        }
+        else
+        {
+            var kwargs = body.RootElement.GetProperty("chat_template_kwargs");
+            kwargs.GetProperty("enable_thinking").GetBoolean().Should().Be(expected.Value);
+            kwargs.GetProperty("thinking").GetBoolean().Should().Be(expected.Value);
+        }
+    }
+
     [Fact]
     public async Task CompleteAsync_WithEmptyChoices_ReturnsEmptyString()
     {

@@ -26,10 +26,26 @@ public static class OpenAICompletionServiceExtensions
         string model,
         ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
+        return services.AddFluxImproverWithOpenAI(endpoint, apiKey, model, OpenAICompatibleReasoningSwitch.None, lifetime);
+    }
+
+    /// <summary>
+    /// Adds FluxImprover with an OpenAI-compatible completion service whose server takes <paramref name="reasoningSwitch"/>
+    /// (<see cref="OpenAICompatibleReasoningSwitch.ChatTemplateKwargs"/> for a vLLM, SGLang or llama.cpp server serving a
+    /// hybrid-reasoning model — then the evaluators' and enrichment's <c>Thinking = Off</c> reaches the model).
+    /// </summary>
+    public static IServiceCollection AddFluxImproverWithOpenAI(
+        this IServiceCollection services,
+        string endpoint,
+        string? apiKey,
+        string model,
+        OpenAICompatibleReasoningSwitch reasoningSwitch,
+        ServiceLifetime lifetime = ServiceLifetime.Scoped)
+    {
         return services.AddFluxImprover(sp =>
         {
             var logger = sp.GetRequiredService<ILogger<OpenAICompatibleCompletionService>>();
-            return new OpenAICompatibleCompletionService(endpoint, apiKey, model, logger);
+            return new OpenAICompatibleCompletionService(endpoint, apiKey, model, logger) { ReasoningSwitch = reasoningSwitch };
         }, lifetime);
     }
 }
