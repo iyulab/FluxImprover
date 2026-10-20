@@ -83,6 +83,17 @@ public sealed class EvaluationOptions
     public bool IncludeDetails { get; init; } = true;
 
     /// <summary>
+    /// 평가기의 판정 호출에서 모델의 추론(thinking) 모드 (기본값: <see cref="Services.ThinkingMode.Off"/>).
+    /// </summary>
+    /// <remarks>
+    /// 판정 호출은 짧은 구조화 답(JSON)을 받는다. 추론 모델은 <see cref="Services.ThinkingMode.Auto"/> 에서 <see cref="MaxTokens"/> 예산을
+    /// 숨은 추론에 써 버리고 판정 없이 끝날 수 있다 — 그러면 점수가 답이 아니라 파싱 실패를 말한다. 그래서 <see cref="EnrichmentOptions.Thinking"/>
+    /// 과 같은 판단으로 기본을 끈다. 추론을 원하면 <c>Auto</c>/<c>On</c> 과 함께 <see cref="MaxTokens"/> 를 늘린다. 이 값을 전달하지 못하는
+    /// 생성 서비스는 모델 기본을 쓴다.
+    /// </remarks>
+    public Services.ThinkingMode Thinking { get; init; } = Services.ThinkingMode.Off;
+
+    /// <summary>
     /// 일괄 평가(<c>EvaluateBatchAsync</c>, <see cref="QAGeneration.QAFilterService.FilterAsync"/>)를 병렬로 처리할지 여부 (기본값: true).
     /// false 이면 항목을 하나씩 평가한다. 결과 순서는 입력 순서를 따른다.
     /// </summary>

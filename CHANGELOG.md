@@ -6,6 +6,16 @@ breaking changes, and each one is marked **Breaking** with a migration note.
 
 ## [Unreleased]
 
+### Added
+- **`EvaluationOptions.Thinking` — the reasoning mode of every evaluator's verdict call** (Faithfulness, Relevancy,
+  Answerability, AnswerCoverage), passed to `CompletionOptions.Thinking`.
+
+### Changed
+- **Breaking** — **evaluators ask for no reasoning by default (`ThinkingMode.Off`).** They sent no thinking mode, so a grader
+  that reasons on its default could spend `MaxTokens` on hidden reasoning and return no verdict — a scoring failure, not a
+  score. Same judgement as `EnrichmentOptions.Thinking`. Migration: to keep the model's own default, set
+  `new EvaluationOptions { Thinking = ThinkingMode.Auto }` (and raise `MaxTokens` if it reasons).
+
 ### Dependencies
 - Re-pinned sibling package(s) `LMSupply.Generator` 0.128.0 -> 0.129.0, `LMSupply.Generator.Onnx` 0.128.0 -> 0.129.0.
 

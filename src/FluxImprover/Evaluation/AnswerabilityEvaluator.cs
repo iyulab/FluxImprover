@@ -44,6 +44,7 @@ public sealed class AnswerabilityEvaluator
             SystemPrompt = GetSystemPrompt(),
             Temperature = options.Temperature,
             MaxTokens = options.MaxTokens,
+            Thinking = options.Thinking,
             JsonMode = true
         };
 

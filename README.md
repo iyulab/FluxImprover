@@ -241,6 +241,10 @@ Faithfulness is computed from the model's claim verdicts — supported claims ÷
 answer into atomic facts (or takes your `IReadOnlyList<string>` of facts) and judges each `supported` / `partial` /
 `missing`: score = (supported + 0.5 × partial) ÷ facts, with each verdict in `Details["facts"]`.
 
+The evaluators ask for no reasoning by default: `EvaluationOptions.Thinking` (default `Off`) goes to every verdict call, because
+a grader that reasons on its default can spend `MaxTokens` thinking and return no verdict. Set `Auto` (and raise `MaxTokens`) to
+let it reason.
+
 `EvaluationOptions` also bounds the batch methods (`EvaluateBatchAsync`): `EnableParallelProcessing` (default on) runs up to
 `MaxDegreeOfParallelism` items (default 4) at once, results in input order.
 

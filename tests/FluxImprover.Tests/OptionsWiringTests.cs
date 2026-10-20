@@ -24,6 +24,37 @@ public sealed class OptionsWiringTests
 
     // ---- EvaluationOptions ------------------------------------------------------------------------------------------
 
+    // A verdict call wants a short JSON answer: a reasoning grader on Auto can spend MaxTokens on hidden reasoning and return
+    // no verdict. Off by default (EnrichmentOptions' judgement); the caller can ask for Auto/On.
+    [Theory]
+    [InlineData(null, ThinkingMode.Off)]
+    [InlineData(ThinkingMode.Auto, ThinkingMode.Auto)]
+    public async Task Evaluators_SendTheThinkingMode_OffByDefault(ThinkingMode? requested, ThinkingMode expected)
+    {
+        var completion = Substitute.For<ITextGenerationService>();
+        var sent = new List<ThinkingMode?>();
+        completion.CompleteAsync(Arg.Any<string>(), Arg.Any<CompletionOptions>(), Arg.Any<CancellationToken>())
+            .Returns(ci =>
+            {
+                lock (sent) sent.Add(ci.ArgAt<CompletionOptions?>(1)?.Thinking);
+                return Score;
+            });
+        var options = requested is { } mode ? new EvaluationOptions { Thinking = mode } : new EvaluationOptions();
+
+        await new QAFilterService(new FaithfulnessEvaluator(completion), new RelevancyEvaluator(completion), new AnswerabilityEvaluator(completion))
+            .FilterAsync([new GeneratedQAPair { Question = "Q", Answer = "A", Context = "C" }], new QAFilterOptions { Evaluation = options }, Ct);
+        completion.CompleteAsync(Arg.Any<string>(), Arg.Any<CompletionOptions>(), Arg.Any<CancellationToken>())
+            .Returns(ci =>
+            {
+                lock (sent) sent.Add(ci.ArgAt<CompletionOptions?>(1)?.Thinking);
+                return @"{""facts"": [{""fact"": ""f"", ""verdict"": ""supported""}]}";
+            });
+        await new AnswerCoverageEvaluator(completion).EvaluateAsync("answer", "reference", options, Ct);
+
+        sent.Should().HaveCount(4, "faithfulness, relevancy, answerability and answer coverage each make one verdict call");
+        sent.Should().AllBeEquivalentTo(expected);
+    }
+
     [Fact]
     public async Task QAFilter_DisabledMetrics_AreNeverRequested_AndDoNotGateThePair()
     {
