@@ -6,6 +6,10 @@ breaking changes, and each one is marked **Breaking** with a migration note.
 
 ## [Unreleased]
 
+### Removed
+- **Breaking: the unused evaluation result records `EvaluationResult`, `EvaluationDetails`, `ClaimVerification` and the
+  `AnswerabilityGrade` enum are gone.** No evaluator returned them. Migration: the evaluators return `MetricResult` — read it instead.
+
 ### Dependencies
 - Re-pinned sibling package(s) `LMSupply.Generator` 0.131.0 -> 0.132.0, `LMSupply.Generator.Onnx` 0.131.0 -> 0.132.0.
 - Re-pinned sibling package(s) `LMSupply.Generator` 0.132.0 -> 0.133.0, `LMSupply.Generator.Onnx` 0.132.0 -> 0.133.0.
