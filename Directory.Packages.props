@@ -12,7 +12,7 @@
     <PackageVersion Include="LMSupply.Generator" Version="0.136.0" />
     <PackageVersion Include="LMSupply.Generator.Onnx" Version="0.136.0" />
     <!-- Optional Dependencies -->
-    <PackageVersion Include="Polly.Core" Version="8.6.6" />
+    <PackageVersion Include="Polly.Core" Version="8.8.0" />
     <!-- Sample/Demo Dependencies -->
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.13" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.13" />
@@ -21,10 +21,10 @@
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.13" />
     <!-- xUnit v3/MTP native mode: no Microsoft.NET.Test.Sdk needed, coverlet.collector was a dead
          reference (CI never invoked the coverage collector flag) -->
-    <PackageVersion Include="xunit.v3" Version="4.0.0" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.0" />
-    <PackageVersion Include="Microsoft.Testing.Extensions.HangDump" Version="2.3.3" />
-    <PackageVersion Include="Microsoft.Testing.Extensions.TrxReport" Version="2.3.3" />
+    <PackageVersion Include="xunit.v3" Version="4.0.2" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.1" />
+    <PackageVersion Include="Microsoft.Testing.Extensions.HangDump" Version="2.5.1" />
+    <PackageVersion Include="Microsoft.Testing.Extensions.TrxReport" Version="2.5.1" />
     <PackageVersion Include="AwesomeAssertions" Version="9.6.0" />
     <PackageVersion Include="Iyu.Conventions.Testing" Version="0.13.0" />
     <PackageVersion Include="Iyu.Conventions.Testing.Snippets" Version="0.13.0" />

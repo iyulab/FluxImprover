@@ -4,6 +4,11 @@ All notable changes to this project are documented in this file. Versions follow
 [Semantic Versioning](https://semver.org/); while the major version is 0, a minor release may contain
 breaking changes, and each one is marked **Breaking** with a migration note.
 
+## [Unreleased]
+
+### Dependencies
+- `Polly.Core` 8.6.6 -> 8.8.0.
+
 ## [0.23.0] - 2026-10-23
 
 ### Removed
