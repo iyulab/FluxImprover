@@ -8,6 +8,7 @@ breaking changes, and each one is marked **Breaking** with a migration note.
 
 ### Dependencies
 - `Polly.Core` 8.6.6 -> 8.8.0.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.136.0 -> 0.137.0, `LMSupply.Generator.Onnx` 0.136.0 -> 0.137.0. LMSupply 0.137.0 changes the token estimate it falls back to when a local server reports no usage: Korean text now counts about 2.5x more tokens than before, English slightly fewer, digits more.
 
 ## [0.23.0] - 2026-10-23
 
