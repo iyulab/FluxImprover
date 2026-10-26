@@ -5,20 +5,20 @@
   <ItemGroup>
     <!-- Core Dependencies (Minimal) -->
     <PackageVersion Include="Flux.Abstractions" Version="0.27.0" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.13" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.13" />
-    <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.14" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.14" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.14" />
     <!-- LMSupply Integration -->
     <PackageVersion Include="LMSupply.Generator" Version="0.137.0" />
     <PackageVersion Include="LMSupply.Generator.Onnx" Version="0.137.0" />
     <!-- Optional Dependencies -->
     <PackageVersion Include="Polly.Core" Version="8.8.0" />
     <!-- Sample/Demo Dependencies -->
-    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.13" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.13" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.14" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.14" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.14" />
     <!-- Test Dependencies -->
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.14" />
     <!-- xUnit v3/MTP native mode: no Microsoft.NET.Test.Sdk needed, coverlet.collector was a dead
          reference (CI never invoked the coverage collector flag) -->
     <PackageVersion Include="xunit.v3" Version="4.0.2" />
