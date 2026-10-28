@@ -12,6 +12,7 @@ breaking changes, and each one is marked **Breaking** with a migration note.
 - Re-pinned third-party packages: 7 .NET servicing pins (Microsoft.Extensions) 10.0.13 -> 10.0.14 (the 10.0.14 security servicing release).
 - Re-pinned sibling package(s) `LMSupply.Generator` 0.137.0 -> 0.138.0, `LMSupply.Generator.Onnx` 0.137.0 -> 0.138.0.
 - Re-pinned third-party packages: `Polly.Core` 8.8.0 -> 8.8.1.
+- Re-pinned sibling package(s) `LMSupply.Generator` 0.138.0 -> 0.139.0, `LMSupply.Generator.Onnx` 0.138.0 -> 0.139.0.
 
 ## [0.23.0] - 2026-10-23
 
