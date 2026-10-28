@@ -6,12 +6,13 @@ breaking changes, and each one is marked **Breaking** with a migration note.
 
 ## [Unreleased]
 
+### Removed
+- **`Polly.Core` is no longer a dependency**: nothing in FluxImprover used it. Consumers that took `Polly.Core` transitively through FluxImprover and use Polly types must reference it themselves.
+
 ### Dependencies
-- `Polly.Core` 8.6.6 -> 8.8.0.
 - Re-pinned sibling package(s) `LMSupply.Generator` 0.136.0 -> 0.137.0, `LMSupply.Generator.Onnx` 0.136.0 -> 0.137.0. LMSupply 0.137.0 changes the token estimate it falls back to when a local server reports no usage: Korean text now counts about 2.5x more tokens than before, English slightly fewer, digits more.
 - Re-pinned third-party packages: 7 .NET servicing pins (Microsoft.Extensions) 10.0.13 -> 10.0.14 (the 10.0.14 security servicing release).
 - Re-pinned sibling package(s) `LMSupply.Generator` 0.137.0 -> 0.138.0, `LMSupply.Generator.Onnx` 0.137.0 -> 0.138.0.
-- Re-pinned third-party packages: `Polly.Core` 8.8.0 -> 8.8.1.
 - Re-pinned sibling package(s) `LMSupply.Generator` 0.138.0 -> 0.139.0, `LMSupply.Generator.Onnx` 0.138.0 -> 0.139.0.
 
 ## [0.23.0] - 2026-10-23
