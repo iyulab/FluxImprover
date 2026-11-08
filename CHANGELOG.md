@@ -4,7 +4,7 @@ All notable changes to this project are documented in this file. Versions follow
 [Semantic Versioning](https://semver.org/); while the major version is 0, a minor release may contain
 breaking changes, and each one is marked **Breaking** with a migration note.
 
-## [Unreleased]
+## [0.24.0] - 2026-11-09
 
 ### Removed
 - **`Polly.Core` is no longer a dependency**: nothing in FluxImprover used it. Consumers that took `Polly.Core` transitively through FluxImprover and use Polly types must reference it themselves.
