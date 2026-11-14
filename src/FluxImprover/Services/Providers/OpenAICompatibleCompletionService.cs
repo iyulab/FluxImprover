@@ -100,10 +100,10 @@ public sealed partial class OpenAICompatibleCompletionService : ITextGenerationS
 
         LogCompletion(_logger, _model, prompt.Length);
 
-        var response = await _httpClient.PostAsJsonAsync(
+        using var response = await _httpClient.PostAsJsonAsync(
             "chat/completions", request, JsonOptions, cancellationToken);
 
-        response.EnsureSuccessStatusCode();
+        await ThrowIfNotSuccessAsync(response, cancellationToken);
 
         var result = await response.Content.ReadFromJsonAsync<ChatCompletionResponse>(
             JsonOptions, cancellationToken);
@@ -132,7 +132,7 @@ public sealed partial class OpenAICompatibleCompletionService : ITextGenerationS
 
         LogCompletionStream(_logger, _model, prompt.Length);
 
-        var httpRequest = new HttpRequestMessage(HttpMethod.Post, "chat/completions")
+        using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "chat/completions")
         {
             Content = new StringContent(
                 JsonSerializer.Serialize(request, JsonOptions),
@@ -140,10 +140,10 @@ public sealed partial class OpenAICompatibleCompletionService : ITextGenerationS
                 "application/json")
         };
 
-        var response = await _httpClient.SendAsync(
+        using var response = await _httpClient.SendAsync(
             httpRequest, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
 
-        response.EnsureSuccessStatusCode();
+        await ThrowIfNotSuccessAsync(response, cancellationToken);
 
         using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
         using var reader = new StreamReader(responseStream);
@@ -171,6 +171,37 @@ public sealed partial class OpenAICompatibleCompletionService : ITextGenerationS
             }
         }
     }
+
+    /// <summary>
+    /// Throws <see cref="HttpRequestException"/> (with <see cref="HttpRequestException.StatusCode"/>) for a refused request,
+    /// carrying the start of the server's answer: an OpenAI-compatible server says why it refused (an unsupported parameter,
+    /// a context that is too long, an unknown model) in the body, and the status line alone hides it.
+    /// </summary>
+    private static async Task ThrowIfNotSuccessAsync(HttpResponseMessage response, CancellationToken cancellationToken)
+    {
+        if (response.IsSuccessStatusCode)
+            return;
+
+        var body = string.Empty;
+        try
+        {
+            body = await response.Content.ReadAsStringAsync(cancellationToken);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or IOException or InvalidOperationException)
+        {
+            // The body is only an explanation; the status is the failure.
+        }
+
+        body = body.Trim();
+        if (body.Length > MaxErrorBodyLength)
+            body = body[..MaxErrorBodyLength] + "...";
+
+        var message = $"Response status code does not indicate success: {(int)response.StatusCode} ({response.ReasonPhrase})."
+            + (body.Length > 0 ? $" Server response: {body}" : string.Empty);
+        throw new HttpRequestException(message, null, response.StatusCode);
+    }
+
+    private const int MaxErrorBodyLength = 500;
 
     /// <summary>
     /// The exception for a streamed <c>data:</c> line whose body is an error object (<c>{"error": {"code", "message",

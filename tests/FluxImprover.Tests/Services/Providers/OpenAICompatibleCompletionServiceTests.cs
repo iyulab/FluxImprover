@@ -246,6 +246,103 @@ public class OpenAICompatibleCompletionServiceTests : IDisposable
             .Should().ThrowAsync<HttpRequestException>();
     }
 
+    private const string RefusalBody = "{\"error\":{\"message\":\"Unsupported value: 'temperature' does not support 0.7 with this model.\",\"type\":\"invalid_request_error\"}}";
+
+    [Fact]
+    public async Task CompleteAsync_WhenTheServerRefusesTheRequest_CarriesTheStatusAndTheServersReason()
+    {
+        using var handler = new MockHttpMessageHandler(RefusalBody, HttpStatusCode.BadRequest);
+        using var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.openai.com/v1/") };
+        _sut = new OpenAICompatibleCompletionService(httpClient, "gpt-4o-mini", _logger);
+
+        var thrown = await _sut.Invoking(s => s.CompleteAsync("Test", cancellationToken: TestContext.Current.CancellationToken))
+            .Should().ThrowAsync<HttpRequestException>();
+
+        thrown.Which.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        thrown.Which.Message.Should().Contain("400").And.Contain("Unsupported value: 'temperature'");
+    }
+
+    [Fact]
+    public async Task CompleteStreamingAsync_WhenTheServerRefusesTheRequest_CarriesTheStatusAndTheServersReason()
+    {
+        using var handler = new MockHttpMessageHandler(RefusalBody, HttpStatusCode.BadRequest);
+        using var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.openai.com/v1/") };
+        _sut = new OpenAICompatibleCompletionService(httpClient, "gpt-4o-mini", _logger);
+
+        var thrown = await _sut.Invoking(async s =>
+            {
+                await foreach (var _ in s.CompleteStreamingAsync("Test", cancellationToken: TestContext.Current.CancellationToken))
+                {
+                }
+            })
+            .Should().ThrowAsync<HttpRequestException>();
+
+        thrown.Which.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        thrown.Which.Message.Should().Contain("Unsupported value: 'temperature'");
+    }
+
+    [Fact]
+    public async Task CompleteAsync_WhenTheRefusalBodyIsLong_OnlyItsStartIsCarried()
+    {
+        using var handler = new MockHttpMessageHandler(new string('x', 5000), HttpStatusCode.InternalServerError);
+        using var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.openai.com/v1/") };
+        _sut = new OpenAICompatibleCompletionService(httpClient, "gpt-4o-mini", _logger);
+
+        var thrown = await _sut.Invoking(s => s.CompleteAsync("Test", cancellationToken: TestContext.Current.CancellationToken))
+            .Should().ThrowAsync<HttpRequestException>();
+
+        thrown.Which.Message.Length.Should().BeLessThan(700);
+    }
+
+    [Fact]
+    public async Task CompleteAsync_WhenTheServerRefusesTheRequest_ReleasesTheResponse()
+    {
+        var content = new DisposeTrackingContent(RefusalBody);
+        using var handler = new StubHandler(() => new HttpResponseMessage(HttpStatusCode.BadRequest) { Content = content });
+        using var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.openai.com/v1/") };
+        _sut = new OpenAICompatibleCompletionService(httpClient, "gpt-4o-mini", _logger);
+
+        await _sut.Invoking(s => s.CompleteAsync("Test", cancellationToken: TestContext.Current.CancellationToken))
+            .Should().ThrowAsync<HttpRequestException>();
+
+        content.Disposed.Should().BeTrue("a refused request must not keep its connection until a finalizer runs");
+    }
+
+    [Fact]
+    public async Task CompleteStreamingAsync_AfterTheLastToken_ReleasesTheResponse()
+    {
+        var content = new DisposeTrackingContent("data: {\"choices\":[{\"delta\":{\"content\":\"Hi\"}}]}\n\ndata: [DONE]\n\n");
+        using var handler = new StubHandler(() => new HttpResponseMessage(HttpStatusCode.OK) { Content = content });
+        using var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.openai.com/v1/") };
+        _sut = new OpenAICompatibleCompletionService(httpClient, "gpt-4o-mini", _logger);
+
+        var tokens = new List<string>();
+        await foreach (var token in _sut.CompleteStreamingAsync("Test", cancellationToken: TestContext.Current.CancellationToken))
+        {
+            tokens.Add(token);
+        }
+
+        tokens.Should().Equal("Hi");
+        content.Disposed.Should().BeTrue();
+    }
+
+    private sealed class DisposeTrackingContent(string text) : StringContent(text, Encoding.UTF8, "application/json")
+    {
+        public bool Disposed { get; private set; }
+
+        protected override void Dispose(bool disposing)
+        {
+            Disposed = true;
+            base.Dispose(disposing);
+        }
+    }
+
+    private sealed class StubHandler(Func<HttpResponseMessage> respond) : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            => Task.FromResult(respond());
+    }
+
     #endregion
 
     #region CompleteStreamingAsync Tests
