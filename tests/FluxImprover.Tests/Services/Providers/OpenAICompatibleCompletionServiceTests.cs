@@ -324,6 +324,76 @@ public class OpenAICompatibleCompletionServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task CompleteStreamingAsync_WithAnErrorEventAfterText_DeliversTheTextThenThrowsWithTheServersMessage()
+    {
+        // A server that fails after the 200 (llama.cpp «Compute error.», OpenAI, vLLM) sends the error as a data event with
+        // no choices: read as a chunk it vanished and the stream looked like «the model said nothing».
+        var sseResponse = new StringBuilder();
+        sseResponse.AppendLine("data: {\"choices\":[{\"delta\":{\"content\":\"Hel\"}}]}");
+        sseResponse.AppendLine();
+        sseResponse.AppendLine("data: {\"error\":{\"code\":500,\"message\":\"Compute error.\",\"type\":\"server_error\"}}");
+        sseResponse.AppendLine();
+
+        using var handler = new MockHttpMessageHandler(sseResponse.ToString(), HttpStatusCode.OK);
+        using var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.openai.com/v1/") };
+        _sut = new OpenAICompatibleCompletionService(httpClient, "gpt-4o-mini", _logger);
+
+        var tokens = new List<string>();
+        var act = async () =>
+        {
+            await foreach (var token in _sut.CompleteStreamingAsync("Test", cancellationToken: TestContext.Current.CancellationToken))
+            {
+                tokens.Add(token);
+            }
+        };
+
+        var thrown = await act.Should().ThrowAsync<HttpRequestException>();
+        thrown.Which.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+        thrown.Which.Message.Should().Contain("Compute error.");
+        tokens.Should().ContainSingle().Which.Should().Be("Hel");
+    }
+
+    [Fact]
+    public async Task CompleteStreamingAsync_WithAnErrorEventGivenAsAString_ThrowsWithThatMessage()
+    {
+        // The other shape of an error object: {"error": "…"} with no code (a 500 is assumed).
+        using var handler = new MockHttpMessageHandler("data: {\"error\":\"model is loading\"}\n\n", HttpStatusCode.OK);
+        using var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.openai.com/v1/") };
+        _sut = new OpenAICompatibleCompletionService(httpClient, "gpt-4o-mini", _logger);
+
+        var act = async () =>
+        {
+            await foreach (var _ in _sut.CompleteStreamingAsync("Test", cancellationToken: TestContext.Current.CancellationToken)) { }
+        };
+
+        var thrown = await act.Should().ThrowAsync<HttpRequestException>();
+        thrown.Which.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+        thrown.Which.Message.Should().Contain("model is loading");
+    }
+
+    [Fact]
+    public async Task CompleteStreamingAsync_WithAnOrdinaryChunkThatMentionsTheWordError_IsNotAFailure()
+    {
+        // The check reads an «error» member, not the word: text about errors streams as text.
+        var sseResponse = new StringBuilder();
+        sseResponse.AppendLine("data: {\"choices\":[{\"delta\":{\"content\":\"the \\\"error\\\" key\"}}]}");
+        sseResponse.AppendLine();
+        sseResponse.AppendLine("data: [DONE]");
+
+        using var handler = new MockHttpMessageHandler(sseResponse.ToString(), HttpStatusCode.OK);
+        using var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.openai.com/v1/") };
+        _sut = new OpenAICompatibleCompletionService(httpClient, "gpt-4o-mini", _logger);
+
+        var tokens = new List<string>();
+        await foreach (var token in _sut.CompleteStreamingAsync("Test", cancellationToken: TestContext.Current.CancellationToken))
+        {
+            tokens.Add(token);
+        }
+
+        tokens.Should().ContainSingle().Which.Should().Be("the \"error\" key");
+    }
+
+    [Fact]
     public async Task CompleteStreamingAsync_WithAlreadyCancelledToken_ThrowsOperationCanceled()
     {
         // Arrange

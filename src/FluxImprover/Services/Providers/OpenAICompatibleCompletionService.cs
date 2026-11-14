@@ -2,6 +2,7 @@ using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Flux.Abstractions;
 using Microsoft.Extensions.Logging;
@@ -158,6 +159,10 @@ public sealed partial class OpenAICompatibleCompletionService : ITextGenerationS
             var data = line["data: ".Length..];
             if (data == "[DONE]") yield break;
 
+            // A server that fails after the 200 (llama.cpp «Compute error.», OpenAI, vLLM) sends the error as a data event of
+            // its own, with no choices: read as a chunk it would vanish and the stream would look like «the model said nothing».
+            if (TryReadStreamError(data) is { } streamError) throw streamError;
+
             var chunk = JsonSerializer.Deserialize<ChatCompletionStreamResponse>(data, JsonOptions);
             var delta = chunk?.Choices?.FirstOrDefault()?.Delta?.Content;
             if (!string.IsNullOrEmpty(delta))
@@ -165,6 +170,39 @@ public sealed partial class OpenAICompatibleCompletionService : ITextGenerationS
                 yield return delta;
             }
         }
+    }
+
+    /// <summary>
+    /// The exception for a streamed <c>data:</c> line whose body is an error object (<c>{"error": {"code", "message",
+    /// "type"}}</c>, or <c>{"error": "…"}</c>), or null for an ordinary chunk. The type is the one a refused non-streamed
+    /// request throws (<see cref="HttpRequestException"/>), with the event's <c>code</c> as the status (500 when it has none)
+    /// and the server's message in the text.
+    /// </summary>
+    private static HttpRequestException? TryReadStreamError(string data)
+    {
+        if (!data.Contains("\"error\"", StringComparison.Ordinal))
+            return null;
+
+        JsonNode? root;
+        try
+        {
+            root = JsonNode.Parse(data);
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+
+        if (root is not JsonObject obj || obj["error"] is not { } error)
+            return null;
+
+        var fields = error as JsonObject;
+        var message = fields is null ? error.ToString() : fields["message"]?.ToString() ?? error.ToJsonString();
+        var status = fields?["code"] is JsonValue code && code.TryGetValue<int>(out var number) && number is >= 400 and <= 599
+            ? (System.Net.HttpStatusCode)number
+            : System.Net.HttpStatusCode.InternalServerError;
+
+        return new HttpRequestException($"The server reported a failure inside the response stream: {message}", null, status);
     }
 
     private ChatCompletionRequest BuildRequest(string prompt, CompletionOptions? options, bool stream)
