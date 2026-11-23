@@ -4,7 +4,7 @@ All notable changes to this project are documented in this file. Versions follow
 [Semantic Versioning](https://semver.org/); while the major version is 0, a minor release may contain
 breaking changes, and each one is marked **Breaking** with a migration note.
 
-## [Unreleased]
+## [0.25.0] - 2026-11-23
 
 ### Fixed
 - **Breaking by observation: `OpenAICompatibleCompletionService.CompleteStreamingAsync` throws when the server reports a failure inside the stream.** A server that fails after the `200` (a llama.cpp `Compute error.`, OpenAI, vLLM) sends the failure as a `data:` event `{"error":{"code":500,"message":...}}` with no choices; the reader skipped it, so the stream ended as if the model had said nothing. It now throws the exception a refused non-streamed request throws, `HttpRequestException`, with the event's `code` as `StatusCode` (500 when it has none) and the server's message in `Message`; text already yielded stays delivered. **Migration:** a caller that treated an empty streamed answer as the failure signal catches `HttpRequestException` around the enumeration.
